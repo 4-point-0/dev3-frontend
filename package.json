@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "api:codegen": "npx openapi-codegen gen dev3"
   },
   "dependencies": {
     "@emotion/react": "^11.10.4",
@@ -15,10 +16,10 @@
     "@mantine/dates": "^5.5.2",
     "@mantine/dropzone": "^5.5.2",
     "@mantine/form": "^5.5.2",
-    "@mantine/hooks": "^5.5.2",
+    "@mantine/hooks": "^5.5.5",
     "@mantine/modals": "^5.5.2",
     "@mantine/next": "^5.5.2",
-    "@mantine/notifications": "^5.5.2",
+    "@mantine/notifications": "^5.5.5",
     "@mantine/nprogress": "^5.5.2",
     "@mantine/prism": "^5.5.2",
     "@mantine/rte": "^5.5.2",
@@ -34,20 +35,31 @@
     "@near-wallet-selector/nightly-connect": "^7.0.3",
     "@near-wallet-selector/sender": "^7.0.3",
     "@near-wallet-selector/wallet-connect": "^7.0.3",
+    "@tanstack/react-query": "^4.10.3",
+    "@tanstack/react-query-devtools": "^4.11.0",
+    "axios": "^1.1.2",
     "better-sqlite3": "^7.6.2",
+    "big.js": "^6.2.1",
     "dayjs": "^1.11.5",
-    "near-api-js": "^0.44.2",
+    "near-api-js": "^1.1.0",
     "next": "12.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "rxjs": "^7.5.7"
+    "rxjs": "^7.5.7",
+    "tabler-icons-react": "^1.55.0"
   },
   "devDependencies": {
+    "@openapi-codegen/cli": "^2.0.0",
+    "@openapi-codegen/typescript": "^6.0.0",
+    "@types/big.js": "^6.1.5",
+    "@types/bn.js": "^5.1.0",
     "@types/node": "18.8.2",
     "@types/react": "18.0.21",
     "@types/react-dom": "18.0.6",
     "eslint": "8.24.0",
     "eslint-config-next": "12.3.1",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "2.7.1",
     "typescript": "4.8.4"
   }
 }
