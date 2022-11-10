@@ -4,18 +4,23 @@ import { Project } from "../services/api/dev3Schemas";
 interface ProjectContextValue {
   project: Project | null;
   setProject: React.Dispatch<React.SetStateAction<Project | null>>;
+  needRefresh: boolean;
+  setNeedRefresh: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ProjectContext = React.createContext<ProjectContextValue | null>(null);
 
 export const ProjectContextProvider = ({ children }: any) => {
   const [project, setProject] = useState<Project | null>(null);
+  const [needRefresh, setNeedRefresh] = useState<boolean>(false);
 
   return (
     <ProjectContext.Provider
       value={{
         project,
         setProject,
+        needRefresh,
+        setNeedRefresh,
       }}
     >
       {children}

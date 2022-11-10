@@ -8,8 +8,10 @@ import {
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { NextPage } from "next";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { Check, X } from "tabler-icons-react";
+import { useProjectContext } from "../../context/ProjectContext";
 import { fetchProjectControllerCreate } from "../../services/api/dev3Components";
 
 const NewProject: NextPage = () => {
@@ -17,19 +19,33 @@ const NewProject: NextPage = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const { setNeedRefresh } = useProjectContext();
+
+  const router = useRouter();
+
   const form = useForm({
+    validateInputOnChange: true,
     initialValues: {
       name: "",
       slug: "",
       logoUrl: "",
     },
+    validate: {
+      name: (value) => (value.length > 0 ? null : "Name is required"),
+      slug: (value) => (value.length > 0 ? null : "Slug is required"),
+      logoUrl: (value) => (value.length > 0 ? null : "Logo URL is required"),
+    },
   });
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const { name, slug, logoUrl } = form.values;
-
+  const handleSubmit = async ({
+    name,
+    slug,
+    logoUrl,
+  }: {
+    name: string;
+    slug: string;
+    logoUrl: string;
+  }) => {
     try {
       setLoading(true);
 
@@ -60,7 +76,8 @@ const NewProject: NextPage = () => {
         autoClose: 3000,
       });
 
-      console.log(project);
+      setNeedRefresh(true);
+      router.push(`/contracts`);
     } catch (error) {
       updateNotification({
         id: "loading-notification",
@@ -80,8 +97,9 @@ const NewProject: NextPage = () => {
 
   return (
     <Paper p="lg" sx={{ maxWidth: 300 }} mx="auto">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
         <TextInput
+          disabled={loading}
           withAsterisk
           label="Project Name"
           placeholder="Enter project name"
@@ -89,6 +107,7 @@ const NewProject: NextPage = () => {
         />
 
         <TextInput
+          disabled={loading}
           mt="sm"
           withAsterisk
           label="Project Slug"
@@ -97,6 +116,7 @@ const NewProject: NextPage = () => {
         />
 
         <TextInput
+          disabled={loading}
           mt="sm"
           withAsterisk
           label="Project Logo URL"
@@ -105,7 +125,9 @@ const NewProject: NextPage = () => {
         />
 
         <Group position="right" mt="md">
-          <Button type="submit">Submit</Button>
+          <Button disabled={loading} type="submit">
+            Create project
+          </Button>
         </Group>
       </form>
     </Paper>

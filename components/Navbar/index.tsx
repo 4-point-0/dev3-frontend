@@ -13,20 +13,16 @@ const AppNavbar = ({ opened }: AdminNavbarProps) => {
   const { project } = useProjectContext();
 
   return (
-    <Navbar
-      p="md"
-      hiddenBreakpoint="sm"
-      hidden={!opened}
-      width={{ sm: 200, lg: 300 }}
-    >
+    <Navbar hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200, lg: 300 }}>
       <Navbar.Section>
         <ProjectSelector />
       </Navbar.Section>
-      <Navbar.Section mt="md">
+      <Divider />
+      <Navbar.Section p="sm">
         <AppLinks disabled={project === null} />
       </Navbar.Section>
-      <Divider mt={16} />
-      <Navbar.Section grow mt="md">
+      <Divider />
+      <Navbar.Section grow p="sm">
         <AppLinksBottom disabled={project === null} />
       </Navbar.Section>
     </Navbar>

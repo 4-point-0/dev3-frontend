@@ -10,6 +10,7 @@ import { setupNightly } from "@near-wallet-selector/nightly";
 import { setupNightlyConnect } from "@near-wallet-selector/nightly-connect";
 import { setupSender } from "@near-wallet-selector/sender";
 import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
+import * as nearApi from "near-api-js";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { distinctUntilChanged, map } from "rxjs";
 
@@ -25,6 +26,7 @@ interface WalletSelectorContextValue {
   modal: WalletSelectorModal;
   accounts: Array<AccountState>;
   accountId: string | null;
+  nearConnection: nearApi.Near | null;
 }
 
 const WalletSelectorContext =
@@ -34,8 +36,26 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
   const [selector, setSelector] = useState<WalletSelector | null>(null);
   const [modal, setModal] = useState<WalletSelectorModal | null>(null);
   const [accounts, setAccounts] = useState<Array<AccountState>>([]);
+  const [nearConnection, setNearConnection] = useState<nearApi.Near | null>(
+    null
+  );
 
   const init = useCallback(async () => {
+    const { connect, keyStores, WalletConnection } = nearApi;
+
+    const connectionConfig = {
+      networkId: "testnet",
+      keyStore: new keyStores.BrowserLocalStorageKeyStore(),
+      nodeUrl: "https://rpc.testnet.near.org",
+      walletUrl: "https://wallet.testnet.near.org",
+      helperUrl: "https://helper.testnet.near.org",
+      explorerUrl: "https://explorer.testnet.near.org",
+    };
+
+    // connect to NEAR
+    const nearConnection = await connect(connectionConfig);
+    setNearConnection(nearConnection);
+
     const _selector = await setupWalletSelector({
       network: "testnet",
       debug: true,
@@ -67,7 +87,7 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
       ],
     });
     const _modal = setupModal(_selector, {
-      contractId: "cetvrti.testnet",
+      contractId: "dev-1666309439608-26517137824857",
       // theme: "light", // doesn't work, need to open an issue on github
     });
     const state = _selector.store.getState();
@@ -121,6 +141,7 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
         modal,
         accounts,
         accountId,
+        nearConnection,
       }}
     >
       {children}

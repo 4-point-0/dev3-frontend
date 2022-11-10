@@ -6,7 +6,7 @@ const Contracts: NextPage = () => {
 
   return (
     <Box m={theme.spacing.lg}>
-      <h1>Contracts</h1>
+      <h1>Contracts (WIP)</h1>
     </Box>
   );
 };

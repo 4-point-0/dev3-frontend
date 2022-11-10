@@ -1,4 +1,4 @@
-import { Alert, AppShell, useMantineTheme } from "@mantine/core";
+import { Alert, AppShell, Center, useMantineTheme } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { AlertCircle } from "tabler-icons-react";
@@ -15,13 +15,16 @@ export default function AppLayout({ children }: React.PropsWithChildren<{}>) {
 
   const loggedOutMessage = () => {
     return (
-      <Alert
-        icon={<AlertCircle size={16} />}
-        title="You are not logged in"
-        variant="outline"
-      >
-        Please log in to use Dev3.
-      </Alert>
+      <Center>
+        <Alert
+          sx={{ width: "50%" }}
+          icon={<AlertCircle size={16} />}
+          title="You are not logged in"
+          variant="outline"
+        >
+          Please log in to use Dev3.
+        </Alert>
+      </Center>
     );
   };
 

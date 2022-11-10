@@ -51,13 +51,17 @@ export const useProjectControllerCreate = (
 };
 
 export type ProjectControllerFindAllQueryParams = {
-  id?: string;
+  offset?: number;
+  limit?: number;
   slug?: string;
+  name?: string;
 };
 
 export type ProjectControllerFindAllError = Fetcher.ErrorWrapper<undefined>;
 
-export type ProjectControllerFindAllResponse = Schemas.Project[];
+export type ProjectControllerFindAllResponse = Schemas.PaginatedDto & {
+  results?: Schemas.Project[];
+};
 
 export type ProjectControllerFindAllVariables = {
   queryParams?: ProjectControllerFindAllQueryParams;
@@ -112,35 +116,35 @@ export const useProjectControllerFindAll = <
   );
 };
 
-export type ProjectControllerFindOnePathParams = {
-  slug: string;
+export type ProjectControllerFindByIdPathParams = {
+  id: string;
 };
 
-export type ProjectControllerFindOneError = Fetcher.ErrorWrapper<undefined>;
+export type ProjectControllerFindByIdError = Fetcher.ErrorWrapper<undefined>;
 
-export type ProjectControllerFindOneVariables = {
-  pathParams: ProjectControllerFindOnePathParams;
+export type ProjectControllerFindByIdVariables = {
+  pathParams: ProjectControllerFindByIdPathParams;
 } & Dev3Context["fetcherOptions"];
 
-export const fetchProjectControllerFindOne = (
-  variables: ProjectControllerFindOneVariables,
+export const fetchProjectControllerFindById = (
+  variables: ProjectControllerFindByIdVariables,
   signal?: AbortSignal
 ) =>
   dev3Fetch<
     Schemas.Project,
-    ProjectControllerFindOneError,
+    ProjectControllerFindByIdError,
     undefined,
     {},
     {},
-    ProjectControllerFindOnePathParams
-  >({ url: "/api/v1/project/{slug}", method: "get", ...variables, signal });
+    ProjectControllerFindByIdPathParams
+  >({ url: "/api/v1/project/{id}", method: "get", ...variables, signal });
 
-export const useProjectControllerFindOne = <TData = Schemas.Project>(
-  variables: ProjectControllerFindOneVariables,
+export const useProjectControllerFindById = <TData = Schemas.Project>(
+  variables: ProjectControllerFindByIdVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<
       Schemas.Project,
-      ProjectControllerFindOneError,
+      ProjectControllerFindByIdError,
       TData
     >,
     "queryKey" | "queryFn"
@@ -149,16 +153,16 @@ export const useProjectControllerFindOne = <TData = Schemas.Project>(
   const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
   return reactQuery.useQuery<
     Schemas.Project,
-    ProjectControllerFindOneError,
+    ProjectControllerFindByIdError,
     TData
   >(
     queryKeyFn({
-      path: "/api/v1/project/{slug}",
-      operationId: "projectControllerFindOne",
+      path: "/api/v1/project/{id}",
+      operationId: "projectControllerFindById",
       variables,
     }),
     ({ signal }) =>
-      fetchProjectControllerFindOne(
+      fetchProjectControllerFindById(
         { ...fetcherOptions, ...variables },
         signal
       ),
@@ -215,55 +219,72 @@ export const useProjectControllerUpdate = (
   );
 };
 
-export type ProjectControllerRemovePathParams = {
-  id: string;
+export type ProjectControllerFindBySlugPathParams = {
+  slug: string;
 };
 
-export type ProjectControllerRemoveError = Fetcher.ErrorWrapper<undefined>;
+export type ProjectControllerFindBySlugError = Fetcher.ErrorWrapper<undefined>;
 
-export type ProjectControllerRemoveVariables = {
-  pathParams: ProjectControllerRemovePathParams;
+export type ProjectControllerFindBySlugVariables = {
+  pathParams: ProjectControllerFindBySlugPathParams;
 } & Dev3Context["fetcherOptions"];
 
-export const fetchProjectControllerRemove = (
-  variables: ProjectControllerRemoveVariables,
+export const fetchProjectControllerFindBySlug = (
+  variables: ProjectControllerFindBySlugVariables,
   signal?: AbortSignal
 ) =>
   dev3Fetch<
     Schemas.Project,
-    ProjectControllerRemoveError,
+    ProjectControllerFindBySlugError,
     undefined,
     {},
     {},
-    ProjectControllerRemovePathParams
-  >({ url: "/api/v1/project/{id}", method: "delete", ...variables, signal });
+    ProjectControllerFindBySlugPathParams
+  >({
+    url: "/api/v1/project/slug/{slug}",
+    method: "get",
+    ...variables,
+    signal,
+  });
 
-export const useProjectControllerRemove = (
+export const useProjectControllerFindBySlug = <TData = Schemas.Project>(
+  variables: ProjectControllerFindBySlugVariables,
   options?: Omit<
-    reactQuery.UseMutationOptions<
+    reactQuery.UseQueryOptions<
       Schemas.Project,
-      ProjectControllerRemoveError,
-      ProjectControllerRemoveVariables
+      ProjectControllerFindBySlugError,
+      TData
     >,
-    "mutationFn"
+    "queryKey" | "queryFn"
   >
 ) => {
-  const { fetcherOptions } = useDev3Context();
-  return reactQuery.useMutation<
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
     Schemas.Project,
-    ProjectControllerRemoveError,
-    ProjectControllerRemoveVariables
+    ProjectControllerFindBySlugError,
+    TData
   >(
-    (variables: ProjectControllerRemoveVariables) =>
-      fetchProjectControllerRemove({ ...fetcherOptions, ...variables }),
-    options
+    queryKeyFn({
+      path: "/api/v1/project/slug/{slug}",
+      operationId: "projectControllerFindBySlug",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchProjectControllerFindBySlug(
+        { ...fetcherOptions, ...variables },
+        signal
+      ),
+    {
+      ...options,
+      ...queryOptions,
+    }
   );
 };
 
 export type AuthControllerNearLoginError = Fetcher.ErrorWrapper<undefined>;
 
 export type AuthControllerNearLoginVariables = {
-  body: Schemas.NearLoginDto;
+  body: Schemas.NearLoginRequestDto;
 } & Dev3Context["fetcherOptions"];
 
 export const fetchAuthControllerNearLogin = (
@@ -271,9 +292,9 @@ export const fetchAuthControllerNearLogin = (
   signal?: AbortSignal
 ) =>
   dev3Fetch<
-    Schemas.NearLoginResponse,
+    Schemas.NearLoginResponseDto,
     AuthControllerNearLoginError,
-    Schemas.NearLoginDto,
+    Schemas.NearLoginRequestDto,
     {},
     {},
     {}
@@ -282,7 +303,7 @@ export const fetchAuthControllerNearLogin = (
 export const useAuthControllerNearLogin = (
   options?: Omit<
     reactQuery.UseMutationOptions<
-      Schemas.NearLoginResponse,
+      Schemas.NearLoginResponseDto,
       AuthControllerNearLoginError,
       AuthControllerNearLoginVariables
     >,
@@ -291,7 +312,7 @@ export const useAuthControllerNearLogin = (
 ) => {
   const { fetcherOptions } = useDev3Context();
   return reactQuery.useMutation<
-    Schemas.NearLoginResponse,
+    Schemas.NearLoginResponseDto,
     AuthControllerNearLoginError,
     AuthControllerNearLoginVariables
   >(
@@ -339,346 +360,467 @@ export const useUserControllerFindMe = <TData = Schemas.User>(
   );
 };
 
-export type UserControllerProjectsOwnedError = Fetcher.ErrorWrapper<undefined>;
+export type AddressControllerCreateError = Fetcher.ErrorWrapper<undefined>;
 
-export type UserControllerProjectsOwnedResponse = Schemas.Project[];
+export type AddressControllerCreateVariables = {
+  body: Schemas.CreateAddressDto;
+} & Dev3Context["fetcherOptions"];
 
-export type UserControllerProjectsOwnedVariables =
-  Dev3Context["fetcherOptions"];
-
-export const fetchUserControllerProjectsOwned = (
-  variables: UserControllerProjectsOwnedVariables,
+export const fetchAddressControllerCreate = (
+  variables: AddressControllerCreateVariables,
   signal?: AbortSignal
 ) =>
   dev3Fetch<
-    UserControllerProjectsOwnedResponse,
-    UserControllerProjectsOwnedError,
+    Schemas.Address,
+    AddressControllerCreateError,
+    Schemas.CreateAddressDto,
+    {},
+    {},
+    {}
+  >({ url: "/api/v1/address", method: "post", ...variables, signal });
+
+export const useAddressControllerCreate = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.Address,
+      AddressControllerCreateError,
+      AddressControllerCreateVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.Address,
+    AddressControllerCreateError,
+    AddressControllerCreateVariables
+  >(
+    (variables: AddressControllerCreateVariables) =>
+      fetchAddressControllerCreate({ ...fetcherOptions, ...variables }),
+    options
+  );
+};
+
+export type AddressControllerFindAllQueryParams = {
+  offset?: number;
+  limit?: number;
+  alias?: string;
+};
+
+export type AddressControllerFindAllError = Fetcher.ErrorWrapper<undefined>;
+
+export type AddressControllerFindAllResponse = Schemas.PaginatedDto & {
+  results?: Schemas.Address[];
+};
+
+export type AddressControllerFindAllVariables = {
+  queryParams?: AddressControllerFindAllQueryParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchAddressControllerFindAll = (
+  variables: AddressControllerFindAllVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    AddressControllerFindAllResponse,
+    AddressControllerFindAllError,
+    undefined,
+    {},
+    AddressControllerFindAllQueryParams,
+    {}
+  >({ url: "/api/v1/address", method: "get", ...variables, signal });
+
+export const useAddressControllerFindAll = <
+  TData = AddressControllerFindAllResponse
+>(
+  variables: AddressControllerFindAllVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      AddressControllerFindAllResponse,
+      AddressControllerFindAllError,
+      TData
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
+    AddressControllerFindAllResponse,
+    AddressControllerFindAllError,
+    TData
+  >(
+    queryKeyFn({
+      path: "/api/v1/address",
+      operationId: "addressControllerFindAll",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchAddressControllerFindAll(
+        { ...fetcherOptions, ...variables },
+        signal
+      ),
+    {
+      ...options,
+      ...queryOptions,
+    }
+  );
+};
+
+export type AddressControllerFindOnePathParams = {
+  id: string;
+};
+
+export type AddressControllerFindOneError = Fetcher.ErrorWrapper<undefined>;
+
+export type AddressControllerFindOneVariables = {
+  pathParams: AddressControllerFindOnePathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchAddressControllerFindOne = (
+  variables: AddressControllerFindOneVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.Address,
+    AddressControllerFindOneError,
+    undefined,
+    {},
+    {},
+    AddressControllerFindOnePathParams
+  >({ url: "/api/v1/address/{id}", method: "get", ...variables, signal });
+
+export const useAddressControllerFindOne = <TData = Schemas.Address>(
+  variables: AddressControllerFindOneVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.Address,
+      AddressControllerFindOneError,
+      TData
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
+    Schemas.Address,
+    AddressControllerFindOneError,
+    TData
+  >(
+    queryKeyFn({
+      path: "/api/v1/address/{id}",
+      operationId: "addressControllerFindOne",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchAddressControllerFindOne(
+        { ...fetcherOptions, ...variables },
+        signal
+      ),
+    {
+      ...options,
+      ...queryOptions,
+    }
+  );
+};
+
+export type AddressControllerUpdatePathParams = {
+  id: string;
+};
+
+export type AddressControllerUpdateError = Fetcher.ErrorWrapper<undefined>;
+
+export type AddressControllerUpdateVariables = {
+  body?: Schemas.UpdateAddressDto;
+  pathParams: AddressControllerUpdatePathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchAddressControllerUpdate = (
+  variables: AddressControllerUpdateVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.Address,
+    AddressControllerUpdateError,
+    Schemas.UpdateAddressDto,
+    {},
+    {},
+    AddressControllerUpdatePathParams
+  >({ url: "/api/v1/address/{id}", method: "patch", ...variables, signal });
+
+export const useAddressControllerUpdate = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.Address,
+      AddressControllerUpdateError,
+      AddressControllerUpdateVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.Address,
+    AddressControllerUpdateError,
+    AddressControllerUpdateVariables
+  >(
+    (variables: AddressControllerUpdateVariables) =>
+      fetchAddressControllerUpdate({ ...fetcherOptions, ...variables }),
+    options
+  );
+};
+
+export type AddressControllerRemovePathParams = {
+  id: string;
+};
+
+export type AddressControllerRemoveError = Fetcher.ErrorWrapper<undefined>;
+
+export type AddressControllerRemoveVariables = {
+  pathParams: AddressControllerRemovePathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchAddressControllerRemove = (
+  variables: AddressControllerRemoveVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.Address,
+    AddressControllerRemoveError,
+    undefined,
+    {},
+    {},
+    AddressControllerRemovePathParams
+  >({ url: "/api/v1/address/{id}", method: "delete", ...variables, signal });
+
+export const useAddressControllerRemove = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.Address,
+      AddressControllerRemoveError,
+      AddressControllerRemoveVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.Address,
+    AddressControllerRemoveError,
+    AddressControllerRemoveVariables
+  >(
+    (variables: AddressControllerRemoveVariables) =>
+      fetchAddressControllerRemove({ ...fetcherOptions, ...variables }),
+    options
+  );
+};
+
+export type PaymentControllerCreateError = Fetcher.ErrorWrapper<undefined>;
+
+export type PaymentControllerCreateVariables = {
+  body: Schemas.CreatePaymentDto;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchPaymentControllerCreate = (
+  variables: PaymentControllerCreateVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.Payment,
+    PaymentControllerCreateError,
+    Schemas.CreatePaymentDto,
+    {},
+    {},
+    {}
+  >({ url: "/api/v1/payment", method: "post", ...variables, signal });
+
+export const usePaymentControllerCreate = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.Payment,
+      PaymentControllerCreateError,
+      PaymentControllerCreateVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.Payment,
+    PaymentControllerCreateError,
+    PaymentControllerCreateVariables
+  >(
+    (variables: PaymentControllerCreateVariables) =>
+      fetchPaymentControllerCreate({ ...fetcherOptions, ...variables }),
+    options
+  );
+};
+
+export type PaymentControllerFindAllQueryParams = {
+  offset?: number;
+  limit?: number;
+  uid?: string;
+  receiver?: string;
+  receiver_fungible?: string;
+  status?: "pending" | "paid";
+};
+
+export type PaymentControllerFindAllError = Fetcher.ErrorWrapper<undefined>;
+
+export type PaymentControllerFindAllResponse = Schemas.PaginatedDto & {
+  results?: Schemas.Payment[];
+};
+
+export type PaymentControllerFindAllVariables = {
+  queryParams?: PaymentControllerFindAllQueryParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchPaymentControllerFindAll = (
+  variables: PaymentControllerFindAllVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    PaymentControllerFindAllResponse,
+    PaymentControllerFindAllError,
+    undefined,
+    {},
+    PaymentControllerFindAllQueryParams,
+    {}
+  >({ url: "/api/v1/payment", method: "get", ...variables, signal });
+
+export const usePaymentControllerFindAll = <
+  TData = PaymentControllerFindAllResponse
+>(
+  variables: PaymentControllerFindAllVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      PaymentControllerFindAllResponse,
+      PaymentControllerFindAllError,
+      TData
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
+    PaymentControllerFindAllResponse,
+    PaymentControllerFindAllError,
+    TData
+  >(
+    queryKeyFn({
+      path: "/api/v1/payment",
+      operationId: "paymentControllerFindAll",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchPaymentControllerFindAll(
+        { ...fetcherOptions, ...variables },
+        signal
+      ),
+    {
+      ...options,
+      ...queryOptions,
+    }
+  );
+};
+
+export type PaymentControllerFindByIdPathParams = {
+  id: string;
+};
+
+export type PaymentControllerFindByIdError = Fetcher.ErrorWrapper<undefined>;
+
+export type PaymentControllerFindByIdVariables = {
+  pathParams: PaymentControllerFindByIdPathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchPaymentControllerFindById = (
+  variables: PaymentControllerFindByIdVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.PaymentDto,
+    PaymentControllerFindByIdError,
+    undefined,
+    {},
+    {},
+    PaymentControllerFindByIdPathParams
+  >({ url: "/api/v1/payment/{id}", method: "get", ...variables, signal });
+
+export const usePaymentControllerFindById = <TData = Schemas.PaymentDto>(
+  variables: PaymentControllerFindByIdVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.PaymentDto,
+      PaymentControllerFindByIdError,
+      TData
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
+    Schemas.PaymentDto,
+    PaymentControllerFindByIdError,
+    TData
+  >(
+    queryKeyFn({
+      path: "/api/v1/payment/{id}",
+      operationId: "paymentControllerFindById",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchPaymentControllerFindById(
+        { ...fetcherOptions, ...variables },
+        signal
+      ),
+    {
+      ...options,
+      ...queryOptions,
+    }
+  );
+};
+
+export type PaymentControllerPagodaEventError = Fetcher.ErrorWrapper<undefined>;
+
+export type PaymentControllerPagodaEventVariables =
+  Dev3Context["fetcherOptions"];
+
+export const fetchPaymentControllerPagodaEvent = (
+  variables: PaymentControllerPagodaEventVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.PaymentDto,
+    PaymentControllerPagodaEventError,
     undefined,
     {},
     {},
     {}
   >({
-    url: "/api/v1/user/projects/owned",
-    method: "get",
+    url: "/api/v1/payment/ft-transfer-pagoda",
+    method: "post",
     ...variables,
     signal,
   });
 
-export const useUserControllerProjectsOwned = <
-  TData = UserControllerProjectsOwnedResponse
->(
-  variables: UserControllerProjectsOwnedVariables,
-  options?: Omit<
-    reactQuery.UseQueryOptions<
-      UserControllerProjectsOwnedResponse,
-      UserControllerProjectsOwnedError,
-      TData
-    >,
-    "queryKey" | "queryFn"
-  >
-) => {
-  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
-  return reactQuery.useQuery<
-    UserControllerProjectsOwnedResponse,
-    UserControllerProjectsOwnedError,
-    TData
-  >(
-    queryKeyFn({
-      path: "/api/v1/user/projects/owned",
-      operationId: "userControllerProjectsOwned",
-      variables,
-    }),
-    ({ signal }) =>
-      fetchUserControllerProjectsOwned(
-        { ...fetcherOptions, ...variables },
-        signal
-      ),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
-};
-
-export type UserControllerProjectsAllError = Fetcher.ErrorWrapper<undefined>;
-
-export type UserControllerProjectsAllResponse = Schemas.Project[];
-
-export type UserControllerProjectsAllVariables = Dev3Context["fetcherOptions"];
-
-export const fetchUserControllerProjectsAll = (
-  variables: UserControllerProjectsAllVariables,
-  signal?: AbortSignal
-) =>
-  dev3Fetch<
-    UserControllerProjectsAllResponse,
-    UserControllerProjectsAllError,
-    undefined,
-    {},
-    {},
-    {}
-  >({ url: "/api/v1/user/projects/all", method: "get", ...variables, signal });
-
-export const useUserControllerProjectsAll = <
-  TData = UserControllerProjectsAllResponse
->(
-  variables: UserControllerProjectsAllVariables,
-  options?: Omit<
-    reactQuery.UseQueryOptions<
-      UserControllerProjectsAllResponse,
-      UserControllerProjectsAllError,
-      TData
-    >,
-    "queryKey" | "queryFn"
-  >
-) => {
-  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
-  return reactQuery.useQuery<
-    UserControllerProjectsAllResponse,
-    UserControllerProjectsAllError,
-    TData
-  >(
-    queryKeyFn({
-      path: "/api/v1/user/projects/all",
-      operationId: "userControllerProjectsAll",
-      variables,
-    }),
-    ({ signal }) =>
-      fetchUserControllerProjectsAll(
-        { ...fetcherOptions, ...variables },
-        signal
-      ),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
-};
-
-export type UserControllerCreateError = Fetcher.ErrorWrapper<undefined>;
-
-export type UserControllerCreateVariables = {
-  body?: Schemas.CreateUserDto;
-} & Dev3Context["fetcherOptions"];
-
-export const fetchUserControllerCreate = (
-  variables: UserControllerCreateVariables,
-  signal?: AbortSignal
-) =>
-  dev3Fetch<
-    undefined,
-    UserControllerCreateError,
-    Schemas.CreateUserDto,
-    {},
-    {},
-    {}
-  >({ url: "/api/v1/user", method: "post", ...variables, signal });
-
-export const useUserControllerCreate = (
+export const usePaymentControllerPagodaEvent = (
   options?: Omit<
     reactQuery.UseMutationOptions<
-      undefined,
-      UserControllerCreateError,
-      UserControllerCreateVariables
+      Schemas.PaymentDto,
+      PaymentControllerPagodaEventError,
+      PaymentControllerPagodaEventVariables
     >,
     "mutationFn"
   >
 ) => {
   const { fetcherOptions } = useDev3Context();
   return reactQuery.useMutation<
-    undefined,
-    UserControllerCreateError,
-    UserControllerCreateVariables
+    Schemas.PaymentDto,
+    PaymentControllerPagodaEventError,
+    PaymentControllerPagodaEventVariables
   >(
-    (variables: UserControllerCreateVariables) =>
-      fetchUserControllerCreate({ ...fetcherOptions, ...variables }),
-    options
-  );
-};
-
-export type UserControllerFindAllError = Fetcher.ErrorWrapper<undefined>;
-
-export type UserControllerFindAllResponse = Schemas.User[];
-
-export type UserControllerFindAllVariables = Dev3Context["fetcherOptions"];
-
-export const fetchUserControllerFindAll = (
-  variables: UserControllerFindAllVariables,
-  signal?: AbortSignal
-) =>
-  dev3Fetch<
-    UserControllerFindAllResponse,
-    UserControllerFindAllError,
-    undefined,
-    {},
-    {},
-    {}
-  >({ url: "/api/v1/user", method: "get", ...variables, signal });
-
-export const useUserControllerFindAll = <TData = UserControllerFindAllResponse>(
-  variables: UserControllerFindAllVariables,
-  options?: Omit<
-    reactQuery.UseQueryOptions<
-      UserControllerFindAllResponse,
-      UserControllerFindAllError,
-      TData
-    >,
-    "queryKey" | "queryFn"
-  >
-) => {
-  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
-  return reactQuery.useQuery<
-    UserControllerFindAllResponse,
-    UserControllerFindAllError,
-    TData
-  >(
-    queryKeyFn({
-      path: "/api/v1/user",
-      operationId: "userControllerFindAll",
-      variables,
-    }),
-    ({ signal }) =>
-      fetchUserControllerFindAll({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
-};
-
-export type UserControllerFindOnePathParams = {
-  uid: string;
-};
-
-export type UserControllerFindOneError = Fetcher.ErrorWrapper<undefined>;
-
-export type UserControllerFindOneVariables = {
-  pathParams: UserControllerFindOnePathParams;
-} & Dev3Context["fetcherOptions"];
-
-export const fetchUserControllerFindOne = (
-  variables: UserControllerFindOneVariables,
-  signal?: AbortSignal
-) =>
-  dev3Fetch<
-    undefined,
-    UserControllerFindOneError,
-    undefined,
-    {},
-    {},
-    UserControllerFindOnePathParams
-  >({ url: "/api/v1/user/{uid}", method: "get", ...variables, signal });
-
-export const useUserControllerFindOne = <TData = undefined>(
-  variables: UserControllerFindOneVariables,
-  options?: Omit<
-    reactQuery.UseQueryOptions<undefined, UserControllerFindOneError, TData>,
-    "queryKey" | "queryFn"
-  >
-) => {
-  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
-  return reactQuery.useQuery<undefined, UserControllerFindOneError, TData>(
-    queryKeyFn({
-      path: "/api/v1/user/{uid}",
-      operationId: "userControllerFindOne",
-      variables,
-    }),
-    ({ signal }) =>
-      fetchUserControllerFindOne({ ...fetcherOptions, ...variables }, signal),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
-};
-
-export type UserControllerUpdatePathParams = {
-  id: string;
-};
-
-export type UserControllerUpdateError = Fetcher.ErrorWrapper<undefined>;
-
-export type UserControllerUpdateVariables = {
-  body?: Schemas.UpdateUserDto;
-  pathParams: UserControllerUpdatePathParams;
-} & Dev3Context["fetcherOptions"];
-
-export const fetchUserControllerUpdate = (
-  variables: UserControllerUpdateVariables,
-  signal?: AbortSignal
-) =>
-  dev3Fetch<
-    undefined,
-    UserControllerUpdateError,
-    Schemas.UpdateUserDto,
-    {},
-    {},
-    UserControllerUpdatePathParams
-  >({ url: "/api/v1/user/{id}", method: "patch", ...variables, signal });
-
-export const useUserControllerUpdate = (
-  options?: Omit<
-    reactQuery.UseMutationOptions<
-      undefined,
-      UserControllerUpdateError,
-      UserControllerUpdateVariables
-    >,
-    "mutationFn"
-  >
-) => {
-  const { fetcherOptions } = useDev3Context();
-  return reactQuery.useMutation<
-    undefined,
-    UserControllerUpdateError,
-    UserControllerUpdateVariables
-  >(
-    (variables: UserControllerUpdateVariables) =>
-      fetchUserControllerUpdate({ ...fetcherOptions, ...variables }),
-    options
-  );
-};
-
-export type UserControllerRemovePathParams = {
-  id: string;
-};
-
-export type UserControllerRemoveError = Fetcher.ErrorWrapper<undefined>;
-
-export type UserControllerRemoveVariables = {
-  pathParams: UserControllerRemovePathParams;
-} & Dev3Context["fetcherOptions"];
-
-export const fetchUserControllerRemove = (
-  variables: UserControllerRemoveVariables,
-  signal?: AbortSignal
-) =>
-  dev3Fetch<
-    undefined,
-    UserControllerRemoveError,
-    undefined,
-    {},
-    {},
-    UserControllerRemovePathParams
-  >({ url: "/api/v1/user/{id}", method: "delete", ...variables, signal });
-
-export const useUserControllerRemove = (
-  options?: Omit<
-    reactQuery.UseMutationOptions<
-      undefined,
-      UserControllerRemoveError,
-      UserControllerRemoveVariables
-    >,
-    "mutationFn"
-  >
-) => {
-  const { fetcherOptions } = useDev3Context();
-  return reactQuery.useMutation<
-    undefined,
-    UserControllerRemoveError,
-    UserControllerRemoveVariables
-  >(
-    (variables: UserControllerRemoveVariables) =>
-      fetchUserControllerRemove({ ...fetcherOptions, ...variables }),
+    (variables: PaymentControllerPagodaEventVariables) =>
+      fetchPaymentControllerPagodaEvent({ ...fetcherOptions, ...variables }),
     options
   );
 };
@@ -690,9 +832,14 @@ export type QueryOperation =
       variables: ProjectControllerFindAllVariables;
     }
   | {
-      path: "/api/v1/project/{slug}";
-      operationId: "projectControllerFindOne";
-      variables: ProjectControllerFindOneVariables;
+      path: "/api/v1/project/{id}";
+      operationId: "projectControllerFindById";
+      variables: ProjectControllerFindByIdVariables;
+    }
+  | {
+      path: "/api/v1/project/slug/{slug}";
+      operationId: "projectControllerFindBySlug";
+      variables: ProjectControllerFindBySlugVariables;
     }
   | {
       path: "/api/v1/user/me";
@@ -700,22 +847,22 @@ export type QueryOperation =
       variables: UserControllerFindMeVariables;
     }
   | {
-      path: "/api/v1/user/projects/owned";
-      operationId: "userControllerProjectsOwned";
-      variables: UserControllerProjectsOwnedVariables;
+      path: "/api/v1/address";
+      operationId: "addressControllerFindAll";
+      variables: AddressControllerFindAllVariables;
     }
   | {
-      path: "/api/v1/user/projects/all";
-      operationId: "userControllerProjectsAll";
-      variables: UserControllerProjectsAllVariables;
+      path: "/api/v1/address/{id}";
+      operationId: "addressControllerFindOne";
+      variables: AddressControllerFindOneVariables;
     }
   | {
-      path: "/api/v1/user";
-      operationId: "userControllerFindAll";
-      variables: UserControllerFindAllVariables;
+      path: "/api/v1/payment";
+      operationId: "paymentControllerFindAll";
+      variables: PaymentControllerFindAllVariables;
     }
   | {
-      path: "/api/v1/user/{uid}";
-      operationId: "userControllerFindOne";
-      variables: UserControllerFindOneVariables;
+      path: "/api/v1/payment/{id}";
+      operationId: "paymentControllerFindById";
+      variables: PaymentControllerFindByIdVariables;
     };

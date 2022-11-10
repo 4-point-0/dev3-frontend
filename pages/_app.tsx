@@ -4,6 +4,7 @@ import {
   MantineProvider,
 } from "@mantine/core";
 import { useColorScheme, useLocalStorage } from "@mantine/hooks";
+import { ModalsProvider } from "@mantine/modals";
 import { NotificationsProvider } from "@mantine/notifications";
 import "@near-wallet-selector/modal-ui/styles.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -56,11 +57,13 @@ export default function App(props: AppProps) {
                     colorScheme,
                   }}
                 >
-                  <NotificationsProvider>
-                    <AppLayout>
-                      <Component {...pageProps} />
-                    </AppLayout>
-                  </NotificationsProvider>
+                  <ModalsProvider>
+                    <NotificationsProvider>
+                      <AppLayout>
+                        <Component {...pageProps} />
+                      </AppLayout>
+                    </NotificationsProvider>
+                  </ModalsProvider>
                 </MantineProvider>
               </ColorSchemeProvider>
             </WalletSelectorContextProvider>

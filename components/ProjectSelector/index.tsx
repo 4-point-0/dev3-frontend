@@ -12,21 +12,34 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Plus, Selector } from "tabler-icons-react";
 import { useProjectContext } from "../../context/ProjectContext";
-import { useUserControllerProjectsOwned } from "../../services/api/dev3Components";
+import { useProjectControllerFindAll } from "../../services/api/dev3Components";
 import { Project } from "../../services/api/dev3Schemas";
 
 const ProjectSelector = () => {
-  const { isLoading, error, data } = useUserControllerProjectsOwned({});
-  const { project, setProject } = useProjectContext();
+  const { isLoading, refetch, error, data } = useProjectControllerFindAll({});
+  const { project, setProject, needRefresh, setNeedRefresh } =
+    useProjectContext();
   const [selectedProject, setSelectedProject] = useState<Project | null>(
     project
   );
   const router = useRouter();
 
   useEffect(() => {
-    if (data && data.length > 0) {
-      setSelectedProject(project ?? data[0]);
-      setProject(project ?? data[0]);
+    if (needRefresh) {
+      refetch();
+    }
+  }, [needRefresh, refetch]);
+
+  useEffect(() => {
+    if (data && (data.results?.length ?? 0) > 0) {
+      setNeedRefresh(false);
+      const selectedProjectFromData =
+        data.results?.find(
+          (project) => (project as any)._id === (selectedProject as any)?._id
+        ) ?? project;
+
+      setSelectedProject(selectedProjectFromData ?? data.results![0]);
+      setProject(selectedProjectFromData ?? data.results![0]);
       router.push("/contracts");
     } else {
       router.push("/new-project");
@@ -42,7 +55,7 @@ const ProjectSelector = () => {
     return <Text>Error: {error.payload}</Text>;
   }
 
-  if (!data || data.length === 0) {
+  if (!data || data.results?.length === 0) {
     return (
       <Link href="/new-project" passHref>
         <Button fullWidth leftIcon={<Plus size={14} />}>
@@ -98,7 +111,7 @@ const ProjectSelector = () => {
           </Menu.Item>
         </Link>
         <Divider mb={8} />
-        {data?.map((project) => {
+        {data?.results?.map((project) => {
           return (
             <Menu.Item
               sx={{ width: "100%" }}

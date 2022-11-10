@@ -93,7 +93,11 @@ const ConnectAccount = () => {
   };
 
   if (accountId) {
-    return <Button onClick={handleSignOut}>Sign out</Button>;
+    return (
+      <Button variant="light" onClick={handleSignOut}>
+        Sign out
+      </Button>
+    );
   }
 
   if (isLoading) return <div>Loading...</div>;
@@ -104,7 +108,7 @@ const ConnectAccount = () => {
         modal.show();
       }}
     >
-      Continue with NEAR wallet
+      Login with NEAR wallet
     </Button>
   );
 };

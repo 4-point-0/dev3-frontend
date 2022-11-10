@@ -3,8 +3,13 @@
  *
  * @version 1.0
  */
+export type PaginatedDto = {
+  total: number;
+  limit: number;
+  offset: number;
+};
+
 export type CreateProjectDto = {
-  isActive?: boolean;
   name: string;
   slug: string;
   logoUrl: string;
@@ -37,25 +42,87 @@ export type Project = {
    * @format date-time
    */
   createdAt: string;
-  isCensored: boolean;
-  isActive: boolean;
   name: string;
   slug: string;
   logoUrl: string;
   owner: User;
 };
 
-export type UpdateProjectDto = {};
+export type UpdateProjectDto = {
+  name?: string;
+  slug?: string;
+  logoUrl?: string;
+};
 
-export type NearLoginDto = {
+export type NearLoginRequestDto = {
   username: string;
   signedJsonString: string;
 };
 
-export type NearLoginResponse = {
+export type NearLoginResponseDto = {
   token: string;
 };
 
-export type CreateUserDto = {};
+export type CreateAddressDto = {
+  wallet: string;
+  alias: string;
+  email?: string;
+  phone?: string;
+};
 
-export type UpdateUserDto = {};
+export type Address = {
+  /**
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * @format date-time
+   */
+  createdAt: string;
+  wallet: string;
+  alias: string;
+  phone: string;
+  email: string;
+  owner: User;
+};
+
+export type UpdateAddressDto = {
+  email?: string;
+  phone?: string;
+};
+
+export type CreatePaymentDto = {
+  uid: string;
+  memo: string;
+  amount: string;
+  receiver: string;
+  receiver_fungible: string;
+};
+
+export type Payment = {
+  /**
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * @format date-time
+   */
+  createdAt: string;
+  uid: string;
+  memo: string;
+  amount: string;
+  receiver: string;
+  receiver_fungible: string;
+  status: "pending" | "paid";
+  owner: User;
+};
+
+export type PaymentDto = {
+  _id: string;
+  uid: string;
+  amount: string;
+  memo: string;
+  receiver: string;
+  receiver_fungible: string;
+  status: "pending" | "paid";
+};
