@@ -1,6 +1,6 @@
 import { Dev3Context } from "./dev3Context";
 
-const baseUrl = "http://localhost:3001"; // TODO add your baseUrl
+const baseUrl = "https://dev3-backend.vercel.app"; // "http://localhost:3001"; // TODO add your baseUrl
 
 export type ErrorWrapper<TError> =
   | TError
