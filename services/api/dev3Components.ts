@@ -780,6 +780,63 @@ export const usePaymentControllerFindById = <TData = Schemas.PaymentDto>(
   );
 };
 
+export type PaymentControllerFindByUidPathParams = {
+  uid: string;
+};
+
+export type PaymentControllerFindByUidError = Fetcher.ErrorWrapper<undefined>;
+
+export type PaymentControllerFindByUidVariables = {
+  pathParams: PaymentControllerFindByUidPathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchPaymentControllerFindByUid = (
+  variables: PaymentControllerFindByUidVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.PaymentDto,
+    PaymentControllerFindByUidError,
+    undefined,
+    {},
+    {},
+    PaymentControllerFindByUidPathParams
+  >({ url: "/api/v1/payment/uid/{uid}", method: "get", ...variables, signal });
+
+export const usePaymentControllerFindByUid = <TData = Schemas.PaymentDto>(
+  variables: PaymentControllerFindByUidVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.PaymentDto,
+      PaymentControllerFindByUidError,
+      TData
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
+    Schemas.PaymentDto,
+    PaymentControllerFindByUidError,
+    TData
+  >(
+    queryKeyFn({
+      path: "/api/v1/payment/uid/{uid}",
+      operationId: "paymentControllerFindByUid",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchPaymentControllerFindByUid(
+        { ...fetcherOptions, ...variables },
+        signal
+      ),
+    {
+      ...options,
+      ...queryOptions,
+    }
+  );
+};
+
 export type PaymentControllerPagodaEventError = Fetcher.ErrorWrapper<undefined>;
 
 export type PaymentControllerPagodaEventVariables =
@@ -865,4 +922,9 @@ export type QueryOperation =
       path: "/api/v1/payment/{id}";
       operationId: "paymentControllerFindById";
       variables: PaymentControllerFindByIdVariables;
+    }
+  | {
+      path: "/api/v1/payment/uid/{uid}";
+      operationId: "paymentControllerFindByUid";
+      variables: PaymentControllerFindByUidVariables;
     };

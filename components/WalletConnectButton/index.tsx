@@ -71,6 +71,11 @@ const ConnectAccount = () => {
       console.log(token);
       userData.onLogin(token);
       setIsLoading(false);
+
+      if (router.route.includes("action")) {
+        return;
+      }
+
       router.push("/");
     },
     []

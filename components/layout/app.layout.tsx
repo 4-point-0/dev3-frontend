@@ -28,6 +28,29 @@ export default function AppLayout({ children }: React.PropsWithChildren<{}>) {
     );
   };
 
+  if (router.route.includes("action")) {
+    return (
+      <AppShell
+        styles={{
+          main: {
+            background:
+              theme.colorScheme === "dark"
+                ? theme.colors.dark[8]
+                : theme.colors.gray[0],
+          },
+        }}
+        navbarOffsetBreakpoint="sm"
+        asideOffsetBreakpoint="sm"
+        footer={<AppFooter />}
+        header={
+          <AppHeader theme={theme} opened={opened} setOpened={setOpened} />
+        }
+      >
+        <div>{children}</div>
+      </AppShell>
+    );
+  }
+
   if (localStorage.getItem("user") === null) {
     return (
       <AppShell

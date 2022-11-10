@@ -24,12 +24,12 @@ const Payments = () => {
   const showModal = (title: string, id: string) => {
     showShareModal({
       title,
-      url: `${window.location.origin}${getUrl(id)}`,
+      url: `${window.location.origin}/${getUrl(id)}`,
     });
   };
 
   const getUrl = (id: string) =>
-    `/${projectContext.project?.slug}/request-send/${id}/action`;
+    `action/payment/${projectContext.project?.slug}/${id}`;
 
   const rows = data?.results?.map((element) => (
     <tr key={element.uid}>
@@ -46,7 +46,10 @@ const Payments = () => {
       <td>{new Date(element.updatedAt).toLocaleString()}</td>
       <td>
         <Group>
-          <CopyButton value={getUrl(element.uid)} timeout={2000}>
+          <CopyButton
+            value={`${window.location.origin}/${getUrl(element.uid)}`}
+            timeout={2000}
+          >
             {({ copied, copy }) => (
               <Tooltip
                 label={copied ? "Copied" : "Copy"}
