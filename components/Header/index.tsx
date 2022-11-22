@@ -23,6 +23,14 @@ import { useUserContext } from "../../context/UserContext";
 import { useWalletSelector } from "../../context/WalletSelectorContext";
 import ThemeTogglerButton from "../ThemeTogglerButton";
 import WalletConnectButton from "../WalletConnectButton";
+
+import {
+  NotificationBell,
+  NovuProvider,
+  PopoverNotificationCenter,
+} from "@novu/notification-center";
+import { useRouter } from "next/router";
+
 export interface AdminHeaderProps {
   theme: MantineTheme;
   opened: boolean;
@@ -30,6 +38,12 @@ export interface AdminHeaderProps {
 }
 
 const AppHeader = ({ theme, opened, setOpened }: AdminHeaderProps) => {
+  const router = useRouter();
+
+  function onNotificationClick(notification: any) {
+    router.push(notification.cta.data.url);
+  }
+
   const userContext = useUserContext();
   const { selector, accountId } = useWalletSelector();
   const [account, setAccount] = useState<AccountView | null>(null);
@@ -161,6 +175,25 @@ const AppHeader = ({ theme, opened, setOpened }: AdminHeaderProps) => {
                 </Tooltip>
               </Group>
             </Paper>
+
+            {userContext.user && (
+              <NovuProvider
+                subscriberId={userContext.user.nearWalletAccountId}
+                applicationIdentifier={
+                  process.env.NEXT_PUBLIC_NOVU_APP_ID || ""
+                }
+              >
+                <PopoverNotificationCenter
+                  colorScheme={theme.colorScheme === "dark" ? "dark" : "light"}
+                  onNotificationClick={onNotificationClick}
+                >
+                  {({ unseenCount }) => (
+                    <NotificationBell unseenCount={unseenCount} />
+                  )}
+                </PopoverNotificationCenter>
+              </NovuProvider>
+            )}
+
             <WalletConnectButton />
             <ThemeTogglerButton />
           </Group>

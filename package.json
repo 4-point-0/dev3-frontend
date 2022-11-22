@@ -36,6 +36,7 @@
     "@near-wallet-selector/nightly-connect": "^7.0.3",
     "@near-wallet-selector/sender": "^7.0.3",
     "@near-wallet-selector/wallet-connect": "^7.0.3",
+    "@novu/notification-center": "^0.9.1",
     "@tanstack/react-query": "^4.10.3",
     "@tanstack/react-query-devtools": "^4.11.0",
     "axios": "^1.1.2",

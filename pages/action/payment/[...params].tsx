@@ -1,4 +1,5 @@
 import {
+  Alert,
   Avatar,
   Badge,
   Box,
@@ -11,10 +12,13 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { showNotification } from "@mantine/notifications";
+import { showNotification, updateNotification } from "@mantine/notifications";
+import { utils } from "near-api-js";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { AlertCircle, Check, X } from "tabler-icons-react";
 import { useUserContext } from "../../../context/UserContext";
+import { useWalletSelector } from "../../../context/WalletSelectorContext";
 import {
   usePaymentControllerFindByUid,
   useProjectControllerFindBySlug,
@@ -42,11 +46,14 @@ const useStyles = createStyles((theme) => ({
 }));
 
 const PaymentRequestDetail = () => {
+  const { selector } = useWalletSelector();
   const { classes } = useStyles();
   const router = useRouter();
-  const { params } = router.query;
+  const { params, errorCode, errorMessage, transactionHashes } = router.query;
 
   const userContext = useUserContext();
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const {
     isLoading: projectIsLoading,
@@ -74,25 +81,129 @@ const PaymentRequestDetail = () => {
     }
   }, [paymentRequestData, router]);
 
-  const handleButtonClick = () => {
+  const handleButtonClick = async () => {
     if (userContext.user === null) {
       return;
     }
 
+    setLoading(true);
+
     showNotification({
-      id: "WIP",
-      title: "Work in progress",
-      message: "This feature is not yet implemented.",
-      color: "blue",
+      id: "loading-notification",
+      loading: true,
+      title: "Preparing transaction",
+      message: "Please wait...",
+      autoClose: false,
+      disallowClose: true,
     });
+
+    try {
+      const wallet = await selector.wallet();
+
+      let args: {
+        request: {
+          id: string | undefined;
+          amount?: string | null;
+          receiver_account_id: string | undefined;
+          ft_token_account_id?: string | undefined;
+        };
+      } = {
+        request: {
+          id: paymentRequestData?.uid,
+          receiver_account_id: paymentRequestData?.receiver,
+        },
+      };
+
+      if (
+        paymentRequestData?.receiver_fungible !== undefined &&
+        paymentRequestData?.receiver_fungible !== null &&
+        paymentRequestData?.receiver_fungible !== ""
+      ) {
+        args.request.ft_token_account_id =
+          paymentRequestData?.receiver_fungible;
+      }
+
+      args.request.amount = args.request.ft_token_account_id
+        ? paymentRequestData?.amount
+        : utils.format.parseNearAmount(paymentRequestData?.amount);
+
+      await wallet.signAndSendTransaction({
+        signerId: userContext.user?.nearWalletAccountId,
+        actions: [
+          {
+            type: "FunctionCall",
+            params: {
+              methodName: "transfer_funds",
+              args,
+              gas: "100000000000000",
+              deposit: args.request.ft_token_account_id
+                ? "1250000000000000000001"
+                : utils.format.parseNearAmount(paymentRequestData?.amount) ||
+                  "0",
+            },
+          },
+        ],
+      });
+    } catch (error) {
+      updateNotification({
+        id: "loading-notification",
+        color: "red",
+        title: "Error while preparing transaction",
+        message:
+          "There was an error while preparing the transaction. Please try again.",
+        icon: <X size={16} />,
+        autoClose: 3000,
+      });
+
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (projectIsLoading || paymentRequestIsLoading) {
     return <Loader />;
   }
 
+  if (transactionHashes) {
+    return (
+      <Alert icon={<Check size={16} />} title="Success">
+        Transaction has been successfully signed.
+      </Alert>
+    );
+  }
+
+  if (paymentRequestData?.receiver_fungible !== "") {
+    return (
+      <Alert icon={<AlertCircle size={16} />} color="red" title="WIP">
+        Sorry, Fungible tokens are not yet supported.
+      </Alert>
+    );
+  }
+
   return (
     <Box>
+      {errorCode && errorCode === "userRejected" && (
+        <Alert
+          mb={40}
+          icon={<AlertCircle size={16} />}
+          title="Transaction rejected by user"
+          color="red"
+        >
+          You rejected the transaction.
+        </Alert>
+      )}
+
+      {errorCode && errorCode !== "userRejected" && errorMessage && (
+        <Alert
+          mb={40}
+          icon={<AlertCircle size={16} />}
+          title="Something went wrong"
+          color="red"
+        >
+          Please try again.
+        </Alert>
+      )}
       <Paper
         mx="auto"
         maw={400}
@@ -142,7 +253,11 @@ const PaymentRequestDetail = () => {
 
         <Center mt="xl">
           <Button
-            disabled={userContext.user === null}
+            disabled={
+              userContext.user === null ||
+              loading ||
+              paymentRequestData?.receiver_fungible !== ""
+            }
             fullWidth
             variant="light"
             onClick={handleButtonClick}
