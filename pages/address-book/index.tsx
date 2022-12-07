@@ -1,36 +1,63 @@
-import {
-  ActionIcon,
-  Button,
-  CopyButton,
-  Group,
-  Loader,
-  Paper,
-  Stack,
-  Table,
-  Text,
-  Tooltip,
-} from "@mantine/core";
+import { ActionIcon, Button, Group, Paper, Stack, Text } from "@mantine/core";
 import { openConfirmModal } from "@mantine/modals";
 import { NextLink } from "@mantine/next";
 import { showNotification } from "@mantine/notifications";
-import { Check, Copy, Plus, X } from "tabler-icons-react";
+import { DataTable, DataTableColumn } from "mantine-datatable";
+import { useRouter } from "next/router";
+import { useCallback, useMemo } from "react";
+import { Edit, Plus, Trash, X } from "tabler-icons-react";
+
+import { CopyCell } from "../../components/table/CopyCell";
 import {
   fetchAddressControllerRemove,
   useAddressControllerFindAll,
 } from "../../services/api/dev3Components";
 import { Address } from "../../services/api/dev3Schemas";
 
-const AddressBook = () => {
-  const { isLoading, refetch, data } = useAddressControllerFindAll({});
+const PAGE_LIMIT = 20;
 
-  const openDeleteModal = (address: Address) =>
+const AddressBook = () => {
+  const router = useRouter();
+  console.log(router.asPath);
+
+  const page = useMemo(() => {
+    if (!router.query.page) {
+      return 1;
+    }
+
+    return parseInt(router.query.page as string);
+  }, [router.query?.page]);
+
+  const { isLoading, refetch, data } = useAddressControllerFindAll({
+    queryParams: {
+      offset: (page - 1) * PAGE_LIMIT,
+      limit: PAGE_LIMIT,
+    },
+  });
+
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      router.push(
+        {
+          pathname: router.pathname,
+          query: { page: newPage },
+        },
+        undefined,
+        { shallow: true }
+      );
+    },
+    [router]
+  );
+
+  const handleDelete = (address: Address) =>
     openConfirmModal({
       title: `Delete address '${address.alias}'?`,
       centered: true,
       children: (
         <Text size="sm">
-          Are you sure you want to delete address &apos;{address.alias}&apos;?
-          This action is destructive and you can&apos;t take it back.
+          Are you sure you want to delete address &apos;
+          {address.alias}&apos;? This action is destructive and you can&apos;t
+          take it back.
         </Text>
       ),
       labels: {
@@ -41,7 +68,7 @@ const AddressBook = () => {
       onCancel: () => {},
       onConfirm: async () => {
         try {
-          const response = await fetchAddressControllerRemove({
+          await fetchAddressControllerRemove({
             pathParams: {
               id: (address as any)._id,
             },
@@ -63,107 +90,56 @@ const AddressBook = () => {
       },
     });
 
-  const rows = data?.results?.map((element) => (
-    <tr key={element.createdAt}>
-      <td>{element.alias}</td>
-      <td>
-        <Group>
-          {element.wallet}
-          <CopyButton value={element.wallet} timeout={2000}>
-            {({ copied, copy }) => (
-              <Tooltip
-                label={copied ? "Copied" : "Copy"}
-                withArrow
-                position="bottom"
-              >
-                <ActionIcon
-                  radius="xl"
-                  variant="light"
-                  color={copied ? "teal" : "primary"}
-                  onClick={copy}
-                >
-                  {copied ? <Check size={16} /> : <Copy size={16} />}
-                </ActionIcon>
-              </Tooltip>
-            )}
-          </CopyButton>
-        </Group>
-      </td>
-      <td>
-        {element.phone ? (
-          <Group>
-            {element.phone}
-            <CopyButton value={element.phone} timeout={2000}>
-              {({ copied, copy }) => (
-                <Tooltip
-                  label={copied ? "Copied" : "Copy"}
-                  withArrow
-                  position="bottom"
-                >
-                  <ActionIcon
-                    radius="xl"
-                    variant="light"
-                    color={copied ? "teal" : "primary"}
-                    onClick={copy}
-                  >
-                    {copied ? <Check size={16} /> : <Copy size={16} />}
-                  </ActionIcon>
-                </Tooltip>
-              )}
-            </CopyButton>
+  const columns: Array<DataTableColumn<Address>> = [
+    {
+      accessor: "alias",
+    },
+    {
+      accessor: "wallet",
+      render: ({ wallet }) => {
+        return <CopyCell value={wallet} />;
+      },
+    },
+    {
+      accessor: "phone",
+      render: ({ phone }) => {
+        return <CopyCell value={phone} />;
+      },
+    },
+    {
+      accessor: "email",
+      render: ({ email }) => {
+        return <CopyCell value={email} />;
+      },
+    },
+    {
+      accessor: "actions",
+      render: (address) => {
+        return (
+          <Group spacing={4} noWrap>
+            <ActionIcon
+              component={NextLink}
+              href="/address-book/[id]/edit"
+              as={`/address-book/${(address as any)._id}/edit`}
+              color="blue"
+            >
+              <Edit size={16} />
+            </ActionIcon>
+            <ActionIcon color="red" onClick={() => handleDelete(address)}>
+              <Trash size={16} />
+            </ActionIcon>
           </Group>
-        ) : (
-          "Not applicable"
-        )}
-      </td>
-      <td>
-        {element.email ? (
-          <Group>
-            {element.email}
-            <CopyButton value={element.email} timeout={2000}>
-              {({ copied, copy }) => (
-                <Tooltip
-                  label={copied ? "Copied" : "Copy"}
-                  withArrow
-                  position="bottom"
-                >
-                  <ActionIcon
-                    radius="xl"
-                    variant="light"
-                    color={copied ? "teal" : "primary"}
-                    onClick={copy}
-                  >
-                    {copied ? <Check size={16} /> : <Copy size={16} />}
-                  </ActionIcon>
-                </Tooltip>
-              )}
-            </CopyButton>
-          </Group>
-        ) : (
-          "Not applicable"
-        )}
-      </td>
-      <td>
-        <Button
-          variant="light"
-          color="red"
-          onClick={() => openDeleteModal(element)}
-        >
-          Delete
-        </Button>
-      </td>
-    </tr>
-  ));
-
-  if (isLoading) {
-    return <Loader size="lg" />;
-  }
+        );
+      },
+    },
+  ];
 
   return (
     <Stack align="flex-start">
       <Text size="xl" weight={500}>
         Addresses
       </Text>
+
       <Button
         sx={{ alignSelf: "self-end" }}
         component={NextLink}
@@ -173,19 +149,20 @@ const AddressBook = () => {
       >
         Add new address
       </Button>
+
       <Paper sx={{ width: "100%" }} shadow="sm" p="md" withBorder>
-        <Table highlightOnHover>
-          <thead>
-            <tr>
-              <th>Alias</th>
-              <th>Wallet</th>
-              <th>Phone</th>
-              <th>Email</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>{rows}</tbody>
-        </Table>
+        <DataTable
+          highlightOnHover
+          minHeight={180}
+          idAccessor="alias"
+          columns={columns}
+          records={data?.results}
+          fetching={isLoading}
+          totalRecords={data?.total}
+          recordsPerPage={PAGE_LIMIT}
+          page={page}
+          onPageChange={handlePageChange}
+        ></DataTable>
       </Paper>
     </Stack>
   );

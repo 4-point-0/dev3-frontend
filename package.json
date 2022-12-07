@@ -43,6 +43,7 @@
     "better-sqlite3": "^7.6.2",
     "big.js": "^6.2.1",
     "dayjs": "^1.11.6",
+    "mantine-datatable": "^1.7.24",
     "near-api-js": "^1.1.0",
     "next": "12.3.1",
     "next-share": "^0.19.0",
