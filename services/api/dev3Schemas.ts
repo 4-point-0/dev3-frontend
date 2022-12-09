@@ -7,6 +7,8 @@ export type PaginatedDto = {
   total: number;
   limit: number;
   offset: number;
+  count: number;
+  results: any[];
 };
 
 export type CreateProjectDto = {
@@ -63,11 +65,49 @@ export type NearLoginResponseDto = {
   token: string;
 };
 
+export type CreateApiKeyDto = {
+  project_id: string;
+  /**
+   * @format date-time
+   */
+  expires: string;
+};
+
+export type ApiKeyDto = {};
+
+export type RegenerateApiKeyDto = {
+  /**
+   * @format date-time
+   */
+  expires: string;
+};
+
+export type RevokeApiKeyDto = {
+  is_revoked: boolean;
+};
+
+export type ApiKey = {
+  /**
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * @format date-time
+   */
+  createdAt: string;
+  api_key: string;
+  /**
+   * @format date-time
+   */
+  expires: string;
+  owner: User;
+};
+
 export type CreateAddressDto = {
   wallet: string;
   alias: string;
-  email?: string;
-  phone?: string;
+  email?: string | null;
+  phone?: string | null;
 };
 
 export type Address = {
@@ -91,15 +131,17 @@ export type UpdateAddressDto = {
   phone?: string;
 };
 
-export type CreatePaymentDto = {
-  uid: string;
-  memo: string;
-  amount: string;
-  receiver: string;
-  receiver_fungible: string;
+export type CreateTransactionRequestDto = {
+  contractId?: string;
+  method: string;
+  args?: Record<string, any>;
+  gas?: string;
+  deposit?: string;
+  is_near_token: boolean;
+  project_id: string;
 };
 
-export type Payment = {
+export type TransactionRequest = {
   /**
    * @format date-time
    */
@@ -108,21 +150,42 @@ export type Payment = {
    * @format date-time
    */
   createdAt: string;
-  uid: string;
-  memo: string;
-  amount: string;
-  receiver: string;
-  receiver_fungible: string;
-  status: "pending" | "paid";
+  uuid: string;
+  status: "Pending" | "Success" | "Failure";
+  contractId?: string;
+  method: string;
+  args: string;
+  gas: string;
+  deposit: string;
+  txHash: string;
+  txDetails: string;
+  caller_address: string;
+  is_near_token: boolean;
   owner: User;
+  project: Project;
 };
 
-export type PaymentDto = {
-  _id: string;
-  uid: string;
-  amount: string;
-  memo: string;
-  receiver: string;
-  receiver_fungible: string;
-  status: "pending" | "paid";
+export type TransactionRequestDto = {
+  uuid: string;
+  /**
+   * @format date-time
+   */
+  created_at: string;
+  status: "Pending" | "Success" | "Failure";
+  contractId?: string;
+  method: string;
+  args?: Record<string, any>;
+  gas?: string;
+  deposit?: string;
+  caller_address?: string;
+  txHash: string;
+  txDetails: string;
+  is_near_token: boolean;
+  project_id: string;
+};
+
+export type UpdateTransactionRequestDto = {
+  txHash: string;
+  caller_address: string;
+  txDetails?: Record<string, any>;
 };

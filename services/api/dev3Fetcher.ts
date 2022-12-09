@@ -1,6 +1,6 @@
 import { Dev3Context } from "./dev3Context";
 
-const baseUrl = "https://dev3-backend.herokuapp.com"; // "http://localhost:3001"; // TODO add your baseUrl
+const baseUrl = `${process.env.NEXT_PUBLIC_API_URL}`;
 
 export type ErrorWrapper<TError> =
   | TError
