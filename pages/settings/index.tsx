@@ -11,18 +11,19 @@ import {
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { NextPage } from "next";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { Check, X } from "tabler-icons-react";
-import { useProjectContext } from "../../context/ProjectContext";
-import { fetchProjectControllerUpdate } from "../../services/api/dev3Components";
+
+import { useSelectedProject } from "../../context/SelectedProjectContext";
+import {
+  fetchProjectControllerUpdate,
+  useProjectControllerFindAll,
+} from "../../services/api/dev3Components";
 
 const Settings: NextPage = () => {
   const [loading, setLoading] = useState(false);
-
-  const { setNeedRefresh, project } = useProjectContext();
-
-  const router = useRouter();
+  const { project } = useSelectedProject();
+  const { refetch } = useProjectControllerFindAll({});
 
   const form = useForm({
     validateInputOnChange: true,
@@ -74,7 +75,7 @@ const Settings: NextPage = () => {
         autoClose: 3000,
       });
 
-      setNeedRefresh(true);
+      refetch();
     } catch (error) {
       updateNotification({
         id: "loading-notification",

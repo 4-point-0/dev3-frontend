@@ -12,7 +12,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import AppLayout from "../components/layout/app.layout";
-import { ProjectContextProvider } from "../context/ProjectContext";
+import { SelectedProjectProvider } from "../context/SelectedProjectContext";
 import { UserContextProvider } from "../context/UserContext";
 import { WalletSelectorContextProvider } from "../context/WalletSelectorContext";
 
@@ -44,7 +44,7 @@ export default function App(props: AppProps) {
 
       <QueryClientProvider client={queryClient}>
         <UserContextProvider>
-          <ProjectContextProvider>
+          <SelectedProjectProvider>
             <WalletSelectorContextProvider>
               <ColorSchemeProvider
                 colorScheme={colorScheme}
@@ -67,7 +67,7 @@ export default function App(props: AppProps) {
                 </MantineProvider>
               </ColorSchemeProvider>
             </WalletSelectorContextProvider>
-          </ProjectContextProvider>
+          </SelectedProjectProvider>
         </UserContextProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

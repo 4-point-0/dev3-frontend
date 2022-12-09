@@ -13,12 +13,13 @@ import {
 } from "@mantine/core";
 import { NextLink } from "@mantine/next";
 import { Check, Copy, ExternalLink, Plus, Share } from "tabler-icons-react";
+
 import showShareModal from "../../components/ShareModal";
-import { useProjectContext } from "../../context/ProjectContext";
+import { useSelectedProject } from "../../context/SelectedProjectContext";
 import { usePaymentControllerFindAll } from "../../services/api/dev3Components";
 
 const Payments = () => {
-  const projectContext = useProjectContext();
+  const projectContext = useSelectedProject();
   const { isLoading, data } = usePaymentControllerFindAll({});
 
   const showModal = (title: string, id: string) => {
