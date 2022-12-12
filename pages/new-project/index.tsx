@@ -8,20 +8,22 @@ import {
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { NextPage } from "next";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { Check, X } from "tabler-icons-react";
-import { useProjectContext } from "../../context/ProjectContext";
-import { fetchProjectControllerCreate } from "../../services/api/dev3Components";
+
+import { useSelectedProject } from "../../context/SelectedProjectContext";
+import {
+  fetchProjectControllerCreate,
+  useProjectControllerFindAll,
+} from "../../services/api/dev3Components";
 
 const NewProject: NextPage = () => {
   const theme = useMantineTheme();
 
   const [loading, setLoading] = useState(false);
 
-  const { setNeedRefresh } = useProjectContext();
-
-  const router = useRouter();
+  const { refetch: refetchProjects } = useProjectControllerFindAll({});
+  const { selectProject } = useSelectedProject();
 
   const form = useForm({
     validateInputOnChange: true,
@@ -66,6 +68,8 @@ const NewProject: NextPage = () => {
         },
       });
 
+      await refetchProjects();
+
       updateNotification({
         id: "loading-notification",
         color: "teal",
@@ -76,8 +80,7 @@ const NewProject: NextPage = () => {
         autoClose: 3000,
       });
 
-      setNeedRefresh(true);
-      router.push(`/contracts`);
+      selectProject(project);
     } catch (error) {
       updateNotification({
         id: "loading-notification",

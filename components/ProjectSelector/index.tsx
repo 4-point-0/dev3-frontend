@@ -8,44 +8,33 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { Plus, Selector } from "tabler-icons-react";
-import { useProjectContext } from "../../context/ProjectContext";
+
+import {
+  isSameProject,
+  useSelectedProject,
+} from "../../context/SelectedProjectContext";
 import { useProjectControllerFindAll } from "../../services/api/dev3Components";
 import { Project } from "../../services/api/dev3Schemas";
 
 const ProjectSelector = () => {
-  const { isLoading, refetch, error, data } = useProjectControllerFindAll({});
-  const { project, setProject, needRefresh, setNeedRefresh } =
-    useProjectContext();
-  const [selectedProject, setSelectedProject] = useState<Project | null>(
-    project
-  );
-  const router = useRouter();
+  const { project, selectProject } = useSelectedProject();
+  const { isLoading, error, data } = useProjectControllerFindAll({});
 
-  useEffect(() => {
-    if (needRefresh) {
-      refetch();
+  const selectedProject = useMemo(() => {
+    if (!(data?.results && project)) {
+      return null;
     }
-  }, [needRefresh, refetch]);
 
-  useEffect(() => {
-    if (data && (data.results?.length ?? 0) > 0) {
-      setNeedRefresh(false);
-      const selectedProjectFromData =
-        data.results?.find(
-          (project) => (project as any)._id === (selectedProject as any)?._id
-        ) ?? project;
+    return data.results.find(isSameProject(project));
+  }, [data, project]);
 
-      setSelectedProject(selectedProjectFromData ?? data.results![0]);
-      setProject(selectedProjectFromData ?? data.results![0]);
-      router.push("/contracts");
-    } else {
-      router.push("/new-project");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project, data, setProject]);
+  const handleSelect = (project: Project) => {
+    return () => {
+      selectProject(project);
+    };
+  };
 
   if (isLoading) {
     return <Text>Loading...</Text>;
@@ -125,11 +114,7 @@ const ProjectSelector = () => {
               }
               rightSection={project.slug === selectedProject?.slug ? "✓" : ""}
               key={project.name}
-              onClick={() => {
-                setSelectedProject(project);
-                setProject(project);
-                router.push("/contracts");
-              }}
+              onClick={handleSelect(project)}
             >
               {project.name}
             </Menu.Item>

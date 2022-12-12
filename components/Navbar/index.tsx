@@ -1,5 +1,6 @@
 import { Divider, Navbar } from "@mantine/core";
-import { useProjectContext } from "../../context/ProjectContext";
+
+import { useSelectedProject } from "../../context/SelectedProjectContext";
 import { useUserContext } from "../../context/UserContext";
 import ProjectSelector from "../ProjectSelector";
 import { AppLinks, AppLinksBottom } from "./Links.component";
@@ -10,7 +11,7 @@ export interface AdminNavbarProps {
 
 const AppNavbar = ({ opened }: AdminNavbarProps) => {
   const userData = useUserContext();
-  const { project } = useProjectContext();
+  const { project } = useSelectedProject();
 
   return (
     <Navbar hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200, lg: 300 }}>
