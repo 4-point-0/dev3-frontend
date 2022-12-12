@@ -59,8 +59,12 @@ export type ProjectControllerFindAllQueryParams = {
 
 export type ProjectControllerFindAllError = Fetcher.ErrorWrapper<undefined>;
 
-export type ProjectControllerFindAllResponse = Schemas.PaginatedDto & {
-  results?: Schemas.Project[];
+export type ProjectControllerFindAllResponse = {
+  total: number;
+  limit: number;
+  offset: number;
+  count: number;
+  results: Schemas.Project[];
 };
 
 export type ProjectControllerFindAllVariables = {
@@ -360,6 +364,369 @@ export const useUserControllerFindMe = <TData = Schemas.User>(
   );
 };
 
+export type ApiKeyControllerCreateError = Fetcher.ErrorWrapper<undefined>;
+
+export type ApiKeyControllerCreateVariables = {
+  body: Schemas.CreateApiKeyDto;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchApiKeyControllerCreate = (
+  variables: ApiKeyControllerCreateVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.ApiKeyDto,
+    ApiKeyControllerCreateError,
+    Schemas.CreateApiKeyDto,
+    {},
+    {},
+    {}
+  >({ url: "/api/v1/api-key", method: "post", ...variables, signal });
+
+export const useApiKeyControllerCreate = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.ApiKeyDto,
+      ApiKeyControllerCreateError,
+      ApiKeyControllerCreateVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.ApiKeyDto,
+    ApiKeyControllerCreateError,
+    ApiKeyControllerCreateVariables
+  >(
+    (variables: ApiKeyControllerCreateVariables) =>
+      fetchApiKeyControllerCreate({ ...fetcherOptions, ...variables }),
+    options
+  );
+};
+
+export type ApiKeyControllerFindAllQueryParams = {
+  offset?: number;
+  limit?: number;
+  project_id?: string;
+  api_key?: string;
+};
+
+export type ApiKeyControllerFindAllError = Fetcher.ErrorWrapper<undefined>;
+
+export type ApiKeyControllerFindAllVariables = {
+  queryParams?: ApiKeyControllerFindAllQueryParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchApiKeyControllerFindAll = (
+  variables: ApiKeyControllerFindAllVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.PaginatedDto,
+    ApiKeyControllerFindAllError,
+    undefined,
+    {},
+    ApiKeyControllerFindAllQueryParams,
+    {}
+  >({ url: "/api/v1/api-key", method: "get", ...variables, signal });
+
+export const useApiKeyControllerFindAll = <TData = Schemas.PaginatedDto>(
+  variables: ApiKeyControllerFindAllVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.PaginatedDto,
+      ApiKeyControllerFindAllError,
+      TData
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
+    Schemas.PaginatedDto,
+    ApiKeyControllerFindAllError,
+    TData
+  >(
+    queryKeyFn({
+      path: "/api/v1/api-key",
+      operationId: "apiKeyControllerFindAll",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchApiKeyControllerFindAll({ ...fetcherOptions, ...variables }, signal),
+    {
+      ...options,
+      ...queryOptions,
+    }
+  );
+};
+
+export type ApiKeyControllerFindOnePathParams = {
+  projectId: string;
+};
+
+export type ApiKeyControllerFindOneError = Fetcher.ErrorWrapper<undefined>;
+
+export type ApiKeyControllerFindOneVariables = {
+  pathParams: ApiKeyControllerFindOnePathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchApiKeyControllerFindOne = (
+  variables: ApiKeyControllerFindOneVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.ApiKeyDto,
+    ApiKeyControllerFindOneError,
+    undefined,
+    {},
+    {},
+    ApiKeyControllerFindOnePathParams
+  >({
+    url: "/api/v1/api-key/{projectId}",
+    method: "get",
+    ...variables,
+    signal,
+  });
+
+export const useApiKeyControllerFindOne = <TData = Schemas.ApiKeyDto>(
+  variables: ApiKeyControllerFindOneVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.ApiKeyDto,
+      ApiKeyControllerFindOneError,
+      TData
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
+    Schemas.ApiKeyDto,
+    ApiKeyControllerFindOneError,
+    TData
+  >(
+    queryKeyFn({
+      path: "/api/v1/api-key/{projectId}",
+      operationId: "apiKeyControllerFindOne",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchApiKeyControllerFindOne({ ...fetcherOptions, ...variables }, signal),
+    {
+      ...options,
+      ...queryOptions,
+    }
+  );
+};
+
+export type ApiKeyControllerIsValidPathParams = {
+  apiKey: string;
+};
+
+export type ApiKeyControllerIsValidError = Fetcher.ErrorWrapper<undefined>;
+
+export type ApiKeyControllerIsValidVariables = {
+  pathParams: ApiKeyControllerIsValidPathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchApiKeyControllerIsValid = (
+  variables: ApiKeyControllerIsValidVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.ApiKeyDto,
+    ApiKeyControllerIsValidError,
+    undefined,
+    {},
+    {},
+    ApiKeyControllerIsValidPathParams
+  >({
+    url: "/api/v1/api-key/is-valid/{apiKey}",
+    method: "get",
+    ...variables,
+    signal,
+  });
+
+export const useApiKeyControllerIsValid = <TData = Schemas.ApiKeyDto>(
+  variables: ApiKeyControllerIsValidVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.ApiKeyDto,
+      ApiKeyControllerIsValidError,
+      TData
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
+    Schemas.ApiKeyDto,
+    ApiKeyControllerIsValidError,
+    TData
+  >(
+    queryKeyFn({
+      path: "/api/v1/api-key/is-valid/{apiKey}",
+      operationId: "apiKeyControllerIsValid",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchApiKeyControllerIsValid({ ...fetcherOptions, ...variables }, signal),
+    {
+      ...options,
+      ...queryOptions,
+    }
+  );
+};
+
+export type ApiKeyControllerRegeneratePathParams = {
+  apiKey: string;
+};
+
+export type ApiKeyControllerRegenerateError = Fetcher.ErrorWrapper<undefined>;
+
+export type ApiKeyControllerRegenerateVariables = {
+  body: Schemas.RegenerateApiKeyDto;
+  pathParams: ApiKeyControllerRegeneratePathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchApiKeyControllerRegenerate = (
+  variables: ApiKeyControllerRegenerateVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.ApiKeyDto,
+    ApiKeyControllerRegenerateError,
+    Schemas.RegenerateApiKeyDto,
+    {},
+    {},
+    ApiKeyControllerRegeneratePathParams
+  >({
+    url: "/api/v1/api-key/regenerate/{apiKey}",
+    method: "patch",
+    ...variables,
+    signal,
+  });
+
+export const useApiKeyControllerRegenerate = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.ApiKeyDto,
+      ApiKeyControllerRegenerateError,
+      ApiKeyControllerRegenerateVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.ApiKeyDto,
+    ApiKeyControllerRegenerateError,
+    ApiKeyControllerRegenerateVariables
+  >(
+    (variables: ApiKeyControllerRegenerateVariables) =>
+      fetchApiKeyControllerRegenerate({ ...fetcherOptions, ...variables }),
+    options
+  );
+};
+
+export type ApiKeyControllerRevokePathParams = {
+  apiKey: string;
+};
+
+export type ApiKeyControllerRevokeError = Fetcher.ErrorWrapper<undefined>;
+
+export type ApiKeyControllerRevokeVariables = {
+  body: Schemas.RevokeApiKeyDto;
+  pathParams: ApiKeyControllerRevokePathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchApiKeyControllerRevoke = (
+  variables: ApiKeyControllerRevokeVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.ApiKeyDto,
+    ApiKeyControllerRevokeError,
+    Schemas.RevokeApiKeyDto,
+    {},
+    {},
+    ApiKeyControllerRevokePathParams
+  >({
+    url: "/api/v1/api-key/revoke/{apiKey}",
+    method: "patch",
+    ...variables,
+    signal,
+  });
+
+export const useApiKeyControllerRevoke = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.ApiKeyDto,
+      ApiKeyControllerRevokeError,
+      ApiKeyControllerRevokeVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.ApiKeyDto,
+    ApiKeyControllerRevokeError,
+    ApiKeyControllerRevokeVariables
+  >(
+    (variables: ApiKeyControllerRevokeVariables) =>
+      fetchApiKeyControllerRevoke({ ...fetcherOptions, ...variables }),
+    options
+  );
+};
+
+export type ApiKeyControllerRemovePathParams = {
+  id: string;
+};
+
+export type ApiKeyControllerRemoveError = Fetcher.ErrorWrapper<undefined>;
+
+export type ApiKeyControllerRemoveVariables = {
+  pathParams: ApiKeyControllerRemovePathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchApiKeyControllerRemove = (
+  variables: ApiKeyControllerRemoveVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.ApiKey,
+    ApiKeyControllerRemoveError,
+    undefined,
+    {},
+    {},
+    ApiKeyControllerRemovePathParams
+  >({ url: "/api/v1/api-key/{id}", method: "delete", ...variables, signal });
+
+export const useApiKeyControllerRemove = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.ApiKey,
+      ApiKeyControllerRemoveError,
+      ApiKeyControllerRemoveVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.ApiKey,
+    ApiKeyControllerRemoveError,
+    ApiKeyControllerRemoveVariables
+  >(
+    (variables: ApiKeyControllerRemoveVariables) =>
+      fetchApiKeyControllerRemove({ ...fetcherOptions, ...variables }),
+    options
+  );
+};
+
 export type AddressControllerCreateError = Fetcher.ErrorWrapper<undefined>;
 
 export type AddressControllerCreateVariables = {
@@ -409,8 +776,12 @@ export type AddressControllerFindAllQueryParams = {
 
 export type AddressControllerFindAllError = Fetcher.ErrorWrapper<undefined>;
 
-export type AddressControllerFindAllResponse = Schemas.PaginatedDto & {
-  results?: Schemas.Address[];
+export type AddressControllerFindAllResponse = {
+  total: number;
+  limit: number;
+  offset: number;
+  count: number;
+  results: Schemas.Address[];
 };
 
 export type AddressControllerFindAllVariables = {
@@ -614,87 +985,38 @@ export const useAddressControllerRemove = (
   );
 };
 
-export type PaymentControllerCreateError = Fetcher.ErrorWrapper<undefined>;
-
-export type PaymentControllerCreateVariables = {
-  body: Schemas.CreatePaymentDto;
-} & Dev3Context["fetcherOptions"];
-
-export const fetchPaymentControllerCreate = (
-  variables: PaymentControllerCreateVariables,
-  signal?: AbortSignal
-) =>
-  dev3Fetch<
-    Schemas.Payment,
-    PaymentControllerCreateError,
-    Schemas.CreatePaymentDto,
-    {},
-    {},
-    {}
-  >({ url: "/api/v1/payment", method: "post", ...variables, signal });
-
-export const usePaymentControllerCreate = (
-  options?: Omit<
-    reactQuery.UseMutationOptions<
-      Schemas.Payment,
-      PaymentControllerCreateError,
-      PaymentControllerCreateVariables
-    >,
-    "mutationFn"
-  >
-) => {
-  const { fetcherOptions } = useDev3Context();
-  return reactQuery.useMutation<
-    Schemas.Payment,
-    PaymentControllerCreateError,
-    PaymentControllerCreateVariables
-  >(
-    (variables: PaymentControllerCreateVariables) =>
-      fetchPaymentControllerCreate({ ...fetcherOptions, ...variables }),
-    options
-  );
-};
-
-export type PaymentControllerFindAllQueryParams = {
+export type ContractControllerFindAllQueryParams = {
   offset?: number;
   limit?: number;
-  uid?: string;
-  receiver?: string;
-  receiver_fungible?: string;
-  status?: "pending" | "paid";
+  name?: string;
+  isAudited?: boolean;
 };
 
-export type PaymentControllerFindAllError = Fetcher.ErrorWrapper<undefined>;
+export type ContractControllerFindAllError = Fetcher.ErrorWrapper<undefined>;
 
-export type PaymentControllerFindAllResponse = Schemas.PaginatedDto & {
-  results?: Schemas.Payment[];
-};
-
-export type PaymentControllerFindAllVariables = {
-  queryParams?: PaymentControllerFindAllQueryParams;
+export type ContractControllerFindAllVariables = {
+  queryParams?: ContractControllerFindAllQueryParams;
 } & Dev3Context["fetcherOptions"];
 
-export const fetchPaymentControllerFindAll = (
-  variables: PaymentControllerFindAllVariables,
+export const fetchContractControllerFindAll = (
+  variables: ContractControllerFindAllVariables,
   signal?: AbortSignal
 ) =>
   dev3Fetch<
-    PaymentControllerFindAllResponse,
-    PaymentControllerFindAllError,
+    Schemas.PaginatedDto,
+    ContractControllerFindAllError,
     undefined,
     {},
-    PaymentControllerFindAllQueryParams,
+    ContractControllerFindAllQueryParams,
     {}
-  >({ url: "/api/v1/payment", method: "get", ...variables, signal });
+  >({ url: "/api/v1/contract", method: "get", ...variables, signal });
 
-export const usePaymentControllerFindAll = <
-  TData = PaymentControllerFindAllResponse
->(
-  variables: PaymentControllerFindAllVariables,
+export const useContractControllerFindAll = <TData = Schemas.PaginatedDto>(
+  variables: ContractControllerFindAllVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<
-      PaymentControllerFindAllResponse,
-      PaymentControllerFindAllError,
+      Schemas.PaginatedDto,
+      ContractControllerFindAllError,
       TData
     >,
     "queryKey" | "queryFn"
@@ -702,17 +1024,17 @@ export const usePaymentControllerFindAll = <
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
   return reactQuery.useQuery<
-    PaymentControllerFindAllResponse,
-    PaymentControllerFindAllError,
+    Schemas.PaginatedDto,
+    ContractControllerFindAllError,
     TData
   >(
     queryKeyFn({
-      path: "/api/v1/payment",
-      operationId: "paymentControllerFindAll",
+      path: "/api/v1/contract",
+      operationId: "contractControllerFindAll",
       variables,
     }),
     ({ signal }) =>
-      fetchPaymentControllerFindAll(
+      fetchContractControllerFindAll(
         { ...fetcherOptions, ...variables },
         signal
       ),
@@ -723,161 +1045,299 @@ export const usePaymentControllerFindAll = <
   );
 };
 
-export type PaymentControllerFindByIdPathParams = {
-  id: string;
-};
+export type ContractControllerUpdateContractsError =
+  Fetcher.ErrorWrapper<undefined>;
 
-export type PaymentControllerFindByIdError = Fetcher.ErrorWrapper<undefined>;
-
-export type PaymentControllerFindByIdVariables = {
-  pathParams: PaymentControllerFindByIdPathParams;
-} & Dev3Context["fetcherOptions"];
-
-export const fetchPaymentControllerFindById = (
-  variables: PaymentControllerFindByIdVariables,
-  signal?: AbortSignal
-) =>
-  dev3Fetch<
-    Schemas.PaymentDto,
-    PaymentControllerFindByIdError,
-    undefined,
-    {},
-    {},
-    PaymentControllerFindByIdPathParams
-  >({ url: "/api/v1/payment/{id}", method: "get", ...variables, signal });
-
-export const usePaymentControllerFindById = <TData = Schemas.PaymentDto>(
-  variables: PaymentControllerFindByIdVariables,
-  options?: Omit<
-    reactQuery.UseQueryOptions<
-      Schemas.PaymentDto,
-      PaymentControllerFindByIdError,
-      TData
-    >,
-    "queryKey" | "queryFn"
-  >
-) => {
-  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
-  return reactQuery.useQuery<
-    Schemas.PaymentDto,
-    PaymentControllerFindByIdError,
-    TData
-  >(
-    queryKeyFn({
-      path: "/api/v1/payment/{id}",
-      operationId: "paymentControllerFindById",
-      variables,
-    }),
-    ({ signal }) =>
-      fetchPaymentControllerFindById(
-        { ...fetcherOptions, ...variables },
-        signal
-      ),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
-};
-
-export type PaymentControllerFindByUidPathParams = {
-  uid: string;
-};
-
-export type PaymentControllerFindByUidError = Fetcher.ErrorWrapper<undefined>;
-
-export type PaymentControllerFindByUidVariables = {
-  pathParams: PaymentControllerFindByUidPathParams;
-} & Dev3Context["fetcherOptions"];
-
-export const fetchPaymentControllerFindByUid = (
-  variables: PaymentControllerFindByUidVariables,
-  signal?: AbortSignal
-) =>
-  dev3Fetch<
-    Schemas.PaymentDto,
-    PaymentControllerFindByUidError,
-    undefined,
-    {},
-    {},
-    PaymentControllerFindByUidPathParams
-  >({ url: "/api/v1/payment/uid/{uid}", method: "get", ...variables, signal });
-
-export const usePaymentControllerFindByUid = <TData = Schemas.PaymentDto>(
-  variables: PaymentControllerFindByUidVariables,
-  options?: Omit<
-    reactQuery.UseQueryOptions<
-      Schemas.PaymentDto,
-      PaymentControllerFindByUidError,
-      TData
-    >,
-    "queryKey" | "queryFn"
-  >
-) => {
-  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
-  return reactQuery.useQuery<
-    Schemas.PaymentDto,
-    PaymentControllerFindByUidError,
-    TData
-  >(
-    queryKeyFn({
-      path: "/api/v1/payment/uid/{uid}",
-      operationId: "paymentControllerFindByUid",
-      variables,
-    }),
-    ({ signal }) =>
-      fetchPaymentControllerFindByUid(
-        { ...fetcherOptions, ...variables },
-        signal
-      ),
-    {
-      ...options,
-      ...queryOptions,
-    }
-  );
-};
-
-export type PaymentControllerPagodaEventError = Fetcher.ErrorWrapper<undefined>;
-
-export type PaymentControllerPagodaEventVariables =
+export type ContractControllerUpdateContractsVariables =
   Dev3Context["fetcherOptions"];
 
-export const fetchPaymentControllerPagodaEvent = (
-  variables: PaymentControllerPagodaEventVariables,
+export const fetchContractControllerUpdateContracts = (
+  variables: ContractControllerUpdateContractsVariables,
   signal?: AbortSignal
 ) =>
   dev3Fetch<
-    Schemas.PaymentDto,
-    PaymentControllerPagodaEventError,
+    undefined,
+    ContractControllerUpdateContractsError,
     undefined,
     {},
     {},
     {}
   >({
-    url: "/api/v1/payment/ft-transfer-pagoda",
+    url: "/api/v1/contract/update-contracts",
     method: "post",
     ...variables,
     signal,
   });
 
-export const usePaymentControllerPagodaEvent = (
+export const useContractControllerUpdateContracts = (
   options?: Omit<
     reactQuery.UseMutationOptions<
-      Schemas.PaymentDto,
-      PaymentControllerPagodaEventError,
-      PaymentControllerPagodaEventVariables
+      undefined,
+      ContractControllerUpdateContractsError,
+      ContractControllerUpdateContractsVariables
     >,
     "mutationFn"
   >
 ) => {
   const { fetcherOptions } = useDev3Context();
   return reactQuery.useMutation<
-    Schemas.PaymentDto,
-    PaymentControllerPagodaEventError,
-    PaymentControllerPagodaEventVariables
+    undefined,
+    ContractControllerUpdateContractsError,
+    ContractControllerUpdateContractsVariables
   >(
-    (variables: PaymentControllerPagodaEventVariables) =>
-      fetchPaymentControllerPagodaEvent({ ...fetcherOptions, ...variables }),
+    (variables: ContractControllerUpdateContractsVariables) =>
+      fetchContractControllerUpdateContracts({
+        ...fetcherOptions,
+        ...variables,
+      }),
+    options
+  );
+};
+
+export type TransactionRequestControllerCreateError =
+  Fetcher.ErrorWrapper<undefined>;
+
+export type TransactionRequestControllerCreateVariables = {
+  body: Schemas.CreateTransactionRequestDto;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchTransactionRequestControllerCreate = (
+  variables: TransactionRequestControllerCreateVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.TransactionRequest,
+    TransactionRequestControllerCreateError,
+    Schemas.CreateTransactionRequestDto,
+    {},
+    {},
+    {}
+  >({
+    url: "/api/v1/transaction-request",
+    method: "post",
+    ...variables,
+    signal,
+  });
+
+export const useTransactionRequestControllerCreate = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.TransactionRequest,
+      TransactionRequestControllerCreateError,
+      TransactionRequestControllerCreateVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.TransactionRequest,
+    TransactionRequestControllerCreateError,
+    TransactionRequestControllerCreateVariables
+  >(
+    (variables: TransactionRequestControllerCreateVariables) =>
+      fetchTransactionRequestControllerCreate({
+        ...fetcherOptions,
+        ...variables,
+      }),
+    options
+  );
+};
+
+export type TransactionRequestControllerFindAllQueryParams = {
+  project_id?: string;
+  offset?: number;
+  limit?: number;
+  contractId?: string;
+  method?: string;
+  status?: "Pending" | "Success" | "Failure";
+};
+
+export type TransactionRequestControllerFindAllError =
+  Fetcher.ErrorWrapper<undefined>;
+
+export type TransactionRequestControllerFindAllResponse = {
+  total: number;
+  limit: number;
+  offset: number;
+  count: number;
+  results: Schemas.TransactionRequest[];
+};
+
+export type TransactionRequestControllerFindAllVariables = {
+  queryParams?: TransactionRequestControllerFindAllQueryParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchTransactionRequestControllerFindAll = (
+  variables: TransactionRequestControllerFindAllVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    TransactionRequestControllerFindAllResponse,
+    TransactionRequestControllerFindAllError,
+    undefined,
+    {},
+    TransactionRequestControllerFindAllQueryParams,
+    {}
+  >({
+    url: "/api/v1/transaction-request",
+    method: "get",
+    ...variables,
+    signal,
+  });
+
+export const useTransactionRequestControllerFindAll = <
+  TData = TransactionRequestControllerFindAllResponse
+>(
+  variables: TransactionRequestControllerFindAllVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      TransactionRequestControllerFindAllResponse,
+      TransactionRequestControllerFindAllError,
+      TData
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
+    TransactionRequestControllerFindAllResponse,
+    TransactionRequestControllerFindAllError,
+    TData
+  >(
+    queryKeyFn({
+      path: "/api/v1/transaction-request",
+      operationId: "transactionRequestControllerFindAll",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchTransactionRequestControllerFindAll(
+        { ...fetcherOptions, ...variables },
+        signal
+      ),
+    {
+      ...options,
+      ...queryOptions,
+    }
+  );
+};
+
+export type TransactionRequestControllerFindByUuidPathParams = {
+  uuid: string;
+};
+
+export type TransactionRequestControllerFindByUuidError =
+  Fetcher.ErrorWrapper<undefined>;
+
+export type TransactionRequestControllerFindByUuidVariables = {
+  pathParams: TransactionRequestControllerFindByUuidPathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchTransactionRequestControllerFindByUuid = (
+  variables: TransactionRequestControllerFindByUuidVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.TransactionRequestDto,
+    TransactionRequestControllerFindByUuidError,
+    undefined,
+    {},
+    {},
+    TransactionRequestControllerFindByUuidPathParams
+  >({
+    url: "/api/v1/transaction-request/uuid/{uuid}",
+    method: "get",
+    ...variables,
+    signal,
+  });
+
+export const useTransactionRequestControllerFindByUuid = <
+  TData = Schemas.TransactionRequestDto
+>(
+  variables: TransactionRequestControllerFindByUuidVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.TransactionRequestDto,
+      TransactionRequestControllerFindByUuidError,
+      TData
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
+    Schemas.TransactionRequestDto,
+    TransactionRequestControllerFindByUuidError,
+    TData
+  >(
+    queryKeyFn({
+      path: "/api/v1/transaction-request/uuid/{uuid}",
+      operationId: "transactionRequestControllerFindByUuid",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchTransactionRequestControllerFindByUuid(
+        { ...fetcherOptions, ...variables },
+        signal
+      ),
+    {
+      ...options,
+      ...queryOptions,
+    }
+  );
+};
+
+export type TransactionRequestControllerUpdatePathParams = {
+  uuid: string;
+};
+
+export type TransactionRequestControllerUpdateError =
+  Fetcher.ErrorWrapper<undefined>;
+
+export type TransactionRequestControllerUpdateVariables = {
+  body: Schemas.UpdateTransactionRequestDto;
+  pathParams: TransactionRequestControllerUpdatePathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchTransactionRequestControllerUpdate = (
+  variables: TransactionRequestControllerUpdateVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.TransactionRequestDto,
+    TransactionRequestControllerUpdateError,
+    Schemas.UpdateTransactionRequestDto,
+    {},
+    {},
+    TransactionRequestControllerUpdatePathParams
+  >({
+    url: "/api/v1/transaction-request/{uuid}",
+    method: "patch",
+    ...variables,
+    signal,
+  });
+
+export const useTransactionRequestControllerUpdate = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.TransactionRequestDto,
+      TransactionRequestControllerUpdateError,
+      TransactionRequestControllerUpdateVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.TransactionRequestDto,
+    TransactionRequestControllerUpdateError,
+    TransactionRequestControllerUpdateVariables
+  >(
+    (variables: TransactionRequestControllerUpdateVariables) =>
+      fetchTransactionRequestControllerUpdate({
+        ...fetcherOptions,
+        ...variables,
+      }),
     options
   );
 };
@@ -904,6 +1364,21 @@ export type QueryOperation =
       variables: UserControllerFindMeVariables;
     }
   | {
+      path: "/api/v1/api-key";
+      operationId: "apiKeyControllerFindAll";
+      variables: ApiKeyControllerFindAllVariables;
+    }
+  | {
+      path: "/api/v1/api-key/{projectId}";
+      operationId: "apiKeyControllerFindOne";
+      variables: ApiKeyControllerFindOneVariables;
+    }
+  | {
+      path: "/api/v1/api-key/is-valid/{apiKey}";
+      operationId: "apiKeyControllerIsValid";
+      variables: ApiKeyControllerIsValidVariables;
+    }
+  | {
       path: "/api/v1/address";
       operationId: "addressControllerFindAll";
       variables: AddressControllerFindAllVariables;
@@ -914,17 +1389,17 @@ export type QueryOperation =
       variables: AddressControllerFindOneVariables;
     }
   | {
-      path: "/api/v1/payment";
-      operationId: "paymentControllerFindAll";
-      variables: PaymentControllerFindAllVariables;
+      path: "/api/v1/contract";
+      operationId: "contractControllerFindAll";
+      variables: ContractControllerFindAllVariables;
     }
   | {
-      path: "/api/v1/payment/{id}";
-      operationId: "paymentControllerFindById";
-      variables: PaymentControllerFindByIdVariables;
+      path: "/api/v1/transaction-request";
+      operationId: "transactionRequestControllerFindAll";
+      variables: TransactionRequestControllerFindAllVariables;
     }
   | {
-      path: "/api/v1/payment/uid/{uid}";
-      operationId: "paymentControllerFindByUid";
-      variables: PaymentControllerFindByUidVariables;
+      path: "/api/v1/transaction-request/uuid/{uuid}";
+      operationId: "transactionRequestControllerFindByUuid";
+      variables: TransactionRequestControllerFindByUuidVariables;
     };
