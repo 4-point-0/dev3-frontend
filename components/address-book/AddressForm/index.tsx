@@ -40,13 +40,13 @@ export const AccountForm: React.FC<IAddressFormProps> = ({
         nearWalletRegex.test(value) ? null : "Invalid wallet address",
       alias: (value) => (value.length > 0 ? null : "Alias is required"),
       phone: (value) =>
-        value === ""
+        !value
           ? null
           : isValidPhoneNumber(value)
           ? null
           : "Invalid phone number",
       email: (value) =>
-        value === ""
+        !value
           ? null
           : /^\S+@\S+$/.test(value)
           ? null

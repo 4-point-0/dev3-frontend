@@ -42,8 +42,8 @@ export const EditAddress = () => {
       await fetchAddressControllerUpdate({
         pathParams: { id },
         body: {
-          email: email,
-          phone: phone,
+          email: (email || null) as any,
+          phone: (phone || null) as any,
         },
       });
 
