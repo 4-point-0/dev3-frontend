@@ -4024,6 +4024,11 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
+mantine-datatable@^1.7.24:
+  version "1.7.24"
+  resolved "https://registry.yarnpkg.com/mantine-datatable/-/mantine-datatable-1.7.24.tgz#6de07b74568c57bec58758334531392a0c178ebb"
+  integrity sha512-yyoUipYLoT/GgMD5vJDywrph7iw75DO4sMwXytk6cqvE9lWGsCElhqdpEh96SaOLKogXWdheMP7jrxPI2S7vJA==
+
 match-sorter@^6.0.2:
   version "6.3.1"
   resolved "https://registry.yarnpkg.com/match-sorter/-/match-sorter-6.3.1.tgz#98cc37fda756093424ddf3cbc62bfe9c75b92bda"

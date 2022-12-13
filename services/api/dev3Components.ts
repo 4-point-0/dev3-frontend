@@ -1342,6 +1342,93 @@ export const useTransactionRequestControllerUpdate = (
   );
 };
 
+export type FileControllerUploadFileError = Fetcher.ErrorWrapper<undefined>;
+
+export type FileControllerUploadFileVariables = {
+  body: Schemas.FileUploadDto;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchFileControllerUploadFile = (
+  variables: FileControllerUploadFileVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.File,
+    FileControllerUploadFileError,
+    Schemas.FileUploadDto,
+    {},
+    {},
+    {}
+  >({ url: "/api/v1/file", method: "post", ...variables, signal });
+
+export const useFileControllerUploadFile = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.File,
+      FileControllerUploadFileError,
+      FileControllerUploadFileVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.File,
+    FileControllerUploadFileError,
+    FileControllerUploadFileVariables
+  >(
+    (variables: FileControllerUploadFileVariables) =>
+      fetchFileControllerUploadFile({ ...fetcherOptions, ...variables }),
+    options
+  );
+};
+
+export type FileControllerUpdateFilePathParams = {
+  url: string;
+};
+
+export type FileControllerUpdateFileError = Fetcher.ErrorWrapper<undefined>;
+
+export type FileControllerUpdateFileVariables = {
+  body: Schemas.FileUploadDto;
+  pathParams: FileControllerUpdateFilePathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchFileControllerUpdateFile = (
+  variables: FileControllerUpdateFileVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.File,
+    FileControllerUpdateFileError,
+    Schemas.FileUploadDto,
+    {},
+    {},
+    FileControllerUpdateFilePathParams
+  >({ url: "/api/v1/file/{url}", method: "patch", ...variables, signal });
+
+export const useFileControllerUpdateFile = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.File,
+      FileControllerUpdateFileError,
+      FileControllerUpdateFileVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.File,
+    FileControllerUpdateFileError,
+    FileControllerUpdateFileVariables
+  >(
+    (variables: FileControllerUpdateFileVariables) =>
+      fetchFileControllerUpdateFile({ ...fetcherOptions, ...variables }),
+    options
+  );
+};
+
 export type QueryOperation =
   | {
       path: "/api/v1/project";

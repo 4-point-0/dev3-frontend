@@ -189,3 +189,25 @@ export type UpdateTransactionRequestDto = {
   caller_address: string;
   txDetails?: Record<string, any>;
 };
+
+export type FileUploadDto = {
+  /**
+   * @format binary
+   */
+  file: Blob;
+};
+
+export type File = {
+  /**
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * @format date-time
+   */
+  createdAt: string;
+  name: string;
+  mime_type: string;
+  url: string;
+  key: string;
+};

@@ -1,19 +1,15 @@
-import { Box, Button, Group, Paper, Text, TextInput } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { Box, Paper, Text } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { Check, X } from "tabler-icons-react";
-import { fetchAddressControllerCreate } from "../../../services/api/dev3Components";
 
-interface AddressForm {
-  alias: string;
-  wallet: string;
-  email: string;
-  phone: string;
-}
+import {
+  AccountForm,
+  IAddressFormValues,
+} from "../../../components/address-book/AddressForm";
+import { fetchAddressControllerCreate } from "../../../services/api/dev3Components";
 
 const CreateAddress = () => {
   const nearWalletRegex =
@@ -23,35 +19,12 @@ const CreateAddress = () => {
 
   const router = useRouter();
 
-  const form = useForm<AddressForm>({
-    validateInputOnChange: true,
-    initialValues: {
-      alias: "",
-      wallet: "",
-      email: "",
-      phone: "",
-    },
-
-    validate: {
-      wallet: (value) =>
-        nearWalletRegex.test(value) ? null : "Invalid wallet address",
-      alias: (value) => (value.length > 0 ? null : "Alias is required"),
-      phone: (value) =>
-        value === ""
-          ? null
-          : isValidPhoneNumber(value)
-          ? null
-          : "Invalid phone number",
-      email: (value) =>
-        value === ""
-          ? null
-          : /^\S+@\S+$/.test(value)
-          ? null
-          : "Invalid email address",
-    },
-  });
-
-  const handleSubmit = async ({ alias, wallet, email, phone }: AddressForm) => {
+  const handleSubmit = async ({
+    alias,
+    wallet,
+    email,
+    phone,
+  }: IAddressFormValues) => {
     try {
       setLoading(true);
 
@@ -64,7 +37,7 @@ const CreateAddress = () => {
         disallowClose: true,
       });
 
-      const response = await fetchAddressControllerCreate({
+      await fetchAddressControllerCreate({
         body: {
           alias,
           wallet,
@@ -94,7 +67,7 @@ const CreateAddress = () => {
         autoClose: 3000,
       });
 
-      console.log(error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -106,48 +79,7 @@ const CreateAddress = () => {
         Add new address
       </Text>
       <Paper p="lg" sx={{ maxWidth: 600 }} mx="auto">
-        <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-          <TextInput
-            withAsterisk
-            label="Alias"
-            description="Enter the alias for the account. Alias is a human readable description, through which you will be able to get the address."
-            placeholder="Enter alias for account"
-            {...form.getInputProps("alias")}
-          />
-
-          <TextInput
-            mt="sm"
-            withAsterisk
-            label="Wallet address"
-            description="Paste the wallet address you want to add to your address book"
-            placeholder="Enter wallet address"
-            {...form.getInputProps("wallet")}
-          />
-
-          <TextInput
-            mt="sm"
-            label="Email address (optional)"
-            description="If you wish, you can add the email of the user."
-            placeholder="Enter email address"
-            type="email"
-            {...form.getInputProps("email")}
-          />
-
-          <TextInput
-            mt="sm"
-            type="tel"
-            label="Phone (optional)"
-            description="If you wish, you can add the phone number of the user."
-            placeholder="Enter phone number"
-            {...form.getInputProps("phone")}
-          />
-
-          <Group position="right" mt="md">
-            <Button type="submit" variant="light" disabled={loading}>
-              Add address
-            </Button>
-          </Group>
-        </form>
+        <AccountForm disabled={loading} handleSubmit={handleSubmit} />
       </Paper>
     </Box>
   );
