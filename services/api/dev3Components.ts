@@ -238,7 +238,7 @@ export const fetchProjectControllerFindBySlug = (
   signal?: AbortSignal
 ) =>
   dev3Fetch<
-    Schemas.Project,
+    Schemas.ProjectDto,
     ProjectControllerFindBySlugError,
     undefined,
     {},
@@ -251,11 +251,11 @@ export const fetchProjectControllerFindBySlug = (
     signal,
   });
 
-export const useProjectControllerFindBySlug = <TData = Schemas.Project>(
+export const useProjectControllerFindBySlug = <TData = Schemas.ProjectDto>(
   variables: ProjectControllerFindBySlugVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<
-      Schemas.Project,
+      Schemas.ProjectDto,
       ProjectControllerFindBySlugError,
       TData
     >,
@@ -264,7 +264,7 @@ export const useProjectControllerFindBySlug = <TData = Schemas.Project>(
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
   return reactQuery.useQuery<
-    Schemas.Project,
+    Schemas.ProjectDto,
     ProjectControllerFindBySlugError,
     TData
   >(
@@ -1384,7 +1384,7 @@ export const useFileControllerUploadFile = (
 };
 
 export type FileControllerUpdateFilePathParams = {
-  url: string;
+  id: string;
 };
 
 export type FileControllerUpdateFileError = Fetcher.ErrorWrapper<undefined>;
@@ -1405,7 +1405,7 @@ export const fetchFileControllerUpdateFile = (
     {},
     {},
     FileControllerUpdateFilePathParams
-  >({ url: "/api/v1/file/{url}", method: "patch", ...variables, signal });
+  >({ url: "/api/v1/file/{id}", method: "patch", ...variables, signal });
 
 export const useFileControllerUpdateFile = (
   options?: Omit<

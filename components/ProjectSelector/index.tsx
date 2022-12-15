@@ -80,7 +80,7 @@ const ProjectSelector = () => {
               radius="sm"
               alt="Project logo"
               src={
-                selectedProject?.logoUrl ?? "https://via.placeholder.com/150"
+                selectedProject?.logo?.url ?? "https://via.placeholder.com/150"
               }
             />
 
@@ -109,7 +109,7 @@ const ProjectSelector = () => {
                   size="lg"
                   radius="sm"
                   alt={project.name}
-                  src={project.logoUrl}
+                  src={project?.logo?.url}
                 />
               }
               rightSection={project.slug === selectedProject?.slug ? "✓" : ""}

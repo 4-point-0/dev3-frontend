@@ -1,18 +1,25 @@
 import {
   Button,
+  Container,
   Group,
   Paper,
+  Stack,
+  Text,
   TextInput,
+  Title,
   useMantineTheme,
 } from "@mantine/core";
+import { FileWithPath } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { NextPage } from "next";
 import { useState } from "react";
 import { Check, X } from "tabler-icons-react";
+import { ProjectImage } from "../../components/ProjectImage";
 
 import { useSelectedProject } from "../../context/SelectedProjectContext";
 import {
+  fetchFileControllerUploadFile,
   fetchProjectControllerCreate,
   useProjectControllerFindAll,
 } from "../../services/api/dev3Components";
@@ -21,6 +28,7 @@ const NewProject: NextPage = () => {
   const theme = useMantineTheme();
 
   const [loading, setLoading] = useState(false);
+  const [logoFile, setLogoFile] = useState<FileWithPath | null>(null);
 
   const { refetch: refetchProjects } = useProjectControllerFindAll({});
   const { selectProject } = useSelectedProject();
@@ -30,23 +38,23 @@ const NewProject: NextPage = () => {
     initialValues: {
       name: "",
       slug: "",
-      logoUrl: "",
     },
     validate: {
       name: (value) => (value.length > 0 ? null : "Name is required"),
       slug: (value) => (value.length > 0 ? null : "Slug is required"),
-      logoUrl: (value) => (value.length > 0 ? null : "Logo URL is required"),
     },
   });
+
+  const handleImageUpload = (file: FileWithPath) => {
+    setLogoFile(file);
+  };
 
   const handleSubmit = async ({
     name,
     slug,
-    logoUrl,
   }: {
     name: string;
     slug: string;
-    logoUrl: string;
   }) => {
     try {
       setLoading(true);
@@ -60,15 +68,25 @@ const NewProject: NextPage = () => {
         disallowClose: true,
       });
 
+      let logoId;
+
+      if (logoFile) {
+        const uploadedFile = await fetchFileControllerUploadFile({
+          body: {
+            file: logoFile,
+          },
+        });
+
+        logoId = (uploadedFile as any)._id;
+      }
+
       const project = await fetchProjectControllerCreate({
         body: {
           name,
           slug,
-          logoUrl,
-        },
+          logo_id: logoId,
+        } as any,
       });
-
-      await refetchProjects();
 
       updateNotification({
         id: "loading-notification",
@@ -80,6 +98,7 @@ const NewProject: NextPage = () => {
         autoClose: 3000,
       });
 
+      await refetchProjects();
       selectProject(project);
     } catch (error) {
       updateNotification({
@@ -99,41 +118,43 @@ const NewProject: NextPage = () => {
   };
 
   return (
-    <Paper p="lg" sx={{ maxWidth: 300 }} mx="auto">
-      <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-        <TextInput
-          disabled={loading}
-          withAsterisk
-          label="Project Name"
-          placeholder="Enter project name"
-          {...form.getInputProps("name")}
-        />
+    <Container py="md">
+      <Paper p="xl" withBorder shadow="md">
+        <Stack spacing="md">
+          <Title order={2}>Create new project</Title>
 
-        <TextInput
-          disabled={loading}
-          mt="sm"
-          withAsterisk
-          label="Project Slug"
-          placeholder="Enter project slug"
-          {...form.getInputProps("slug")}
-        />
+          <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+            <TextInput
+              disabled={loading}
+              withAsterisk
+              label="Project Name"
+              placeholder="Enter project name"
+              {...form.getInputProps("name")}
+            />
 
-        <TextInput
-          disabled={loading}
-          mt="sm"
-          withAsterisk
-          label="Project Logo URL"
-          placeholder="Enter project logo URL"
-          {...form.getInputProps("logoUrl")}
-        />
+            <TextInput
+              disabled={loading}
+              mt="sm"
+              withAsterisk
+              label="Project Slug"
+              placeholder="Enter project slug"
+              {...form.getInputProps("slug")}
+            />
 
-        <Group position="right" mt="md">
-          <Button disabled={loading} type="submit">
-            Create project
-          </Button>
-        </Group>
-      </form>
-    </Paper>
+            <Stack mt="md" spacing={4}>
+              <Text fz="sm">Logo Image</Text>
+              <ProjectImage onUpload={handleImageUpload} />
+            </Stack>
+
+            <Group position="right" mt="md">
+              <Button disabled={loading} type="submit">
+                Create project
+              </Button>
+            </Group>
+          </form>
+        </Stack>
+      </Paper>
+    </Container>
   );
 };
 
