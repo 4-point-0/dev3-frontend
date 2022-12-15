@@ -43,7 +43,10 @@ export const SelectedProjectProvider = ({ children }: any) => {
   const selectProject = useCallback(
     (selectedProject: Project) => {
       setProject((previousProject) => {
-        if (!isSameProject(selectedProject)(previousProject)) {
+        if (
+          previousProject &&
+          !isSameProject(selectedProject)(previousProject)
+        ) {
           router.push("/contracts");
         }
 
