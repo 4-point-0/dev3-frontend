@@ -1,27 +1,32 @@
 import {
-  Box,
   Button,
-  Center,
+  Container,
   Group,
-  Image,
   Paper,
-  Text,
+  Stack,
   TextInput,
+  Title,
 } from "@mantine/core";
+import { FileWithPath } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { NextPage } from "next";
 import { useState } from "react";
 import { Check, X } from "tabler-icons-react";
+import { ProjectImage } from "../../components/ProjectImage";
 
 import { useSelectedProject } from "../../context/SelectedProjectContext";
 import {
+  fetchFileControllerUpdateFile,
+  fetchFileControllerUploadFile,
   fetchProjectControllerUpdate,
   useProjectControllerFindAll,
 } from "../../services/api/dev3Components";
+import { getLogoUrl } from "../../utils/logo";
 
 const Settings: NextPage = () => {
   const [loading, setLoading] = useState(false);
+  const [logoFile, setLogoFile] = useState<FileWithPath>();
   const { project } = useSelectedProject();
   const { refetch } = useProjectControllerFindAll({});
 
@@ -29,21 +34,17 @@ const Settings: NextPage = () => {
     validateInputOnChange: true,
     initialValues: {
       name: project?.name ?? "",
-      logoUrl: project?.logoUrl ?? "",
     },
     validate: {
       name: (value) => (value.length > 0 ? null : "Name is required"),
-      logoUrl: (value) => (value.length > 0 ? null : "Logo URL is required"),
     },
   });
 
-  const handleSubmit = async ({
-    name,
-    logoUrl,
-  }: {
-    name: string;
-    logoUrl: string;
-  }) => {
+  const handleImageUpload = async (file: FileWithPath) => {
+    setLogoFile(file);
+  };
+
+  const handleSubmit = async ({ name }: { name: string }) => {
     try {
       setLoading(true);
 
@@ -56,13 +57,35 @@ const Settings: NextPage = () => {
         disallowClose: true,
       });
 
-      const response = await fetchProjectControllerUpdate({
+      const id = (project as any)._id;
+      let logoId = (project?.logo as any)?._id;
+
+      if (logoFile && logoId) {
+        await fetchFileControllerUpdateFile({
+          body: {
+            file: logoFile,
+          },
+          pathParams: {
+            id: logoId,
+          },
+        });
+      } else if (logoFile) {
+        const uploadedFile = await fetchFileControllerUploadFile({
+          body: {
+            file: logoFile,
+          },
+        });
+
+        logoId = (uploadedFile as any)._id;
+      }
+
+      await fetchProjectControllerUpdate({
         pathParams: {
-          id: (project as any)._id,
+          id,
         },
         body: {
           name,
-          logoUrl,
+          logo_id: logoId,
         },
       });
 
@@ -94,49 +117,35 @@ const Settings: NextPage = () => {
   };
 
   return (
-    <Box>
-      <Text size="xl" weight={500}>
-        Settings
-      </Text>
-      <Paper p="lg" sx={{ maxWidth: 600 }} mx="auto">
-        <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-          <Center>
-            <Image
-              src={form.values.logoUrl}
-              withPlaceholder
-              height={200}
-              width={200}
-              radius="md"
-              alt={`${project?.name} Logo`}
+    <Container py="md">
+      <Paper p="xl" withBorder shadow="md">
+        <Stack spacing="md">
+          <Title order={2}>Settings</Title>
+
+          <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+            <TextInput
+              mt="md"
+              disabled={loading}
+              withAsterisk
+              label="Project Name"
+              placeholder="Enter project name"
+              {...form.getInputProps("name")}
             />
-          </Center>
 
-          <TextInput
-            disabled={loading}
-            mt="md"
-            withAsterisk
-            label="Project Logo URL"
-            placeholder="Enter project logo URL"
-            {...form.getInputProps("logoUrl")}
+            <Group position="right" mt="md">
+              <Button disabled={loading} type="submit">
+                Update project
+              </Button>
+            </Group>
+          </form>
+
+          <ProjectImage
+            imgUrl={project?.logo && getLogoUrl(project.logo)}
+            onUpload={handleImageUpload}
           />
-
-          <TextInput
-            mt="md"
-            disabled={loading}
-            withAsterisk
-            label="Project Name"
-            placeholder="Enter project name"
-            {...form.getInputProps("name")}
-          />
-
-          <Group position="right" mt="md">
-            <Button disabled={loading} type="submit">
-              Update project
-            </Button>
-          </Group>
-        </form>
+        </Stack>
       </Paper>
-    </Box>
+    </Container>
   );
 };
 

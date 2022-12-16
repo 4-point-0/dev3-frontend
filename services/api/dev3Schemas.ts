@@ -14,7 +14,7 @@ export type PaginatedDto = {
 export type CreateProjectDto = {
   name: string;
   slug: string;
-  logoUrl: string;
+  logo_id: string;
 };
 
 export type User = {
@@ -35,6 +35,22 @@ export type User = {
   nearWalletAccountId: string;
 };
 
+export type File = {
+  /**
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * @format date-time
+   */
+  createdAt: string;
+  name: string;
+  mime_type: string;
+  url: string;
+  key: string;
+  owner: User;
+};
+
 export type Project = {
   /**
    * @format date-time
@@ -46,14 +62,21 @@ export type Project = {
   createdAt: string;
   name: string;
   slug: string;
-  logoUrl: string;
+  logo: File;
   owner: User;
+};
+
+export type ProjectDto = {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url: string;
 };
 
 export type UpdateProjectDto = {
   name?: string;
   slug?: string;
-  logoUrl?: string;
+  logo_id?: string;
 };
 
 export type NearLoginRequestDto = {
@@ -195,19 +218,4 @@ export type FileUploadDto = {
    * @format binary
    */
   file: Blob;
-};
-
-export type File = {
-  /**
-   * @format date-time
-   */
-  updatedAt: string;
-  /**
-   * @format date-time
-   */
-  createdAt: string;
-  name: string;
-  mime_type: string;
-  url: string;
-  key: string;
 };

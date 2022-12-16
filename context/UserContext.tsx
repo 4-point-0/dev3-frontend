@@ -31,7 +31,6 @@ export const UserContextProvider = ({ children }: any) => {
   useEffect(() => {
     const getUser = async () => {
       try {
-        console.log("getUser");
         const userData = await fetchUserControllerFindMe({});
         localStorage.setItem("user", JSON.stringify(userData));
         setRoles(userData.roles);

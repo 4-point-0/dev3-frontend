@@ -16,6 +16,24 @@ export type Dev3FetcherOptions<TBody, THeaders, TQueryParams, TPathParams> = {
   signal?: AbortSignal;
 } & Dev3Context["fetcherOptions"];
 
+function serilazeBody(body: unknown) {
+  if (!body) {
+    return undefined;
+  }
+
+  if (body.hasOwnProperty("file")) {
+    const fd = new FormData();
+
+    fd.append("file", (body as any).file);
+
+    console.log(fd.get("file"));
+
+    return fd;
+  }
+
+  return JSON.stringify(body);
+}
+
 export async function dev3Fetch<
   TData,
   TError,
@@ -39,9 +57,11 @@ export async function dev3Fetch<
 >): Promise<TData> {
   try {
     const token = localStorage.getItem("token");
+    const isFileUpload = body?.hasOwnProperty("file");
 
     let newHeaders = {
-      "Content-Type": "application/json",
+      ...(!isFileUpload && { "Content-Type": "application/json" }),
+
       ...headers,
     };
 
@@ -57,7 +77,7 @@ export async function dev3Fetch<
       {
         signal,
         method: method.toUpperCase(),
-        body: body ? JSON.stringify(body) : undefined,
+        body: serilazeBody(body),
         headers: newHeaders,
       }
     );

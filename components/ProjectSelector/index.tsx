@@ -17,6 +17,7 @@ import {
 } from "../../context/SelectedProjectContext";
 import { useProjectControllerFindAll } from "../../services/api/dev3Components";
 import { Project } from "../../services/api/dev3Schemas";
+import { getLogoUrl } from "../../utils/logo";
 
 const ProjectSelector = () => {
   const { project, selectProject } = useSelectedProject();
@@ -80,7 +81,9 @@ const ProjectSelector = () => {
               radius="sm"
               alt="Project logo"
               src={
-                selectedProject?.logoUrl ?? "https://via.placeholder.com/150"
+                selectedProject?.logo
+                  ? getLogoUrl(selectedProject.logo)
+                  : "https://via.placeholder.com/150"
               }
             />
 
@@ -109,7 +112,7 @@ const ProjectSelector = () => {
                   size="lg"
                   radius="sm"
                   alt={project.name}
-                  src={project.logoUrl}
+                  src={getLogoUrl(project?.logo)}
                 />
               }
               rightSection={project.slug === selectedProject?.slug ? "✓" : ""}

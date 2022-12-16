@@ -134,6 +134,16 @@ const AddressBook = () => {
     },
   ];
 
+  const paginationProps =
+    data?.total ?? 0 < PAGE_LIMIT
+      ? {}
+      : {
+          totalRecords: data?.total,
+          recordsPerPage: PAGE_LIMIT,
+          onPageChange: handlePageChange,
+          page,
+        };
+
   return (
     <Stack align="flex-start">
       <Text size="xl" weight={500}>
@@ -153,15 +163,11 @@ const AddressBook = () => {
       <Paper sx={{ width: "100%" }} shadow="sm" p="md" withBorder>
         <DataTable
           highlightOnHover
-          minHeight={180}
           idAccessor="alias"
           columns={columns}
           records={data?.results}
           fetching={isLoading}
-          totalRecords={data?.total}
-          recordsPerPage={PAGE_LIMIT}
-          page={page}
-          onPageChange={handlePageChange}
+          {...paginationProps}
         ></DataTable>
       </Paper>
     </Stack>
