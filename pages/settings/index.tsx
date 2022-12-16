@@ -17,10 +17,12 @@ import { ProjectImage } from "../../components/ProjectImage";
 
 import { useSelectedProject } from "../../context/SelectedProjectContext";
 import {
+  fetchFileControllerUpdateFile,
   fetchFileControllerUploadFile,
   fetchProjectControllerUpdate,
   useProjectControllerFindAll,
 } from "../../services/api/dev3Components";
+import { getLogoUrl } from "../../utils/logo";
 
 const Settings: NextPage = () => {
   const [loading, setLoading] = useState(false);
@@ -58,8 +60,16 @@ const Settings: NextPage = () => {
       const id = (project as any)._id;
       let logoId = (project?.logo as any)?._id;
 
-      // TODO: once PATCH request is fixed on the BE it should be implemented here as well
-      if (logoFile) {
+      if (logoFile && logoId) {
+        await fetchFileControllerUpdateFile({
+          body: {
+            file: logoFile,
+          },
+          pathParams: {
+            id: logoId,
+          },
+        });
+      } else if (logoFile) {
         const uploadedFile = await fetchFileControllerUploadFile({
           body: {
             file: logoFile,
@@ -130,7 +140,7 @@ const Settings: NextPage = () => {
           </form>
 
           <ProjectImage
-            imgUrl={project?.logo?.url}
+            imgUrl={project?.logo && getLogoUrl(project.logo)}
             onUpload={handleImageUpload}
           />
         </Stack>
