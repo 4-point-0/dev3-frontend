@@ -61,18 +61,8 @@ const Settings: NextPage = () => {
       const id = (project as any)._id;
       let logoId = (project?.logo as any)?._id;
 
-      console.log({ logoId });
-
-      if (logoFile && logoId) {
-        const uploadedFile = await fetchFileControllerUpdateFile({
-          body: {
-            file: logoFile,
-          },
-          pathParams: {
-            id: logoId,
-          },
-        });
-      } else if (logoFile) {
+      // TODO: once PATCH request is fixed on the BE it should be implemented here as well
+      if (logoFile) {
         const uploadedFile = await fetchFileControllerUploadFile({
           body: {
             file: logoFile,
