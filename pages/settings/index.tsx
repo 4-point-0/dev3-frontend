@@ -1,11 +1,9 @@
 import {
   Button,
-  Center,
   Container,
   Group,
   Paper,
   Stack,
-  Text,
   TextInput,
   Title,
 } from "@mantine/core";
@@ -19,7 +17,6 @@ import { ProjectImage } from "../../components/ProjectImage";
 
 import { useSelectedProject } from "../../context/SelectedProjectContext";
 import {
-  fetchFileControllerUpdateFile,
   fetchFileControllerUploadFile,
   fetchProjectControllerUpdate,
   useProjectControllerFindAll,
