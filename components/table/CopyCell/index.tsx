@@ -2,18 +2,18 @@ import { ActionIcon, CopyButton, Group, Text, Tooltip } from "@mantine/core";
 import React from "react";
 import { Check, Copy } from "tabler-icons-react";
 
-interface ICopyCellProps {
+interface ICopyCellProps extends React.PropsWithChildren {
   value: string;
 }
 
-export const CopyCell: React.FC<ICopyCellProps> = ({ value }) => {
+export const CopyCell: React.FC<ICopyCellProps> = ({ value, children }) => {
   if (!value) {
     return <Text>-</Text>;
   }
 
   return (
     <Group>
-      {value}
+      {children || value}
       <CopyButton value={value} timeout={2000}>
         {({ copied, copy }) => (
           <Tooltip

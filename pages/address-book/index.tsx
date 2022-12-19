@@ -1,4 +1,13 @@
-import { ActionIcon, Button, Group, Paper, Stack, Text } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Container,
+  Group,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { openConfirmModal } from "@mantine/modals";
 import { NextLink } from "@mantine/next";
 import { showNotification } from "@mantine/notifications";
@@ -135,7 +144,7 @@ const AddressBook = () => {
   ];
 
   const paginationProps =
-    data?.total ?? 0 < PAGE_LIMIT
+    (data?.total || 0) <= PAGE_LIMIT
       ? {}
       : {
           totalRecords: data?.total,
@@ -145,32 +154,34 @@ const AddressBook = () => {
         };
 
   return (
-    <Stack align="flex-start">
-      <Text size="xl" weight={500}>
-        Addresses
-      </Text>
+    <Container fluid>
+      <Paper w="100%" shadow="sm" p="md" withBorder>
+        <Stack>
+          <Title order={2}>Address Book</Title>
 
-      <Button
-        sx={{ alignSelf: "self-end" }}
-        component={NextLink}
-        href="/address-book/create"
-        variant="light"
-        leftIcon={<Plus />}
-      >
-        Add new address
-      </Button>
+          <Button
+            sx={{ alignSelf: "self-end" }}
+            component={NextLink}
+            href="/address-book/create"
+            variant="light"
+            leftIcon={<Plus />}
+          >
+            Add new address
+          </Button>
 
-      <Paper sx={{ width: "100%" }} shadow="sm" p="md" withBorder>
-        <DataTable
-          highlightOnHover
-          idAccessor="alias"
-          columns={columns}
-          records={data?.results}
-          fetching={isLoading}
-          {...paginationProps}
-        ></DataTable>
+          <DataTable
+            highlightOnHover
+            idAccessor="alias"
+            minHeight={164}
+            columns={columns}
+            records={data?.results}
+            fetching={isLoading}
+            noRecordsText="No addresses"
+            {...paginationProps}
+          ></DataTable>
+        </Stack>
       </Paper>
-    </Stack>
+    </Container>
   );
 };
 
