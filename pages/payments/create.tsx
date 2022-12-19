@@ -16,21 +16,18 @@ import { openSpotlight, SpotlightProvider } from "@mantine/spotlight";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { AddressBook, Check, Search, X } from "tabler-icons-react";
-import { v4 } from "uuid";
+import { useSelectedProject } from "../../context/SelectedProjectContext";
 import {
-  fetchPaymentControllerCreate,
+  fetchTransactionRequestControllerCreate,
   useAddressControllerFindAll,
-} from "../../../services/api/dev3Components";
+} from "../../services/api/dev3Components";
+import { nearWalletRegex } from "../../utils/near";
 
 const CreatePayment = () => {
-  const nearWalletRegex =
-    /^((\w|(?<!\.)\.)+(?<!\.)\.(testnet|near)|[A-Fa-f0-9]{64})$/;
-
   const [loading, setLoading] = useState(false);
-
   const router = useRouter();
-
-  const { isLoading, data, error } = useAddressControllerFindAll({});
+  const { project } = useSelectedProject();
+  const { isLoading, data } = useAddressControllerFindAll({});
 
   const form = useForm({
     validateInputOnChange: true,
@@ -78,13 +75,11 @@ const CreatePayment = () => {
         disallowClose: true,
       });
 
-      const response = await fetchPaymentControllerCreate({
+      const response = await fetchTransactionRequestControllerCreate({
         body: {
-          uid: v4(),
-          memo,
-          amount: amount.toString(),
-          receiver,
-          receiver_fungible,
+          project_id: (project as any).__id,
+          method: "send",
+          is_near_token: true,
         },
       });
 
