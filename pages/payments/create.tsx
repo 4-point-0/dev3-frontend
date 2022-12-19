@@ -1,33 +1,27 @@
 import {
-  ActionIcon,
-  Box,
   Button,
   Checkbox,
+  Container,
   Group,
   NumberInput,
   Paper,
-  Text,
-  Textarea,
+  Stack,
   TextInput,
+  Title,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { openSpotlight, SpotlightProvider } from "@mantine/spotlight";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { AddressBook, Check, Search, X } from "tabler-icons-react";
-import { useSelectedProject } from "../../context/SelectedProjectContext";
-import {
-  fetchTransactionRequestControllerCreate,
-  useAddressControllerFindAll,
-} from "../../services/api/dev3Components";
+import { Check, X } from "tabler-icons-react";
+
+import { AddressSpotlight } from "../../components/payments/AddressSpotlight";
+import { Address } from "../../services/api/dev3Schemas";
 import { nearWalletRegex } from "../../utils/near";
 
 const CreatePayment = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { project } = useSelectedProject();
-  const { isLoading, data } = useAddressControllerFindAll({});
 
   const form = useForm({
     validateInputOnChange: true,
@@ -52,17 +46,7 @@ const CreatePayment = () => {
     },
   });
 
-  const handleSubmit = async ({
-    memo,
-    amount,
-    receiver,
-    receiver_fungible,
-  }: {
-    memo: string;
-    amount: number;
-    receiver: string;
-    receiver_fungible: string;
-  }) => {
+  const handleSubmit = async ({ amount, receiver }: any) => {
     try {
       setLoading(true);
 
@@ -75,13 +59,13 @@ const CreatePayment = () => {
         disallowClose: true,
       });
 
-      const response = await fetchTransactionRequestControllerCreate({
-        body: {
-          project_id: (project as any).__id,
-          method: "send",
-          is_near_token: true,
-        },
-      });
+      // const response = await fetchTransactionRequestControllerCreate({
+      //   body: {
+      //     project_id: (project as any).__id,
+      //     method: "send",
+      //     is_near_token: true,
+      //   },
+      // });
 
       updateNotification({
         id: "loading-notification",
@@ -110,89 +94,63 @@ const CreatePayment = () => {
     }
   };
 
+  const handleAddressSelect = (address: Address) => {
+    form.setFieldValue("receiver", address.wallet);
+  };
+
   return (
-    <Box>
-      <Text size="xl" weight={500}>
-        Create payment request
-      </Text>
-      <Paper p="lg" sx={{ maxWidth: 600 }} mx="auto">
-        <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-          <TextInput
-            withAsterisk
-            label="Receiver account id"
-            description="The account to which the funds will be sent"
-            placeholder="Enter receiver account id"
-            rightSection={
-              <SpotlightProvider
-                actions={
-                  data?.results?.map((address) => ({
-                    title: address.alias,
-                    description: address.wallet,
-                    onTrigger: () =>
-                      form.setFieldValue("receiver", address.wallet),
-                  })) ?? []
-                }
-                searchIcon={<Search size={18} />}
-                searchPlaceholder="Search addresses..."
-                nothingFoundMessage="No addresses available"
-              >
-                <ActionIcon
-                  hidden={isLoading || data?.results?.length === 0}
-                  size="lg"
-                  onClick={() => openSpotlight()}
-                  variant="filled"
-                  radius={0}
-                >
-                  <AddressBook size={22} />
-                </ActionIcon>
-              </SpotlightProvider>
-            }
-            {...form.getInputProps("receiver")}
-          />
-
-          <Checkbox
-            mt="md"
-            label="Do you wish to receive fungible token instead of NEAR?"
-            {...form.getInputProps("isFungibleToken", { type: "checkbox" })}
-          />
-
-          {form.values.isFungibleToken && (
+    <Container>
+      <Paper p="lg" w="100%" withBorder shadow="sm">
+        <Stack>
+          <small></small>
+          <Title order={2}>Create payment request</Title>
+          <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
             <TextInput
-              mt="sm"
-              label="Fungible token contract"
-              placeholder="Enter fungible token contract id"
-              {...form.getInputProps("receiver_fungible")}
+              withAsterisk
+              label="Receiver account id"
+              description="The account to which the funds will be sent"
+              placeholder="Enter receiver account id"
+              rightSection={<AddressSpotlight onSelect={handleAddressSelect} />}
+              {...form.getInputProps("receiver")}
             />
-          )}
 
-          <NumberInput
-            mt="sm"
-            label="Amount"
-            placeholder="Enter amount"
-            min={0}
-            max={9999}
-            step={0.1}
-            precision={6}
-            removeTrailingZeros
-            {...form.getInputProps("amount")}
-          />
+            <Checkbox
+              mt="md"
+              disabled
+              label="Do you wish to receive fungible token instead of NEAR?"
+              {...form.getInputProps("isFungibleToken", { type: "checkbox" })}
+            />
 
-          <Textarea
-            mt="sm"
-            label="Payment note (Optional)"
-            description="The note which will be shown to the person paying. This is a good place to put a link to an invoice."
-            placeholder="Enter payment note"
-            {...form.getInputProps("memo")}
-          />
+            {form.values.isFungibleToken && (
+              <TextInput
+                mt="sm"
+                label="Fungible token contract"
+                placeholder="Enter fungible token contract id"
+                {...form.getInputProps("receiver_fungible")}
+              />
+            )}
 
-          <Group position="right" mt="md">
-            <Button type="submit" variant="light" disabled={loading}>
-              Create payment request
-            </Button>
-          </Group>
-        </form>
+            <NumberInput
+              mt="sm"
+              label="Amount"
+              placeholder="Enter amount"
+              min={0}
+              max={9999}
+              step={0.1}
+              precision={6}
+              removeTrailingZeros
+              {...form.getInputProps("amount")}
+            />
+
+            <Group position="right" mt="md">
+              <Button type="submit" variant="light" disabled={loading}>
+                Create payment request
+              </Button>
+            </Group>
+          </form>
+        </Stack>
       </Paper>
-    </Box>
+    </Container>
   );
 };
 
