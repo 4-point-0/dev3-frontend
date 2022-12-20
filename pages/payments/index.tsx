@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Container,
   CopyButton,
@@ -19,12 +20,13 @@ import { useTransactionRequestControllerFindAll } from "../../services/api/dev3C
 import { TransactionRequest } from "../../services/api/dev3Schemas";
 
 const Payments = () => {
-  const { isLoading, data } = useTransactionRequestControllerFindAll({});
+  const { isLoading, data } = useTransactionRequestControllerFindAll({
+    queryParams: {
+      type: "Payment",
+    },
+  });
 
   const columns: Array<DataTableColumn<TransactionRequest>> = [
-    {
-      accessor: "amount",
-    },
     {
       accessor: "createdAt",
       render: ({ createdAt }) => {
@@ -37,7 +39,26 @@ const Payments = () => {
       },
     },
     {
+      accessor: "amount",
+      render: ({ args }) => {
+        let amount = "Unknown";
+
+        try {
+          const parsedArgs = JSON.parse(args);
+
+          amount = parsedArgs?.["amount"];
+        } catch {
+          amount = "Couldn't parse arguments";
+        }
+
+        return <Text>{amount}</Text>;
+      },
+    },
+    {
       accessor: "token",
+      render: ({ is_near_token }) => {
+        return <Badge>{is_near_token ? "NEAR" : "Unknown"}</Badge>;
+      },
     },
     {
       accessor: "status",
@@ -46,7 +67,7 @@ const Payments = () => {
     {
       accessor: "actions",
       render: ({ uuid }) => {
-        const url = `${window.location}/action/payment/${uuid}`;
+        const url = `${window.location.origin}/action/payment/${uuid}`;
 
         const handleShare = (url: string) => {
           return () => {
@@ -60,7 +81,14 @@ const Payments = () => {
         return (
           <CopyCell value={url}>
             <Group>
-              <Button variant="light" rightIcon={<ExternalLink />}>
+              <Button
+                component="a"
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="light"
+                rightIcon={<ExternalLink />}
+              >
                 Open
               </Button>
               <Button

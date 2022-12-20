@@ -155,6 +155,7 @@ export type UpdateAddressDto = {
 };
 
 export type CreateTransactionRequestDto = {
+  type: "Transaction" | "Payment";
   contractId?: string;
   method: string;
   args?: Record<string, any>;
@@ -174,22 +175,56 @@ export type TransactionRequest = {
    */
   createdAt: string;
   uuid: string;
+  type: "Transaction" | "Payment";
   status: "Pending" | "Success" | "Failure";
   contractId?: string;
   method: string;
   args: string;
-  gas: string;
-  deposit: string;
-  txHash: string;
-  txDetails: string;
-  caller_address: string;
-  is_near_token: boolean;
+  gas?: string;
+  deposit?: string;
+  txHash?: string;
+  txDetails?: string;
+  caller_address?: string;
+  is_near_token?: boolean;
   owner: User;
   project: Project;
 };
 
+export type ProjectTransactionRequestDto = {
+  name: string;
+  logo_url?: string;
+};
+
+export type PublicTransactionRequestDto = {
+  uuid: string;
+  type: "Transaction" | "Payment";
+  /**
+   * @format date-time
+   */
+  created_at: string;
+  status: "Pending" | "Success" | "Failure";
+  contractId?: string;
+  method: string;
+  args?: Record<string, any>;
+  gas?: string;
+  deposit?: string;
+  caller_address?: string;
+  txHash: string;
+  txDetails: string;
+  is_near_token: boolean;
+  project: ProjectTransactionRequestDto;
+};
+
+export type UpdateTransactionRequestDto = {
+  txHash: string;
+  caller_address: string;
+  txDetails?: Record<string, any>;
+  type?: "Transaction" | "Payment";
+};
+
 export type TransactionRequestDto = {
   uuid: string;
+  type: "Transaction" | "Payment";
   /**
    * @format date-time
    */
@@ -205,12 +240,6 @@ export type TransactionRequestDto = {
   txDetails: string;
   is_near_token: boolean;
   project_id: string;
-};
-
-export type UpdateTransactionRequestDto = {
-  txHash: string;
-  caller_address: string;
-  txDetails?: Record<string, any>;
 };
 
 export type FileUploadDto = {

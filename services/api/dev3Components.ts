@@ -1151,6 +1151,7 @@ export type TransactionRequestControllerFindAllQueryParams = {
   contractId?: string;
   method?: string;
   status?: "Pending" | "Success" | "Failure";
+  type?: "Transaction" | "Payment";
 };
 
 export type TransactionRequestControllerFindAllError =
@@ -1238,7 +1239,7 @@ export const fetchTransactionRequestControllerFindByUuid = (
   signal?: AbortSignal
 ) =>
   dev3Fetch<
-    Schemas.TransactionRequestDto,
+    Schemas.PublicTransactionRequestDto,
     TransactionRequestControllerFindByUuidError,
     undefined,
     {},
@@ -1252,12 +1253,12 @@ export const fetchTransactionRequestControllerFindByUuid = (
   });
 
 export const useTransactionRequestControllerFindByUuid = <
-  TData = Schemas.TransactionRequestDto
+  TData = Schemas.PublicTransactionRequestDto
 >(
   variables: TransactionRequestControllerFindByUuidVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<
-      Schemas.TransactionRequestDto,
+      Schemas.PublicTransactionRequestDto,
       TransactionRequestControllerFindByUuidError,
       TData
     >,
@@ -1266,7 +1267,7 @@ export const useTransactionRequestControllerFindByUuid = <
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
   return reactQuery.useQuery<
-    Schemas.TransactionRequestDto,
+    Schemas.PublicTransactionRequestDto,
     TransactionRequestControllerFindByUuidError,
     TData
   >(
