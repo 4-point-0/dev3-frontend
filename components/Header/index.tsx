@@ -30,6 +30,7 @@ import {
   PopoverNotificationCenter,
 } from "@novu/notification-center";
 import { useRouter } from "next/router";
+import { NextLink } from "@mantine/next";
 
 export interface AdminHeaderProps {
   theme: MantineTheme;
@@ -95,12 +96,14 @@ const AppHeader = ({ theme, opened, setOpened }: AdminHeaderProps) => {
           />
         </MediaQuery>
 
-        <Image
-          src={theme.colorScheme === "dark" ? logoDark : logoLight}
-          alt="Dev3 Logo"
-          height={40}
-          width={120}
-        />
+        <NextLink href="/">
+          <Image
+            src={theme.colorScheme === "dark" ? logoDark : logoLight}
+            alt="Dev3 Logo"
+            height={40}
+            width={120}
+          />
+        </NextLink>
 
         <Box ml="auto">
           <Group>
