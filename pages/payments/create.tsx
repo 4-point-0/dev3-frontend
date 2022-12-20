@@ -16,12 +16,15 @@ import { useState } from "react";
 import { Check, X } from "tabler-icons-react";
 
 import { AddressSpotlight } from "../../components/payments/AddressSpotlight";
+import { useSelectedProject } from "../../context/SelectedProjectContext";
+import { fetchTransactionRequestControllerCreate } from "../../services/api/dev3Components";
 import { Address } from "../../services/api/dev3Schemas";
 import { nearWalletRegex } from "../../utils/near";
 
 const CreatePayment = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { project } = useSelectedProject();
 
   const form = useForm({
     validateInputOnChange: true,
@@ -59,11 +62,17 @@ const CreatePayment = () => {
         disallowClose: true,
       });
 
-      // const response = await fetchTransactionRequestControllerCreate({
+      // await fetchTransactionRequestControllerCreate({
       //   body: {
-      //     project_id: (project as any).__id,
-      //     method: "send",
-      //     is_near_token: true,
+      //     project_id: (project as any)._id,
+      //     method: "ft_transfer",
+      //     is_near_token: false,
+      //     type: "Payment",
+      //     args: {
+      //       amount,
+      //       receiver_id: receiver,
+      //     },
+      //     contractId: "dev-1667378639276-81893145684696",
       //   },
       // });
 
@@ -94,8 +103,8 @@ const CreatePayment = () => {
     }
   };
 
-  const handleAddressSelect = (address: Address) => {
-    form.setFieldValue("receiver", address.wallet);
+  const handleAddressSelect = (wallet: string) => {
+    form.setFieldValue("receiver", wallet);
   };
 
   return (

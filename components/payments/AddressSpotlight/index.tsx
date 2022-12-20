@@ -1,18 +1,23 @@
 import { ActionIcon, Loader } from "@mantine/core";
-import { openSpotlight, SpotlightProvider } from "@mantine/spotlight";
-import React from "react";
+import {
+  openSpotlight,
+  SpotlightAction,
+  SpotlightProvider,
+} from "@mantine/spotlight";
+import React, { useMemo } from "react";
 import { AddressBook, Search } from "tabler-icons-react";
 
 import { useAddressControllerFindAll } from "../../../services/api/dev3Components";
-import { Address } from "../../../services/api/dev3Schemas";
+import { useWalletSelector } from "../../../context/WalletSelectorContext";
 
 interface IAddressSpotlightProps {
-  onSelect: (wallet: Address) => void;
+  onSelect: (wallet: string) => void;
 }
 
 export const AddressSpotlight: React.FC<IAddressSpotlightProps> = ({
   onSelect,
 }) => {
+  const { selector } = useWalletSelector();
   const [query, setQuery] = React.useState<string>();
   const { isLoading, data } = useAddressControllerFindAll(
     {
@@ -31,15 +36,35 @@ export const AddressSpotlight: React.FC<IAddressSpotlightProps> = ({
     setQuery(newQuery);
   };
 
+  const handleTrigger = (wallet: string) => {
+    return () => onSelect(wallet);
+  };
+
+  const myAddressAction: SpotlightAction | undefined = useMemo(() => {
+    const state = selector.store.getState();
+    const accountId = state.accounts?.[0].accountId;
+
+    if (!accountId) {
+      return;
+    }
+
+    return {
+      title: "Set my address",
+      description: accountId,
+      onTrigger: handleTrigger(accountId),
+    };
+  }, [selector]);
+
+  const actions: Array<SpotlightAction> =
+    data?.results?.map((address) => ({
+      title: address.alias,
+      description: address.wallet,
+      onTrigger: handleTrigger(address.wallet),
+    })) ?? [];
+
   return (
     <SpotlightProvider
-      actions={
-        data?.results?.map((address) => ({
-          title: address.alias,
-          description: address.wallet,
-          onTrigger: () => onSelect(address),
-        })) ?? []
-      }
+      actions={myAddressAction ? [myAddressAction, ...actions] : actions}
       searchIcon={<Search size={18} />}
       searchPlaceholder="Search addresses by alias"
       nothingFoundMessage="No addresses match query"
