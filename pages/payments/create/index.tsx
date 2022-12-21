@@ -13,6 +13,7 @@ import {
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { openSpotlight, SpotlightProvider } from "@mantine/spotlight";
+import { providers } from "near-api-js";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { AddressBook, Check, Search, X } from "tabler-icons-react";
@@ -25,6 +26,10 @@ import {
 const CreatePayment = () => {
   const nearWalletRegex =
     /^((\w|(?<!\.)\.)+(?<!\.)\.(testnet|near)|[A-Fa-f0-9]{64})$/;
+
+  const provider = new providers.JsonRpcProvider({
+    url: "https://rpc.testnet.near.org",
+  });
 
   const [loading, setLoading] = useState(false);
 
@@ -78,6 +83,45 @@ const CreatePayment = () => {
         disallowClose: true,
       });
 
+      if (receiver_fungible !== "") {
+        const args = Buffer.from(
+          JSON.stringify({
+            account_id: receiver,
+          }),
+          "utf8"
+        ).toString("base64");
+
+        const rawResult = await provider.query({
+          request_type: "call_function",
+          account_id: receiver_fungible,
+          method_name: "storage_balance_of",
+          args_base64: args,
+          finality: "optimistic",
+        });
+
+        // format result
+        const res = JSON.parse(
+          Buffer.from((rawResult as any).result).toString()
+        );
+
+        console.log(res);
+
+        if (res === null) {
+          updateNotification({
+            id: "loading-notification",
+            color: "red",
+            title: "Recipient is not registered to receive fungible tokens",
+            message:
+              "Please ask the recipient to register to receive fungible tokens",
+            icon: <X size={16} />,
+            autoClose: 3000,
+          });
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Do after checking
       const response = await fetchPaymentControllerCreate({
         body: {
           uid: v4(),

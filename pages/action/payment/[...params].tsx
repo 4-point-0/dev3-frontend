@@ -46,7 +46,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 const PaymentRequestDetail = () => {
-  const { selector } = useWalletSelector();
+  const { selector, callMethod, viewMethod } = useWalletSelector();
   const { classes } = useStyles();
   const router = useRouter();
   const { params, errorCode, errorMessage, transactionHashes } = router.query;
@@ -54,6 +54,11 @@ const PaymentRequestDetail = () => {
   const userContext = useUserContext();
 
   const [loading, setLoading] = useState<boolean>(false);
+
+  const [ftDecimals, setFtDecimals] = useState<number>(0);
+  const [ftSymbol, setFtSymbol] = useState<string>("");
+  const [ftName, setFtName] = useState<string>("");
+  const [ftIcon, setFtIcon] = useState<string>("");
 
   const {
     isLoading: projectIsLoading,
@@ -79,7 +84,67 @@ const PaymentRequestDetail = () => {
     if (paymentRequestData?.status === "paid") {
       router.push(`/`);
     }
-  }, [paymentRequestData, router]);
+
+    if (paymentRequestData?.receiver_fungible !== "") {
+      const getFtMetadata = async () => {
+        const metadata = await viewMethod(
+          paymentRequestData?.receiver_fungible as string,
+          "ft_metadata",
+          null
+        );
+
+        setFtDecimals(metadata.decimals);
+        setFtSymbol(metadata.symbol);
+        setFtName(metadata.name);
+        setFtIcon(metadata.icon);
+      };
+
+      getFtMetadata();
+    }
+  }, [paymentRequestData, router, viewMethod]);
+
+  const handleNearPay = async () => {
+    if (!paymentRequestData)
+      throw new Error("Payment request data is not available");
+
+    const nearAmount = utils.format.parseNearAmount(
+      paymentRequestData?.amount
+    ) as string;
+
+    await callMethod(
+      "dev-1668975558141-76613200431681",
+      "transfer_funds",
+      {
+        request: {
+          id: paymentRequestData.uid,
+          receiver_account_id: paymentRequestData.receiver,
+          amount: nearAmount,
+        },
+      },
+      nearAmount,
+      "30000000000000"
+    );
+  };
+
+  const handleFungiblePay = async () => {
+    if (!paymentRequestData || !paymentRequestData?.receiver_fungible)
+      throw new Error("No fungible token address provided");
+
+    await callMethod(
+      paymentRequestData.receiver_fungible,
+      "ft_transfer",
+      {
+        receiver_id: paymentRequestData.receiver,
+        amount: (
+          parseInt(paymentRequestData.amount) *
+          10 ** ftDecimals
+        ).toString(),
+        // msg: paymentRequestData.memo,
+      },
+      "1",
+      "30000000000000"
+    );
+  };
 
   const handleButtonClick = async () => {
     if (userContext.user === null) {
@@ -98,52 +163,11 @@ const PaymentRequestDetail = () => {
     });
 
     try {
-      const wallet = await selector.wallet();
-
-      let args: {
-        request: {
-          id: string | undefined;
-          amount?: string | null;
-          receiver_account_id: string | undefined;
-          ft_token_account_id?: string | undefined;
-        };
-      } = {
-        request: {
-          id: paymentRequestData?.uid,
-          receiver_account_id: paymentRequestData?.receiver,
-        },
-      };
-
-      if (
-        paymentRequestData?.receiver_fungible !== undefined &&
-        paymentRequestData?.receiver_fungible !== null &&
-        paymentRequestData?.receiver_fungible !== ""
-      ) {
-        args.request.ft_token_account_id =
-          paymentRequestData?.receiver_fungible;
+      if (paymentRequestData?.receiver_fungible) {
+        await handleFungiblePay();
+      } else {
+        await handleNearPay();
       }
-
-      args.request.amount = args.request.ft_token_account_id
-        ? paymentRequestData?.amount
-        : utils.format.parseNearAmount(paymentRequestData?.amount);
-
-      await wallet.signAndSendTransaction({
-        signerId: userContext.user?.nearWalletAccountId,
-        actions: [
-          {
-            type: "FunctionCall",
-            params: {
-              methodName: "transfer_funds",
-              args,
-              gas: "100000000000000",
-              deposit: args.request.ft_token_account_id
-                ? "1250000000000000000001"
-                : utils.format.parseNearAmount(paymentRequestData?.amount) ||
-                  "0",
-            },
-          },
-        ],
-      });
     } catch (error) {
       updateNotification({
         id: "loading-notification",
@@ -169,14 +193,6 @@ const PaymentRequestDetail = () => {
     return (
       <Alert icon={<Check size={16} />} title="Success">
         Transaction has been successfully signed.
-      </Alert>
-    );
-  }
-
-  if (paymentRequestData?.receiver_fungible !== "") {
-    return (
-      <Alert icon={<AlertCircle size={16} />} color="red" title="WIP">
-        Sorry, Fungible tokens are not yet supported.
       </Alert>
     );
   }
@@ -228,14 +244,17 @@ const PaymentRequestDetail = () => {
 
         <Card mt="md" shadow="none" p="lg" radius="md" withBorder>
           <Stack align="center" spacing="sm">
+            {ftIcon !== "" && <Avatar src={ftIcon} size={40} />}
+            {ftName !== "" && (
+              <Text size="xl" weight={500}>
+                {ftName}
+              </Text>
+            )}
+
             <Text size="xl" weight={500}>
               {paymentRequestData?.amount}{" "}
             </Text>
-            <Badge size="xl">
-              {paymentRequestData?.receiver_fungible !== ""
-                ? paymentRequestData?.receiver_fungible
-                : "NEAR"}
-            </Badge>
+            <Badge size="xl">{ftSymbol !== "" ? ftSymbol : "NEAR"}</Badge>
 
             <Text color="dimmed">on Testnet</Text>
           </Stack>
@@ -253,11 +272,7 @@ const PaymentRequestDetail = () => {
 
         <Center mt="xl">
           <Button
-            disabled={
-              userContext.user === null ||
-              loading ||
-              paymentRequestData?.receiver_fungible !== ""
-            }
+            disabled={userContext.user === null || loading}
             fullWidth
             variant="light"
             onClick={handleButtonClick}

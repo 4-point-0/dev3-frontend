@@ -11,6 +11,7 @@ import { setupNightlyConnect } from "@near-wallet-selector/nightly-connect";
 import { setupSender } from "@near-wallet-selector/sender";
 import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
 import * as nearApi from "near-api-js";
+import { providers } from "near-api-js";
 import React, { useCallback, useContext, useEffect, useState } from "react";
 import { distinctUntilChanged, map } from "rxjs";
 
@@ -27,6 +28,16 @@ interface WalletSelectorContextValue {
   accounts: Array<AccountState>;
   accountId: string | null;
   nearConnection: nearApi.Near | null;
+  // setContractId: React.Dispatch<React.SetStateAction<string>>;
+  viewMethod: (contractId: string, method: string, args: any) => Promise<any>;
+
+  callMethod: (
+    contractId: string,
+    method: string,
+    args?: any,
+    deposit?: string,
+    gas?: string
+  ) => Promise<void | providers.FinalExecutionOutcome>;
 }
 
 const WalletSelectorContext =
@@ -39,6 +50,60 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
   const [nearConnection, setNearConnection] = useState<nearApi.Near | null>(
     null
   );
+
+  const THIRTY_TGAS = "30000000000000";
+  const NO_DEPOSIT = "0";
+
+  // const [contractId, setContractId] = useState<string>(
+  //   "dev-1668975558141-76613200431681"
+  // );
+
+  const viewMethod = async (
+    contractId: string,
+    method: string,
+    args: any = {}
+  ) => {
+    if (!selector) return;
+    const { network } = selector.options;
+    const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
+
+    let res = await provider.query({
+      request_type: "call_function",
+      account_id: contractId,
+      method_name: method,
+      args_base64: Buffer.from(JSON.stringify(args)).toString("base64"),
+      finality: "optimistic",
+    });
+
+    return JSON.parse(Buffer.from((res as any).result).toString());
+  };
+
+  const callMethod = async (
+    contractId: string,
+    method: string,
+    args: any = {},
+    deposit: string = NO_DEPOSIT,
+    gas: string = THIRTY_TGAS
+  ) => {
+    if (!selector) return;
+    const wallet = await selector.wallet();
+
+    return await wallet.signAndSendTransaction({
+      signerId: accounts[0].accountId,
+      receiverId: contractId,
+      actions: [
+        {
+          type: "FunctionCall",
+          params: {
+            methodName: method,
+            args,
+            gas,
+            deposit,
+          },
+        },
+      ],
+    });
+  };
 
   const init = useCallback(async () => {
     const { connect, keyStores, WalletConnection } = nearApi;
@@ -142,6 +207,8 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
         accounts,
         accountId,
         nearConnection,
+        viewMethod,
+        callMethod,
       }}
     >
       {children}
