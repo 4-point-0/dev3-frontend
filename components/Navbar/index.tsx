@@ -4,6 +4,7 @@ import { useSelectedProject } from "../../context/SelectedProjectContext";
 import { useUserContext } from "../../context/UserContext";
 import ProjectSelector from "../ProjectSelector";
 import { AppLinks, AppLinksBottom } from "./Links.component";
+import { ProjectDetails } from "./ProjectDetails";
 
 export interface AdminNavbarProps {
   opened: boolean;
@@ -18,9 +19,13 @@ const AppNavbar = ({ opened }: AdminNavbarProps) => {
       <Navbar.Section>
         <ProjectSelector />
       </Navbar.Section>
+
+      <Navbar.Section bg="100" p="sm">
+        <ProjectDetails />
+      </Navbar.Section>
       <Divider />
       <Navbar.Section p="sm">
-        <AppLinks disabled={project === null} />
+        <AppLinks disabled={!project === null} />
       </Navbar.Section>
       <Divider />
       <Navbar.Section grow p="sm">
