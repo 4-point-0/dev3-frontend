@@ -15,13 +15,14 @@ import {
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { utils } from "near-api-js";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlertCircle, Check, X } from "tabler-icons-react";
 import { useUserContext } from "../../../context/UserContext";
 import { useWalletSelector } from "../../../context/WalletSelectorContext";
 import {
-  usePaymentControllerFindByUid,
+  useProjectControllerFindById,
   useProjectControllerFindBySlug,
+  useTransactionRequestControllerFindByUuid,
 } from "../../../services/api/dev3Components";
 
 const ICON_SIZE = 80;
@@ -49,37 +50,50 @@ const PaymentRequestDetail = () => {
   const { selector } = useWalletSelector();
   const { classes } = useStyles();
   const router = useRouter();
-  const { params, errorCode, errorMessage, transactionHashes } = router.query;
+  const { params, errorCode, errorMessage, transactionHashes, uuid } =
+    router.query;
 
   const userContext = useUserContext();
 
   const [loading, setLoading] = useState<boolean>(false);
 
   const {
-    isLoading: projectIsLoading,
-    data: projectData,
-    error: projectError,
-  } = useProjectControllerFindBySlug({
+    isLoading: transactionRequestIsLoading,
+    data: transactionRequestData,
+  } = useTransactionRequestControllerFindByUuid({
     pathParams: {
-      slug: params?.[0] as string,
+      uuid: uuid as string,
     },
   });
 
-  const {
-    isLoading: paymentRequestIsLoading,
-    data: paymentRequestData,
-    error: paymentRequestError,
-  } = usePaymentControllerFindByUid({
-    pathParams: {
-      uid: params?.[1] as string,
-    },
-  });
+  // const {
+  //   isLoading: projectIsLoading,
+  //   data: projectData,
+  //   error: projectError,
+  // } = useProjectControllerFindById(
+  //   {
+  //     pathParams: {
+  //       id: paymentRequestData?.project_id as string,
+  //     },
+  //   },
+  //   {
+  //     enabled: Boolean(paymentRequestData?.project_id),
+  //   }
+  // );
 
-  useEffect(() => {
-    if (paymentRequestData?.status === "paid") {
-      router.push(`/`);
+  console.log(transactionRequestData);
+
+  const parsedArgs = useMemo(() => {
+    if (!transactionRequestData?.args) {
+      return null;
     }
-  }, [paymentRequestData, router]);
+
+    if (typeof transactionRequestData.args === "string") {
+      return JSON.parse(transactionRequestData.args);
+    }
+
+    return transactionRequestData.args;
+  }, [transactionRequestData?.args]);
 
   const handleButtonClick = async () => {
     if (userContext.user === null) {
@@ -100,32 +114,32 @@ const PaymentRequestDetail = () => {
     try {
       const wallet = await selector.wallet();
 
-      let args: {
-        request: {
-          id: string | undefined;
-          amount?: string | null;
-          receiver_account_id: string | undefined;
-          ft_token_account_id?: string | undefined;
-        };
-      } = {
-        request: {
-          id: paymentRequestData?.uid,
-          receiver_account_id: paymentRequestData?.receiver,
-        },
-      };
+      // let args: {
+      //   request: {
+      //     id: string | undefined;
+      //     amount?: string | null;
+      //     receiver_account_id: string | undefined;
+      //     ft_token_account_id?: string | undefined;
+      //   };
+      // } = {
+      //   request: {
+      //     id: paymentRequestData?.uid,
+      //     receiver_account_id: paymentRequestData?.receiver,
+      //   },
+      // };
 
-      if (
-        paymentRequestData?.receiver_fungible !== undefined &&
-        paymentRequestData?.receiver_fungible !== null &&
-        paymentRequestData?.receiver_fungible !== ""
-      ) {
-        args.request.ft_token_account_id =
-          paymentRequestData?.receiver_fungible;
-      }
+      // if (
+      //   paymentRequestData?.receiver_fungible !== undefined &&
+      //   paymentRequestData?.receiver_fungible !== null &&
+      //   paymentRequestData?.receiver_fungible !== ""
+      // ) {
+      //   args.request.ft_token_account_id =
+      //     paymentRequestData?.receiver_fungible;
+      // }
 
-      args.request.amount = args.request.ft_token_account_id
-        ? paymentRequestData?.amount
-        : utils.format.parseNearAmount(paymentRequestData?.amount);
+      // args.request.amount = args.request.ft_token_account_id
+      //   ? paymentRequestData?.amount
+      //   : utils.format.parseNearAmount(paymentRequestData?.amount);
 
       await wallet.signAndSendTransaction({
         signerId: userContext.user?.nearWalletAccountId,
@@ -133,13 +147,10 @@ const PaymentRequestDetail = () => {
           {
             type: "FunctionCall",
             params: {
-              methodName: "transfer_funds",
-              args,
-              gas: "100000000000000",
-              deposit: args.request.ft_token_account_id
-                ? "1250000000000000000001"
-                : utils.format.parseNearAmount(paymentRequestData?.amount) ||
-                  "0",
+              methodName: transactionRequestData?.method as string,
+              args: parsedArgs,
+              gas: transactionRequestData?.gas ?? "1000000000000",
+              deposit: "10000000000",
             },
           },
         ],
@@ -161,7 +172,7 @@ const PaymentRequestDetail = () => {
     }
   };
 
-  if (projectIsLoading || paymentRequestIsLoading) {
+  if (transactionRequestIsLoading) {
     return <Loader />;
   }
 
@@ -173,13 +184,15 @@ const PaymentRequestDetail = () => {
     );
   }
 
-  if (paymentRequestData?.receiver_fungible !== "") {
-    return (
-      <Alert icon={<AlertCircle size={16} />} color="red" title="WIP">
-        Sorry, Fungible tokens are not yet supported.
-      </Alert>
-    );
-  }
+  // if (paymentRequestData?.receiver_fungible !== "") {
+  //   return (
+  //     <Alert icon={<AlertCircle size={16} />} color="red" title="WIP">
+  //       Sorry, Fungible tokens are not yet supported.
+  //     </Alert>
+  //   );
+  // }
+
+  console.log(parsedArgs);
 
   return (
     <Box>
@@ -213,14 +226,14 @@ const PaymentRequestDetail = () => {
         mt={ICON_SIZE / 3}
       >
         <Avatar
-          src={projectData?.logoUrl}
+          src={transactionRequestData?.project.logo_url}
           className={classes.icon}
           size={ICON_SIZE}
           radius={ICON_SIZE}
         />
 
         <Text align="center" weight={700} className={classes.title}>
-          {projectData?.name}
+          {transactionRequestData?.project.name}
         </Text>
         <Text color="dimmed" align="center" size="sm">
           is requesting payment
@@ -229,12 +242,10 @@ const PaymentRequestDetail = () => {
         <Card mt="md" shadow="none" p="lg" radius="md" withBorder>
           <Stack align="center" spacing="sm">
             <Text size="xl" weight={500}>
-              {paymentRequestData?.amount}{" "}
+              {parsedArgs?.["amount"]}{" "}
             </Text>
             <Badge size="xl">
-              {paymentRequestData?.receiver_fungible !== ""
-                ? paymentRequestData?.receiver_fungible
-                : "NEAR"}
+              {transactionRequestData?.is_near_token ? "NEAR" : "NOT NEAR"}
             </Badge>
 
             <Text color="dimmed">on Testnet</Text>
@@ -243,21 +254,12 @@ const PaymentRequestDetail = () => {
 
         <Stack mt="xl" align="center" spacing="xs">
           <Text size="xl">Receipient</Text>
-          <Badge size="lg">{paymentRequestData?.receiver}</Badge>
-        </Stack>
-
-        <Stack mt="xl" align="center" spacing="xs">
-          <Text size="xl">Memo</Text>
-          <Text color="dimmed">{paymentRequestData?.memo}</Text>
+          <Badge size="lg">{parsedArgs?.["receiver_id"]}</Badge>
         </Stack>
 
         <Center mt="xl">
           <Button
-            disabled={
-              userContext.user === null ||
-              loading ||
-              paymentRequestData?.receiver_fungible !== ""
-            }
+            disabled={userContext.user === null || loading}
             fullWidth
             variant="light"
             onClick={handleButtonClick}
