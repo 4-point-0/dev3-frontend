@@ -26,6 +26,7 @@ export const ProjectDetails: React.FC = () => {
     {
       enabled: Boolean(projectId),
       retry: false,
+      keepPreviousData: true,
     }
   );
 

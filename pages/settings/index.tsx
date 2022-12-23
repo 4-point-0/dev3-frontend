@@ -13,6 +13,7 @@ import { showNotification, updateNotification } from "@mantine/notifications";
 import { NextPage } from "next";
 import { useState } from "react";
 import { Check, X } from "tabler-icons-react";
+import { ApiKeySettings } from "../../components/ApiKeySettings";
 import { ProjectImage } from "../../components/ProjectImage";
 
 import { useSelectedProject } from "../../context/SelectedProjectContext";
@@ -118,33 +119,41 @@ const Settings: NextPage = () => {
 
   return (
     <Container py="md">
-      <Paper p="xl" withBorder shadow="md">
-        <Stack spacing="md">
-          <Title order={2}>Settings</Title>
+      <Stack>
+        <Paper p="xl" withBorder shadow="md">
+          <Stack spacing="md">
+            <Title order={2}>Settings</Title>
 
-          <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-            <TextInput
-              mt="md"
-              disabled={loading}
-              withAsterisk
-              label="Project Name"
-              placeholder="Enter project name"
-              {...form.getInputProps("name")}
+            <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+              <TextInput
+                mt="md"
+                disabled={loading}
+                withAsterisk
+                label="Project Name"
+                placeholder="Enter project name"
+                {...form.getInputProps("name")}
+              />
+
+              <Group position="right" mt="md">
+                <Button disabled={loading} type="submit">
+                  Update project
+                </Button>
+              </Group>
+            </form>
+
+            <ProjectImage
+              imgUrl={project?.logo && getLogoUrl(project.logo)}
+              onUpload={handleImageUpload}
             />
-
-            <Group position="right" mt="md">
-              <Button disabled={loading} type="submit">
-                Update project
-              </Button>
-            </Group>
-          </form>
-
-          <ProjectImage
-            imgUrl={project?.logo && getLogoUrl(project.logo)}
-            onUpload={handleImageUpload}
-          />
-        </Stack>
-      </Paper>
+          </Stack>
+        </Paper>
+        <Paper p="xl" withBorder shadow="md">
+          <Stack>
+            <Title order={2}>API key managment</Title>
+            <ApiKeySettings />
+          </Stack>
+        </Paper>
+      </Stack>
     </Container>
   );
 };
