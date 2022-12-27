@@ -1,4 +1,4 @@
-import { Box, Paper, Text } from "@mantine/core";
+import { Container, Paper, Stack, Title } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -74,14 +74,14 @@ const CreateAddress = () => {
   };
 
   return (
-    <Box>
-      <Text size="xl" weight={500}>
-        Add new address
-      </Text>
-      <Paper p="lg" sx={{ maxWidth: 600 }} mx="auto">
-        <AccountForm disabled={loading} handleSubmit={handleSubmit} />
+    <Container>
+      <Paper p="lg" withBorder shadow="sm">
+        <Stack spacing="md">
+          <Title order={2}>Add new address</Title>
+          <AccountForm disabled={loading} handleSubmit={handleSubmit} />
+        </Stack>
       </Paper>
-    </Box>
+    </Container>
   );
 };
 

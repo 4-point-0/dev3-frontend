@@ -1,4 +1,14 @@
-import { Box, Center, Flex, Loader, Paper, Text } from "@mantine/core";
+import {
+  Box,
+  Center,
+  Container,
+  Flex,
+  Loader,
+  Paper,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -73,26 +83,26 @@ export const EditAddress = () => {
     }
   };
   return (
-    <Box>
-      <Text size="xl" weight={500}>
-        Edit address information
-      </Text>
-      <Paper p="lg" sx={{ maxWidth: 600 }} mx="auto">
-        {isLoading && (
-          <Flex mih={412} align="center" justify="center">
-            <Loader size="lg" />
-          </Flex>
-        )}
-        {data && (
-          <AccountForm
-            isEdit
-            disabled={isEditing}
-            handleSubmit={handleSubmit}
-            initialValues={data}
-          />
-        )}
+    <Container>
+      <Paper p="lg" withBorder shadow="sm">
+        <Stack spacing="md">
+          <Title order={2}>Edit address information</Title>
+          {isLoading && (
+            <Flex mih={412} align="center" justify="center">
+              <Loader size="lg" />
+            </Flex>
+          )}
+          {data && (
+            <AccountForm
+              isEdit
+              disabled={isEditing}
+              handleSubmit={handleSubmit}
+              initialValues={data}
+            />
+          )}
+        </Stack>
       </Paper>
-    </Box>
+    </Container>
   );
 };
 
