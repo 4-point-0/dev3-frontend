@@ -149,7 +149,7 @@ const Settings: NextPage = () => {
         </Paper>
         <Paper p="xl" withBorder shadow="md">
           <Stack>
-            <Title order={2}>API key managment</Title>
+            <Title order={2}>API key management</Title>
             <ApiKeySettings />
           </Stack>
         </Paper>

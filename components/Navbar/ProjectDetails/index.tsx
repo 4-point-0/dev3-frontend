@@ -1,7 +1,5 @@
 import { Button, Group, Skeleton, Stack, Text, Tooltip } from "@mantine/core";
-import { showNotification, updateNotification } from "@mantine/notifications";
 import React, { useMemo, useState } from "react";
-import { Check, X } from "tabler-icons-react";
 
 import { useSelectedProject } from "../../../context/SelectedProjectContext";
 import {
@@ -9,13 +7,14 @@ import {
   useApiKeyControllerFindOne,
 } from "../../../services/api/dev3Components";
 import { getDefaultExpires } from "../../../utils/api-key";
+import { notifications } from "../../../utils/notifications";
 import { CopyActionButton } from "../../core/CopyActionButton";
 
 export const ProjectDetails: React.FC = () => {
   const { projectId } = useSelectedProject();
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const { data, refetch, isLoading } = useApiKeyControllerFindOne<{
+  const { data, refetch, isLoading, error } = useApiKeyControllerFindOne<{
     api_key: string;
   }>(
     {
@@ -26,25 +25,24 @@ export const ProjectDetails: React.FC = () => {
     {
       enabled: Boolean(projectId),
       retry: false,
-      keepPreviousData: true,
     }
   );
 
   const apiKey = useMemo(() => {
+    if (error) {
+      return;
+    }
+
     return data?.api_key;
-  }, [data]);
+  }, [data, error]);
 
   const handleApiKeyGenerate = async () => {
     try {
       setIsGenerating(true);
 
-      showNotification({
-        id: "loading-notification",
-        loading: true,
+      notifications.create({
         title: "Generating a new API key",
         message: "Please wait...",
-        autoClose: false,
-        disallowClose: true,
       });
 
       await fetchApiKeyControllerCreate({
@@ -56,23 +54,16 @@ export const ProjectDetails: React.FC = () => {
 
       await refetch();
 
-      updateNotification({
-        id: "loading-notification",
-        color: "teal",
+      notifications.success({
         title: "API key generated!",
         message: "Your project API key has been generated.",
-        icon: <Check size={16} />,
-        autoClose: 3000,
       });
     } catch {
-      updateNotification({
-        id: "loading-notification",
+      notifications.error({
         color: "red",
         title: "Error generating API key",
         message:
           "There was an error generating the API key. Please try again later.",
-        icon: <X size={16} />,
-        autoClose: 3000,
       });
     } finally {
       setIsGenerating(false);
