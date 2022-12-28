@@ -12,6 +12,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import AppLayout from "../components/layout/app.layout";
+import { AccountProvider } from "../context/AccountContext";
 import { SelectedProjectProvider } from "../context/SelectedProjectContext";
 import { UserContextProvider } from "../context/UserContext";
 import { WalletSelectorContextProvider } from "../context/WalletSelectorContext";
@@ -46,26 +47,28 @@ export default function App(props: AppProps) {
         <UserContextProvider>
           <SelectedProjectProvider>
             <WalletSelectorContextProvider>
-              <ColorSchemeProvider
-                colorScheme={colorScheme}
-                toggleColorScheme={toggleColorScheme}
-              >
-                <MantineProvider
-                  withGlobalStyles
-                  withNormalizeCSS
-                  theme={{
-                    colorScheme,
-                  }}
+              <AccountProvider>
+                <ColorSchemeProvider
+                  colorScheme={colorScheme}
+                  toggleColorScheme={toggleColorScheme}
                 >
-                  <ModalsProvider>
-                    <NotificationsProvider>
-                      <AppLayout>
-                        <Component {...pageProps} />
-                      </AppLayout>
-                    </NotificationsProvider>
-                  </ModalsProvider>
-                </MantineProvider>
-              </ColorSchemeProvider>
+                  <MantineProvider
+                    withGlobalStyles
+                    withNormalizeCSS
+                    theme={{
+                      colorScheme,
+                    }}
+                  >
+                    <ModalsProvider>
+                      <NotificationsProvider>
+                        <AppLayout>
+                          <Component {...pageProps} />
+                        </AppLayout>
+                      </NotificationsProvider>
+                    </ModalsProvider>
+                  </MantineProvider>
+                </ColorSchemeProvider>
+              </AccountProvider>
             </WalletSelectorContextProvider>
           </SelectedProjectProvider>
         </UserContextProvider>
