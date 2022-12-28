@@ -2,6 +2,7 @@ import { Alert, AppShell, Center, useMantineTheme } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { AlertCircle } from "tabler-icons-react";
+
 import { useUserContext } from "../../context/UserContext";
 import AppFooter from "../Footer";
 import AppHeader from "../Header";
