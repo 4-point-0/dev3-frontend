@@ -1,14 +1,4 @@
-import {
-  Box,
-  Center,
-  Container,
-  Flex,
-  Loader,
-  Paper,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Flex, Loader } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -18,6 +8,7 @@ import {
   AccountForm,
   IAddressFormValues,
 } from "../../../components/address-book/AddressForm";
+import { PageContainer } from "../../../components/layout/PageContainer";
 import {
   fetchAddressControllerUpdate,
   useAddressControllerFindOne,
@@ -83,26 +74,23 @@ export const EditAddress = () => {
     }
   };
   return (
-    <Container>
-      <Paper p="lg" withBorder shadow="sm">
-        <Stack spacing="md">
-          <Title order={2}>Edit address information</Title>
-          {isLoading && (
-            <Flex mih={412} align="center" justify="center">
-              <Loader size="lg" />
-            </Flex>
-          )}
-          {data && (
-            <AccountForm
-              isEdit
-              disabled={isEditing}
-              handleSubmit={handleSubmit}
-              initialValues={data}
-            />
-          )}
-        </Stack>
-      </Paper>
-    </Container>
+    <PageContainer title="Edit address information">
+      <>
+        {isLoading && (
+          <Flex mih={412} align="center" justify="center">
+            <Loader size="lg" />
+          </Flex>
+        )}
+        {data && (
+          <AccountForm
+            isEdit
+            disabled={isEditing}
+            handleSubmit={handleSubmit}
+            initialValues={data}
+          />
+        )}
+      </>
+    </PageContainer>
   );
 };
 
