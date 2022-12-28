@@ -1,6 +1,6 @@
 import { Alert, AppShell, Center, useMantineTheme } from "@mantine/core";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AlertCircle } from "tabler-icons-react";
 
 import { useUserContext } from "../../context/UserContext";
@@ -13,6 +13,16 @@ export default function AppLayout({ children }: React.PropsWithChildren<{}>) {
   const [opened, setOpened] = useState(false);
   const userData = useUserContext();
   const router = useRouter();
+
+  useEffect(() => {
+    const handleRouteChangeStart = () => {
+      setOpened(false);
+    };
+    router.events.on("routeChangeStart", handleRouteChangeStart);
+    return () => {
+      router.events.off("routeChangeStart", handleRouteChangeStart);
+    };
+  }, [router, setOpened]);
 
   const loggedOutMessage = () => {
     return (
