@@ -1,12 +1,4 @@
-import {
-  Button,
-  Container,
-  Group,
-  Paper,
-  Stack,
-  TextInput,
-  Title,
-} from "@mantine/core";
+import { Button, Group, TextInput } from "@mantine/core";
 import { FileWithPath } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
@@ -14,6 +6,7 @@ import { NextPage } from "next";
 import { useState } from "react";
 import { Check, X } from "tabler-icons-react";
 import { ApiKeySettings } from "../../components/ApiKeySettings";
+import { PageContainer } from "../../components/layout/PageContainer";
 import { ProjectImage } from "../../components/ProjectImage";
 
 import { useSelectedProject } from "../../context/SelectedProjectContext";
@@ -118,43 +111,34 @@ const Settings: NextPage = () => {
   };
 
   return (
-    <Container py="md">
-      <Stack>
-        <Paper p="xl" withBorder shadow="md">
-          <Stack spacing="md">
-            <Title order={2}>Settings</Title>
+    <>
+      <PageContainer title="Settings">
+        <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+          <TextInput
+            mt="md"
+            disabled={loading}
+            withAsterisk
+            label="Project Name"
+            placeholder="Enter project name"
+            {...form.getInputProps("name")}
+          />
 
-            <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-              <TextInput
-                mt="md"
-                disabled={loading}
-                withAsterisk
-                label="Project Name"
-                placeholder="Enter project name"
-                {...form.getInputProps("name")}
-              />
+          <Group position="right" mt="md">
+            <Button disabled={loading} type="submit">
+              Update project
+            </Button>
+          </Group>
+        </form>
 
-              <Group position="right" mt="md">
-                <Button disabled={loading} type="submit">
-                  Update project
-                </Button>
-              </Group>
-            </form>
-
-            <ProjectImage
-              imgUrl={project?.logo && getLogoUrl(project.logo)}
-              onUpload={handleImageUpload}
-            />
-          </Stack>
-        </Paper>
-        <Paper p="xl" withBorder shadow="md">
-          <Stack>
-            <Title order={2}>API key management</Title>
-            <ApiKeySettings />
-          </Stack>
-        </Paper>
-      </Stack>
-    </Container>
+        <ProjectImage
+          imgUrl={project?.logo && getLogoUrl(project.logo)}
+          onUpload={handleImageUpload}
+        />
+      </PageContainer>
+      <PageContainer title="API key management" containerProps={{ mt: "md" }}>
+        <ApiKeySettings />
+      </PageContainer>
+    </>
   );
 };
 

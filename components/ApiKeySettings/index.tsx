@@ -1,4 +1,12 @@
-import { Badge, Button, Group, Skeleton, Stack, Text } from "@mantine/core";
+import {
+  Badge,
+  Button,
+  Group,
+  Skeleton,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { openConfirmModal } from "@mantine/modals";
 import React, { useMemo } from "react";
 
@@ -245,34 +253,24 @@ export const ApiKeySettings = () => {
     <Stack align="flex-start">
       {apiKeyDto?.api_key && (
         <>
-          <Group noWrap>
-            <Text sx={{ textOverflow: "ellipsis", overflow: "hidden" }}>
-              <Text component="strong" fw={700}>
-                API key:
-              </Text>
-              &nbsp;
-              {apiKeyDto?.api_key}
-            </Text>
-            <CopyActionButton value={apiKeyDto?.api_key} />
-          </Group>
+          <Stack spacing="xs">
+            <Title order={4}>API key</Title>
+            <Group>
+              <Text sx={{ wordBreak: "break-all" }}>{apiKeyDto?.api_key}</Text>
+              <CopyActionButton value={apiKeyDto?.api_key} />
+            </Group>
 
-          <Group noWrap>
-            <Text sx={{ textOverflow: "ellipsis", overflow: "hidden" }}>
-              <Text component="strong" fw={700}>
-                Expires at:
-              </Text>
-              &nbsp;
-              {formatExpired(apiKeyDto?.expires)}
-            </Text>
+            <Title order={4}>Expires at:</Title>
+            <Text>{formatExpired(apiKeyDto?.expires)}</Text>
 
             {expired && <Badge color="red">Expired</Badge>}
-          </Group>
 
-          {apiKeyDto?.is_revoked && (
-            <Badge color="red" variant="outline">
-              Revoked
-            </Badge>
-          )}
+            {apiKeyDto?.is_revoked && (
+              <Badge color="red" variant="outline">
+                Revoked
+              </Badge>
+            )}
+          </Stack>
         </>
       )}
 
