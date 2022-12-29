@@ -17,11 +17,6 @@ const topSectionData = [
     href: "/contracts",
   },
   {
-    icon: <Parachute size={24} />,
-    label: "Airdrops",
-    href: "/airdrops",
-  },
-  {
     icon: <ArrowsLeftRight size={24} />,
     label: "Payment Requests",
     href: "/payments",
