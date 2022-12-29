@@ -53,7 +53,7 @@ export const AddressSpotlight: React.FC<IAddressSpotlightProps> = ({
       description: accountId,
       onTrigger: handleTrigger(accountId),
     };
-  }, [selector]);
+  }, [selector, handleTrigger]);
 
   const actions: Array<SpotlightAction> =
     data?.results?.map((address) => ({

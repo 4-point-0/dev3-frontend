@@ -122,7 +122,6 @@ const CreatePayment = () => {
 
         <Checkbox
           mt="md"
-          disabled
           label="Do you wish to receive fungible token instead of NEAR?"
           {...form.getInputProps("isFungibleToken", { type: "checkbox" })}
         />
