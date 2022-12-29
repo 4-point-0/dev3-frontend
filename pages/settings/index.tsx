@@ -1,4 +1,4 @@
-import { Button, Group, TextInput } from "@mantine/core";
+import { Button, Group, Skeleton, TextInput } from "@mantine/core";
 import { FileWithPath } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
@@ -22,7 +22,7 @@ const Settings: NextPage = () => {
   const [loading, setLoading] = useState(false);
   const [logoFile, setLogoFile] = useState<FileWithPath>();
   const { project } = useSelectedProject();
-  const { refetch } = useProjectControllerFindAll({});
+  const { isLoading, refetch } = useProjectControllerFindAll({});
 
   const form = useForm({
     validateInputOnChange: true,
@@ -130,10 +130,13 @@ const Settings: NextPage = () => {
           </Group>
         </form>
 
-        <ProjectImage
-          imgUrl={project?.logo && getLogoUrl(project.logo)}
-          onUpload={handleImageUpload}
-        />
+        <Skeleton visible={isLoading}>
+          <ProjectImage
+            key={project?.logo.key}
+            imgUrl={project?.logo && getLogoUrl(project.logo)}
+            onUpload={handleImageUpload}
+          />
+        </Skeleton>
       </PageContainer>
       <PageContainer title="API key management" containerProps={{ mt: "md" }}>
         <ApiKeySettings />
