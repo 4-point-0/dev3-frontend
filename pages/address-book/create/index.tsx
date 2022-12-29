@@ -1,4 +1,3 @@
-import { Box, Paper, Text } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -9,6 +8,7 @@ import {
   AccountForm,
   IAddressFormValues,
 } from "../../../components/address-book/AddressForm";
+import { PageContainer } from "../../../components/layout/PageContainer";
 import { fetchAddressControllerCreate } from "../../../services/api/dev3Components";
 
 const CreateAddress = () => {
@@ -74,14 +74,9 @@ const CreateAddress = () => {
   };
 
   return (
-    <Box>
-      <Text size="xl" weight={500}>
-        Add new address
-      </Text>
-      <Paper p="lg" sx={{ maxWidth: 600 }} mx="auto">
-        <AccountForm disabled={loading} handleSubmit={handleSubmit} />
-      </Paper>
-    </Box>
+    <PageContainer title="Add new address">
+      <AccountForm disabled={loading} handleSubmit={handleSubmit} />
+    </PageContainer>
   );
 };
 

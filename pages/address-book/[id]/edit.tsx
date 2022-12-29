@@ -1,4 +1,4 @@
-import { Box, Center, Flex, Loader, Paper, Text } from "@mantine/core";
+import { Flex, Loader } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
@@ -8,6 +8,7 @@ import {
   AccountForm,
   IAddressFormValues,
 } from "../../../components/address-book/AddressForm";
+import { PageContainer } from "../../../components/layout/PageContainer";
 import {
   fetchAddressControllerUpdate,
   useAddressControllerFindOne,
@@ -73,11 +74,8 @@ export const EditAddress = () => {
     }
   };
   return (
-    <Box>
-      <Text size="xl" weight={500}>
-        Edit address information
-      </Text>
-      <Paper p="lg" sx={{ maxWidth: 600 }} mx="auto">
+    <PageContainer title="Edit address information">
+      <>
         {isLoading && (
           <Flex mih={412} align="center" justify="center">
             <Loader size="lg" />
@@ -91,8 +89,8 @@ export const EditAddress = () => {
             initialValues={data}
           />
         )}
-      </Paper>
-    </Box>
+      </>
+    </PageContainer>
   );
 };
 

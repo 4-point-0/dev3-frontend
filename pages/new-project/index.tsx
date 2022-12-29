@@ -1,12 +1,9 @@
 import {
   Button,
-  Container,
   Group,
-  Paper,
   Stack,
   Text,
   TextInput,
-  Title,
   useMantineTheme,
 } from "@mantine/core";
 import { FileWithPath } from "@mantine/dropzone";
@@ -15,6 +12,7 @@ import { showNotification, updateNotification } from "@mantine/notifications";
 import { NextPage } from "next";
 import { useState } from "react";
 import { Check, X } from "tabler-icons-react";
+import { PageContainer } from "../../components/layout/PageContainer";
 import { ProjectImage } from "../../components/ProjectImage";
 
 import { useSelectedProject } from "../../context/SelectedProjectContext";
@@ -127,43 +125,37 @@ const NewProject: NextPage = () => {
   };
 
   return (
-    <Container py="md">
-      <Paper p="xl" withBorder shadow="md">
-        <Stack spacing="md">
-          <Title order={2}>Create new project</Title>
+    <PageContainer title="Create new project">
+      <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+        <TextInput
+          disabled={loading}
+          withAsterisk
+          label="Project Name"
+          placeholder="Enter project name"
+          {...form.getInputProps("name")}
+        />
 
-          <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-            <TextInput
-              disabled={loading}
-              withAsterisk
-              label="Project Name"
-              placeholder="Enter project name"
-              {...form.getInputProps("name")}
-            />
+        <TextInput
+          disabled={loading}
+          mt="sm"
+          withAsterisk
+          label="Project Slug"
+          placeholder="Enter project slug"
+          {...form.getInputProps("slug")}
+        />
 
-            <TextInput
-              disabled={loading}
-              mt="sm"
-              withAsterisk
-              label="Project Slug"
-              placeholder="Enter project slug"
-              {...form.getInputProps("slug")}
-            />
-
-            <Stack mt="md" spacing={4}>
-              <Text fz="sm">Logo Image</Text>
-              <ProjectImage onUpload={handleImageUpload} />
-            </Stack>
-
-            <Group position="right" mt="md">
-              <Button disabled={loading} type="submit">
-                Create project
-              </Button>
-            </Group>
-          </form>
+        <Stack mt="md" spacing={4}>
+          <Text fz="sm">Logo Image</Text>
+          <ProjectImage onUpload={handleImageUpload} />
         </Stack>
-      </Paper>
-    </Container>
+
+        <Group position="right" mt="md">
+          <Button disabled={loading} type="submit">
+            Create project
+          </Button>
+        </Group>
+      </form>
+    </PageContainer>
   );
 };
 
