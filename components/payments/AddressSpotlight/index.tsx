@@ -4,7 +4,7 @@ import {
   SpotlightAction,
   SpotlightProvider,
 } from "@mantine/spotlight";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo } from "react";
 import { AddressBook, Search } from "tabler-icons-react";
 
 import { useAddressControllerFindAll } from "../../../services/api/dev3Components";
@@ -36,9 +36,12 @@ export const AddressSpotlight: React.FC<IAddressSpotlightProps> = ({
     setQuery(newQuery);
   };
 
-  const handleTrigger = (wallet: string) => {
-    return () => onSelect(wallet);
-  };
+  const handleTrigger = useCallback(
+    (wallet: string) => {
+      return () => onSelect(wallet);
+    },
+    [onSelect]
+  );
 
   const myAddressAction: SpotlightAction | undefined = useMemo(() => {
     const state = selector.store.getState();
