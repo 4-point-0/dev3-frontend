@@ -14,6 +14,7 @@ import { showNotification, updateNotification } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { Check, X } from "tabler-icons-react";
+import { PageContainer } from "../../components/layout/PageContainer";
 
 import { AddressSpotlight } from "../../components/payments/AddressSpotlight";
 import { useSelectedProject } from "../../context/SelectedProjectContext";
@@ -108,58 +109,52 @@ const CreatePayment = () => {
   };
 
   return (
-    <Container>
-      <Paper p="lg" w="100%" withBorder shadow="sm">
-        <Stack>
-          <small></small>
-          <Title order={2}>Create payment request</Title>
-          <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
-            <TextInput
-              withAsterisk
-              label="Receiver account id"
-              description="The account to which the funds will be sent"
-              placeholder="Enter receiver account id"
-              rightSection={<AddressSpotlight onSelect={handleAddressSelect} />}
-              {...form.getInputProps("receiver")}
-            />
+    <PageContainer title="Create payment request">
+      <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
+        <TextInput
+          withAsterisk
+          label="Receiver account id"
+          description="The account to which the funds will be sent"
+          placeholder="Enter receiver account id"
+          rightSection={<AddressSpotlight onSelect={handleAddressSelect} />}
+          {...form.getInputProps("receiver")}
+        />
 
-            <Checkbox
-              mt="md"
-              disabled
-              label="Do you wish to receive fungible token instead of NEAR?"
-              {...form.getInputProps("isFungibleToken", { type: "checkbox" })}
-            />
+        <Checkbox
+          mt="md"
+          disabled
+          label="Do you wish to receive fungible token instead of NEAR?"
+          {...form.getInputProps("isFungibleToken", { type: "checkbox" })}
+        />
 
-            {form.values.isFungibleToken && (
-              <TextInput
-                mt="sm"
-                label="Fungible token contract"
-                placeholder="Enter fungible token contract id"
-                {...form.getInputProps("receiver_fungible")}
-              />
-            )}
+        {form.values.isFungibleToken && (
+          <TextInput
+            mt="sm"
+            label="Fungible token contract"
+            placeholder="Enter fungible token contract id"
+            {...form.getInputProps("receiver_fungible")}
+          />
+        )}
 
-            <NumberInput
-              mt="sm"
-              label="Amount"
-              placeholder="Enter amount"
-              min={0}
-              max={9999}
-              step={0.1}
-              precision={6}
-              removeTrailingZeros
-              {...form.getInputProps("amount")}
-            />
+        <NumberInput
+          mt="sm"
+          label="Amount"
+          placeholder="Enter amount"
+          min={0}
+          max={9999}
+          step={0.1}
+          precision={6}
+          removeTrailingZeros
+          {...form.getInputProps("amount")}
+        />
 
-            <Group position="right" mt="md">
-              <Button type="submit" variant="light" disabled={loading}>
-                Create payment request
-              </Button>
-            </Group>
-          </form>
-        </Stack>
-      </Paper>
-    </Container>
+        <Group position="right" mt="md">
+          <Button type="submit" variant="light" disabled={loading}>
+            Create payment request
+          </Button>
+        </Group>
+      </form>
+    </PageContainer>
   );
 };
 

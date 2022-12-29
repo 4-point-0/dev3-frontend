@@ -1,17 +1,8 @@
-import {
-  Badge,
-  Button,
-  Container,
-  CopyButton,
-  Group,
-  Paper,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { ActionIcon, Badge, Button, Group, Text, Tooltip } from "@mantine/core";
 import { NextLink } from "@mantine/next";
 import { DataTable, DataTableColumn } from "mantine-datatable";
 import { ExternalLink, Plus, Share } from "tabler-icons-react";
+import { PageContainer } from "../../components/layout/PageContainer";
 import showShareModal from "../../components/ShareModal";
 import { CopyCell } from "../../components/table/CopyCell";
 import { TransactionStatus } from "../../components/transactions/Status";
@@ -81,23 +72,29 @@ const Payments = () => {
         return (
           <CopyCell value={url}>
             <Group>
-              <Button
-                component="a"
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                variant="light"
-                rightIcon={<ExternalLink />}
-              >
-                Open
-              </Button>
-              <Button
-                variant="light"
-                rightIcon={<Share />}
-                onClick={handleShare(url)}
-              >
-                Share
-              </Button>
+              <Tooltip position="bottom" label="Open" withArrow>
+                <ActionIcon
+                  component="a"
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  radius="xl"
+                  variant="light"
+                  color="blue"
+                >
+                  <ExternalLink size={16} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip position="bottom" label="Share" withArrow>
+                <ActionIcon
+                  radius="xl"
+                  variant="light"
+                  color="blue"
+                  onClick={handleShare(url)}
+                >
+                  <Share size={16} />
+                </ActionIcon>
+              </Tooltip>
             </Group>
           </CopyCell>
         );
@@ -106,32 +103,25 @@ const Payments = () => {
   ];
 
   return (
-    <Container fluid>
-      <Paper w="100%" shadow="sm" p="md" withBorder>
-        <Stack>
-          <Title order={2}>Payment Requests</Title>
-          <Button
-            sx={{ alignSelf: "self-end" }}
-            component={NextLink}
-            href="/payments/create"
-            variant="light"
-            leftIcon={<Plus />}
-          >
-            Create payment request
-          </Button>
+    <PageContainer title="Payment Requests" containerProps={{ fluid: true }}>
+      <Button
+        sx={{ alignSelf: "self-end" }}
+        component={NextLink}
+        href="/payments/create"
+        variant="light"
+        leftIcon={<Plus />}
+      >
+        Create payment request
+      </Button>
 
-          <DataTable
-            minHeight={164}
-            columns={columns}
-            noRecordsText="No payment requests"
-            records={data?.results}
-            fetching={isLoading}
-          />
-
-          {/* <pre>{JSON.stringify({ isLoading, data }, null, 2)}</pre> */}
-        </Stack>
-      </Paper>
-    </Container>
+      <DataTable
+        minHeight={164}
+        columns={columns}
+        noRecordsText="No payment requests"
+        records={data?.results}
+        fetching={isLoading}
+      />
+    </PageContainer>
   );
 };
 

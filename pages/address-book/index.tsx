@@ -1,13 +1,4 @@
-import {
-  ActionIcon,
-  Button,
-  Container,
-  Group,
-  Paper,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { ActionIcon, Button, Group, Text, Tooltip } from "@mantine/core";
 import { openConfirmModal } from "@mantine/modals";
 import { NextLink } from "@mantine/next";
 import { showNotification } from "@mantine/notifications";
@@ -15,6 +6,7 @@ import { DataTable, DataTableColumn } from "mantine-datatable";
 import { useRouter } from "next/router";
 import { useCallback, useMemo } from "react";
 import { Edit, Plus, Trash, X } from "tabler-icons-react";
+import { PageContainer } from "../../components/layout/PageContainer";
 
 import { CopyCell } from "../../components/table/CopyCell";
 import {
@@ -126,17 +118,28 @@ const AddressBook = () => {
       render: (address) => {
         return (
           <Group spacing={4} noWrap>
-            <ActionIcon
-              component={NextLink}
-              href="/address-book/[id]/edit"
-              as={`/address-book/${(address as any)._id}/edit`}
-              color="blue"
-            >
-              <Edit size={16} />
-            </ActionIcon>
-            <ActionIcon color="red" onClick={() => handleDelete(address)}>
-              <Trash size={16} />
-            </ActionIcon>
+            <Tooltip label="Edit" position="bottom" withArrow>
+              <ActionIcon
+                component={NextLink}
+                href="/address-book/[id]/edit"
+                as={`/address-book/${(address as any)._id}/edit`}
+                color="blue"
+                radius="xl"
+                variant="light"
+              >
+                <Edit size={16} />
+              </ActionIcon>
+            </Tooltip>
+            <Tooltip label="Delete" position="bottom" withArrow>
+              <ActionIcon
+                color="red"
+                radius="xl"
+                variant="light"
+                onClick={() => handleDelete(address)}
+              >
+                <Trash size={16} />
+              </ActionIcon>
+            </Tooltip>
           </Group>
         );
       },
@@ -154,34 +157,28 @@ const AddressBook = () => {
         };
 
   return (
-    <Container fluid>
-      <Paper w="100%" shadow="sm" p="md" withBorder>
-        <Stack>
-          <Title order={2}>Address Book</Title>
+    <PageContainer title="Address Book" containerProps={{ fluid: true }}>
+      <Button
+        sx={{ alignSelf: "self-end" }}
+        component={NextLink}
+        href="/address-book/create"
+        variant="light"
+        leftIcon={<Plus />}
+      >
+        Add new address
+      </Button>
 
-          <Button
-            sx={{ alignSelf: "self-end" }}
-            component={NextLink}
-            href="/address-book/create"
-            variant="light"
-            leftIcon={<Plus />}
-          >
-            Add new address
-          </Button>
-
-          <DataTable
-            highlightOnHover
-            idAccessor="alias"
-            minHeight={164}
-            columns={columns}
-            records={data?.results}
-            fetching={isLoading}
-            noRecordsText="No addresses"
-            {...paginationProps}
-          ></DataTable>
-        </Stack>
-      </Paper>
-    </Container>
+      <DataTable
+        highlightOnHover
+        idAccessor="alias"
+        minHeight={164}
+        columns={columns}
+        records={data?.results}
+        fetching={isLoading}
+        noRecordsText="No addresses"
+        {...paginationProps}
+      ></DataTable>
+    </PageContainer>
   );
 };
 
