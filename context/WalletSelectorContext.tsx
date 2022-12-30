@@ -11,9 +11,15 @@ import { setupNightlyConnect } from "@near-wallet-selector/nightly-connect";
 import { setupSender } from "@near-wallet-selector/sender";
 import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
 import * as nearApi from "near-api-js";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { distinctUntilChanged, map } from "rxjs";
-import { providers } from "near-api-js";
+import { NEAR_CONTRACT_ID, NO_DEPOSIT, THIRTY_TGAS } from "../utils/near";
 
 declare global {
   interface Window {
@@ -28,6 +34,7 @@ interface WalletSelectorContextValue {
   accounts: Array<AccountState>;
   accountId: string | null;
   nearConnection: nearApi.Near | null;
+  provider: nearApi.providers.JsonRpcProvider | null;
   viewMethod: (contractId: string, method: string, args: any) => Promise<any>;
   callMethod: (
     contractId: string,
@@ -35,11 +42,8 @@ interface WalletSelectorContextValue {
     args?: any,
     deposit?: string,
     gas?: string
-  ) => Promise<void | providers.FinalExecutionOutcome>;
+  ) => Promise<void | nearApi.providers.FinalExecutionOutcome>;
 }
-
-const THIRTY_TGAS = "30000000000000";
-const NO_DEPOSIT = "0";
 
 const WalletSelectorContext =
   React.createContext<WalletSelectorContextValue | null>(null);
@@ -52,11 +56,18 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
     null
   );
 
+  const provider = useMemo(() => {
+    if (!selector?.options) {
+      return null;
+    }
+    const { network } = selector.options;
+
+    return new nearApi.providers.JsonRpcProvider({ url: network.nodeUrl });
+  }, [selector?.options]);
+
   const viewMethod = useCallback(
     async (contractId: string, method: string, args: any = {}) => {
-      if (!selector) return;
-      const { network } = selector.options;
-      const provider = new providers.JsonRpcProvider({ url: network.nodeUrl });
+      if (!provider) return;
 
       let res = await provider.query({
         request_type: "call_function",
@@ -68,7 +79,7 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
 
       return JSON.parse(Buffer.from((res as any).result).toString());
     },
-    [selector]
+    [provider]
   );
 
   const callMethod = useCallback(
@@ -148,7 +159,7 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
       ],
     });
     const _modal = setupModal(_selector, {
-      contractId: "dev-1668975558141-76613200431681",
+      contractId: NEAR_CONTRACT_ID,
       // theme: "light", // doesn't work, need to open an issue on github
     });
     const state = _selector.store.getState();
@@ -205,6 +216,7 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
         nearConnection,
         callMethod,
         viewMethod,
+        provider,
       }}
     >
       {children}

@@ -45,7 +45,7 @@ export const AddressSpotlight: React.FC<IAddressSpotlightProps> = ({
 
   const myAddressAction: SpotlightAction | undefined = useMemo(() => {
     const state = selector.store.getState();
-    const accountId = state.accounts?.[0].accountId;
+    const accountId = state.accounts?.[0]?.accountId;
 
     if (!accountId) {
       return;
@@ -74,7 +74,7 @@ export const AddressSpotlight: React.FC<IAddressSpotlightProps> = ({
       onQueryChange={handleQueryChange}
     >
       <ActionIcon
-        hidden={isLoading || data?.results?.length === 0}
+        hidden={isLoading}
         size="lg"
         onClick={handleOpen}
         variant="filled"

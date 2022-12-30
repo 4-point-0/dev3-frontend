@@ -1,6 +1,7 @@
 import { ActionIcon, Badge, Button, Group, Text, Tooltip } from "@mantine/core";
 import { NextLink } from "@mantine/next";
 import { DataTable, DataTableColumn } from "mantine-datatable";
+import { formatNearAmount } from "near-api-js/lib/utils/format";
 import { ExternalLink, Plus, Share } from "tabler-icons-react";
 import { PageContainer } from "../../components/layout/PageContainer";
 import showShareModal from "../../components/ShareModal";
@@ -31,13 +32,15 @@ const Payments = () => {
     },
     {
       accessor: "amount",
-      render: ({ args }) => {
+      render: ({ args, is_near_token }) => {
         let amount = "Unknown";
 
         try {
           const parsedArgs = JSON.parse(args);
 
-          amount = parsedArgs?.["amount"];
+          amount = is_near_token
+            ? formatNearAmount(parsedArgs?.["request"]?.["amount"] as string)
+            : parsedArgs?.["amount"];
         } catch {
           amount = "Couldn't parse arguments";
         }
@@ -116,6 +119,7 @@ const Payments = () => {
 
       <DataTable
         minHeight={164}
+        idAccessor="_id"
         columns={columns}
         noRecordsText="No payment requests"
         records={data?.results}

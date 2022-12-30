@@ -11,36 +11,51 @@ import {
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
+import { parseNearAmount } from "near-api-js/lib/utils/format";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Check, X } from "tabler-icons-react";
 import { PageContainer } from "../../components/layout/PageContainer";
 
 import { AddressSpotlight } from "../../components/payments/AddressSpotlight";
 import { useSelectedProject } from "../../context/SelectedProjectContext";
+import { useWalletSelector } from "../../context/WalletSelectorContext";
 import { fetchTransactionRequestControllerCreate } from "../../services/api/dev3Components";
 import { Address } from "../../services/api/dev3Schemas";
-import { nearWalletRegex } from "../../utils/near";
+import {
+  nearWalletRegex,
+  NEAR_CONTRACT_ID,
+  parseFtAmount,
+} from "../../utils/near";
+
+interface IPaymentFormValues {
+  amount: number;
+  receiver: string;
+  contractId: string;
+  isFungibleToken: boolean;
+}
+
+class ReceiverError extends Error {}
 
 const CreatePayment = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { project } = useSelectedProject();
+  const { viewMethod } = useWalletSelector();
 
-  const form = useForm({
+  const form = useForm<IPaymentFormValues>({
     validateInputOnChange: true,
     initialValues: {
-      memo: "",
       amount: 0,
       receiver: "",
-      receiver_fungible: "",
+      contractId: "",
       isFungibleToken: false,
     },
 
     validate: {
       receiver: (value) =>
         nearWalletRegex.test(value) ? null : "Invalid reciver address",
-      receiver_fungible: (value, values) =>
+      contractId: (value, values) =>
         !values.isFungibleToken
           ? null
           : nearWalletRegex.test(value)
@@ -50,7 +65,21 @@ const CreatePayment = () => {
     },
   });
 
-  const handleSubmit = async ({ amount, receiver }: any) => {
+  const validateReceiver = useCallback(
+    async (contractId: string, receiver: string) => {
+      return await viewMethod(contractId, "storage_balance_of", {
+        account_id: receiver,
+      });
+    },
+    [viewMethod]
+  );
+
+  const handleSubmit = async ({
+    amount,
+    isFungibleToken,
+    contractId,
+    receiver,
+  }: IPaymentFormValues) => {
     try {
       setLoading(true);
 
@@ -63,19 +92,51 @@ const CreatePayment = () => {
         disallowClose: true,
       });
 
-      // await fetchTransactionRequestControllerCreate({
-      //   body: {
-      //     project_id: (project as any)._id,
-      //     method: "ft_transfer",
-      //     is_near_token: false,
-      //     type: "Payment",
-      //     args: {
-      //       amount,
-      //       receiver_id: receiver,
-      //     },
-      //     contractId: "dev-1667378639276-81893145684696",
-      //   },
-      // });
+      let args;
+      let method = isFungibleToken ? "ft_transfer" : "transfer_funds";
+      let deposit = "1";
+
+      if (
+        isFungibleToken &&
+        contractId &&
+        (await validateReceiver(contractId, receiver)) === null
+      ) {
+        throw new ReceiverError();
+      }
+
+      if (!isFungibleToken) {
+        const parsedAmount = parseNearAmount(amount.toString());
+        deposit = parsedAmount as string;
+
+        args = {
+          request: {
+            receiver_account_id: receiver,
+            amount: parsedAmount,
+          },
+        };
+      } else {
+        const metadata = await viewMethod(contractId, "ft_metadata", null);
+        const decimals = metadata?.["decimals"] ?? 0;
+
+        const parsedAmount = parseFtAmount(amount, decimals);
+        console.log(decimals, parseFtAmount);
+
+        args = {
+          amount: parsedAmount,
+          receiver_id: receiver,
+        };
+      }
+
+      await fetchTransactionRequestControllerCreate({
+        body: {
+          project_id: (project as any)._id,
+          method,
+          is_near_token: !isFungibleToken,
+          type: "Payment",
+          args,
+          contractId: isFungibleToken ? contractId : NEAR_CONTRACT_ID,
+        },
+      });
 
       updateNotification({
         id: "loading-notification",
@@ -88,12 +149,21 @@ const CreatePayment = () => {
 
       router.push(`/payments`);
     } catch (error) {
+      let title = "Error creating payment request";
+      let message =
+        "There was an error creating your payment request. Please try again later.";
+
+      if (error instanceof ReceiverError) {
+        title = "Recipient is not registered to receive fungible tokens";
+        message =
+          "Please ask the recipient to register to receive fungible tokens";
+      }
+
       updateNotification({
         id: "loading-notification",
         color: "red",
-        title: "Error creating payment request",
-        message:
-          "There was an error creating your payment request. Please try again later.",
+        title,
+        message,
         icon: <X size={16} />,
         autoClose: 3000,
       });
@@ -131,7 +201,7 @@ const CreatePayment = () => {
             mt="sm"
             label="Fungible token contract"
             placeholder="Enter fungible token contract id"
-            {...form.getInputProps("receiver_fungible")}
+            {...form.getInputProps("contractId")}
           />
         )}
 
