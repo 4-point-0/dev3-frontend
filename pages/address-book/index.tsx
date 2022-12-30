@@ -3,8 +3,7 @@ import { openConfirmModal } from "@mantine/modals";
 import { NextLink } from "@mantine/next";
 import { showNotification } from "@mantine/notifications";
 import { DataTable, DataTableColumn } from "mantine-datatable";
-import { useRouter } from "next/router";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Edit, Plus, Trash, X } from "tabler-icons-react";
 
 import { CopyCell } from "../../components/table/CopyCell";
@@ -17,36 +16,18 @@ import { Address } from "../../services/api/dev3Schemas";
 const PAGE_LIMIT = 20;
 
 const AddressBook = () => {
-  const router = useRouter();
-  console.log(router.asPath);
+  const [page, setPage] = useState(1);
 
-  const page = useMemo(() => {
-    if (!router.query.page) {
-      return 1;
+  const { isFetching, refetch, data } = useAddressControllerFindAll(
+    {
+      queryParams: {
+        offset: (page - 1) * PAGE_LIMIT,
+        limit: PAGE_LIMIT,
+      },
+    },
+    {
+      refetchOnWindowFocus: false,
     }
-
-    return parseInt(router.query.page as string);
-  }, [router.query?.page]);
-
-  const { isLoading, refetch, data } = useAddressControllerFindAll({
-    queryParams: {
-      offset: (page - 1) * PAGE_LIMIT,
-      limit: PAGE_LIMIT,
-    },
-  });
-
-  const handlePageChange = useCallback(
-    (newPage: number) => {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: { page: newPage },
-        },
-        undefined,
-        { shallow: true }
-      );
-    },
-    [router]
   );
 
   const handleDelete = (address: Address) =>
@@ -135,14 +116,16 @@ const AddressBook = () => {
   ];
 
   const paginationProps =
-    data?.total ?? 0 < PAGE_LIMIT
+    (data?.total ?? -1) < PAGE_LIMIT
       ? {}
       : {
           totalRecords: data?.total,
           recordsPerPage: PAGE_LIMIT,
-          onPageChange: handlePageChange,
+          onPageChange: setPage,
           page,
         };
+
+  console.log(data?.total ?? 0 < PAGE_LIMIT, paginationProps);
 
   return (
     <Stack align="flex-start">
@@ -166,7 +149,7 @@ const AddressBook = () => {
           idAccessor="alias"
           columns={columns}
           records={data?.results}
-          fetching={isLoading}
+          fetching={isFetching}
           {...paginationProps}
         ></DataTable>
       </Paper>
