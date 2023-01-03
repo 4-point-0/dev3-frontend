@@ -14,7 +14,7 @@ export const CopyCell: React.FC<ICopyCellProps> = ({ value, children }) => {
 
   return (
     <Group>
-      {value}
+      {children || value}
       <CopyActionButton value={value} />
     </Group>
   );
