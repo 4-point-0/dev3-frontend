@@ -234,6 +234,7 @@ export type CreateTransactionRequestDto = {
   contractId?: string;
   method: string;
   args?: Record<string, any>;
+  meta?: Record<string, any>;
   gas?: string;
   deposit?: string;
   is_near_token: boolean;
@@ -254,6 +255,7 @@ export type TransactionRequest = {
   status: "Pending" | "Success" | "Failure";
   contractId?: string;
   method: string;
+  meta: string;
   args: string;
   gas?: string;
   deposit?: string;
@@ -280,6 +282,7 @@ export type PublicTransactionRequestDto = {
   status: "Pending" | "Success" | "Failure";
   contractId?: string;
   method: string;
+  meta?: Record<string, any>;
   args?: Record<string, any>;
   gas?: string;
   deposit?: string;
@@ -308,6 +311,7 @@ export type TransactionRequestDto = {
   contractId?: string;
   method: string;
   args?: Record<string, any>;
+  meta?: Record<string, any>;
   gas?: string;
   deposit?: string;
   caller_address?: string;

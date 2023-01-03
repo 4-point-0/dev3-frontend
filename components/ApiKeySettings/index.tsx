@@ -136,7 +136,7 @@ async function revokeOrApprove(
         apiKey: encodeURIComponent(apiKey),
       },
       body: {
-        is_revoked: isRevoked,
+        is_revoked: !isRevoked,
       },
     });
 
