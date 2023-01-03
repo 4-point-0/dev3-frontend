@@ -1,11 +1,12 @@
 import { useRouter } from "next/router";
-import React, { useCallback, useContext, useState } from "react";
+import React, { useCallback, useContext, useMemo, useState } from "react";
 
 import { useProjectControllerFindAll } from "../services/api/dev3Components";
 import { Project } from "../services/api/dev3Schemas";
 
 interface UseSelectedProject {
   project: Project | null;
+  projectId: string | null;
   selectProject: (project: Project) => void;
 }
 
@@ -20,6 +21,14 @@ export function isSameProject(a: Project | null) {
 export const SelectedProjectProvider = ({ children }: any) => {
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
+
+  const projectId = useMemo(() => {
+    if (!project) {
+      return null;
+    }
+
+    return (project as any)._id as string;
+  }, [project]);
 
   useProjectControllerFindAll(
     {},
@@ -61,6 +70,7 @@ export const SelectedProjectProvider = ({ children }: any) => {
       value={{
         project,
         selectProject,
+        projectId,
       }}
     >
       {children}

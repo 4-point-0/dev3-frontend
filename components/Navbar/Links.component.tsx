@@ -5,7 +5,6 @@ import React from "react";
 import {
   ArrowsLeftRight,
   Book,
-  Parachute,
   Settings,
   ThreeDCubeSphere,
 } from "tabler-icons-react";

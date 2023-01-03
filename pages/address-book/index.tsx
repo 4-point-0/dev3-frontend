@@ -3,8 +3,7 @@ import { openConfirmModal } from "@mantine/modals";
 import { NextLink } from "@mantine/next";
 import { showNotification } from "@mantine/notifications";
 import { DataTable, DataTableColumn } from "mantine-datatable";
-import { useRouter } from "next/router";
-import { useCallback, useMemo } from "react";
+import { useState } from "react";
 import { Edit, Plus, Trash, X } from "tabler-icons-react";
 import { PageContainer } from "../../components/layout/PageContainer";
 
@@ -18,36 +17,18 @@ import { Address } from "../../services/api/dev3Schemas";
 const PAGE_LIMIT = 20;
 
 const AddressBook = () => {
-  const router = useRouter();
-  console.log(router.asPath);
+  const [page, setPage] = useState(1);
 
-  const page = useMemo(() => {
-    if (!router.query.page) {
-      return 1;
+  const { isFetching, refetch, data } = useAddressControllerFindAll(
+    {
+      queryParams: {
+        offset: (page - 1) * PAGE_LIMIT,
+        limit: PAGE_LIMIT,
+      },
+    },
+    {
+      refetchOnWindowFocus: false,
     }
-
-    return parseInt(router.query.page as string);
-  }, [router.query?.page]);
-
-  const { isLoading, refetch, data } = useAddressControllerFindAll({
-    queryParams: {
-      offset: (page - 1) * PAGE_LIMIT,
-      limit: PAGE_LIMIT,
-    },
-  });
-
-  const handlePageChange = useCallback(
-    (newPage: number) => {
-      router.push(
-        {
-          pathname: router.pathname,
-          query: { page: newPage },
-        },
-        undefined,
-        { shallow: true }
-      );
-    },
-    [router]
   );
 
   const handleDelete = (address: Address) =>
@@ -152,7 +133,7 @@ const AddressBook = () => {
       : {
           totalRecords: data?.total,
           recordsPerPage: PAGE_LIMIT,
-          onPageChange: handlePageChange,
+          onPageChange: setPage,
           page,
         };
 
@@ -172,10 +153,10 @@ const AddressBook = () => {
         highlightOnHover
         idAccessor="alias"
         minHeight={164}
+        noRecordsText="No addresses"
         columns={columns}
         records={data?.results}
-        fetching={isLoading}
-        noRecordsText="No addresses"
+        fetching={isFetching}
         {...paginationProps}
       ></DataTable>
     </PageContainer>
