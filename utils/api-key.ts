@@ -1,6 +1,6 @@
 export function getDefaultExpires() {
   const now = new Date();
-  const expires = new Date(new Date().setFullYear(now.getFullYear() + 10));
+  const expires = new Date(new Date().setDate(now.getDate() + 90));
 
   return expires.toISOString();
 }
