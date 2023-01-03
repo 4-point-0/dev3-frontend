@@ -1,14 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  Container,
-  Group,
-  NumberInput,
-  Paper,
-  Stack,
-  TextInput,
-  Title,
-} from "@mantine/core";
+import { Button, Checkbox, Group, NumberInput, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { parseNearAmount } from "near-api-js/lib/utils/format";
@@ -23,9 +13,12 @@ import { useWalletSelector } from "../../context/WalletSelectorContext";
 import { fetchTransactionRequestControllerCreate } from "../../services/api/dev3Components";
 import { Address } from "../../services/api/dev3Schemas";
 import {
+  FungibleTokenError,
   nearWalletRegex,
   NEAR_CONTRACT_ID,
   parseFtAmount,
+  ReceiverError,
+  validateFungibleMetadata,
 } from "../../utils/near";
 
 interface IPaymentFormValues {
@@ -34,8 +27,6 @@ interface IPaymentFormValues {
   contractId: string;
   isFungibleToken: boolean;
 }
-
-class ReceiverError extends Error {}
 
 const CreatePayment = () => {
   const [loading, setLoading] = useState(false);
@@ -116,6 +107,9 @@ const CreatePayment = () => {
         };
       } else {
         const metadata = await viewMethod(contractId, "ft_metadata", null);
+
+        validateFungibleMetadata(metadata);
+
         const decimals = metadata?.["decimals"] ?? 0;
 
         const parsedAmount = parseFtAmount(amount, decimals);
@@ -157,6 +151,11 @@ const CreatePayment = () => {
         title = "Recipient is not registered to receive fungible tokens";
         message =
           "Please ask the recipient to register to receive fungible tokens";
+      }
+
+      if (error instanceof FungibleTokenError) {
+        title = "Contract is not a fungible token";
+        message = error.message;
       }
 
       updateNotification({

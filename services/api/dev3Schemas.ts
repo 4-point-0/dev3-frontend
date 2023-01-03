@@ -154,11 +154,87 @@ export type UpdateAddressDto = {
   phone?: string;
 };
 
+export type CreateDeployedContractDto = {
+  alias: string;
+  contract_template_id: string;
+  args: Record<string, any>;
+  project_id: string;
+};
+
+export type Contract = {
+  /**
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * @format date-time
+   */
+  createdAt: string;
+  name: string;
+  description: string;
+  is_audited: boolean;
+  tags: string[];
+  creator_name: string;
+  github_url: string;
+  info_markdown_url: string;
+};
+
+export type DeployedContract = {
+  /**
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * @format date-time
+   */
+  createdAt: string;
+  uuid: string;
+  alias: string;
+  args: string;
+  tags: string[];
+  status: "Pending" | "Deployed";
+  address?: string;
+  txHash?: string;
+  txDetails?: string;
+  deployer_address?: string;
+  owner: User;
+  project: Project;
+  contract_template?: Contract;
+};
+
+export type DeployedContractDto = {
+  uuid: string;
+  contract_template_name: string;
+  contract_template_description: string;
+  alias: string;
+  tags: string[];
+  status: "Pending" | "Deployed";
+  args: Record<string, any>;
+  deployer_address?: string;
+  txHash: string;
+  txDetails: string;
+  /**
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * @format date-time
+   */
+  updated_at: string;
+};
+
+export type UpdateDeployedContractDto = {
+  txHash: string;
+  deployer_address: string;
+  txDetails?: Record<string, any>;
+};
+
 export type CreateTransactionRequestDto = {
   type: "Transaction" | "Payment";
   contractId?: string;
   method: string;
   args?: Record<string, any>;
+  meta?: Record<string, any>;
   gas?: string;
   deposit?: string;
   is_near_token: boolean;
@@ -179,6 +255,7 @@ export type TransactionRequest = {
   status: "Pending" | "Success" | "Failure";
   contractId?: string;
   method: string;
+  meta: string;
   args: string;
   gas?: string;
   deposit?: string;
@@ -205,6 +282,7 @@ export type PublicTransactionRequestDto = {
   status: "Pending" | "Success" | "Failure";
   contractId?: string;
   method: string;
+  meta?: Record<string, any>;
   args?: Record<string, any>;
   gas?: string;
   deposit?: string;
@@ -233,6 +311,7 @@ export type TransactionRequestDto = {
   contractId?: string;
   method: string;
   args?: Record<string, any>;
+  meta?: Record<string, any>;
   gas?: string;
   deposit?: string;
   caller_address?: string;
