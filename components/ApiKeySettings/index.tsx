@@ -1,12 +1,4 @@
-import {
-  Badge,
-  Button,
-  Group,
-  Skeleton,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Button, Group, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { openConfirmModal } from "@mantine/modals";
 import React, { useMemo } from "react";
 
@@ -120,13 +112,9 @@ async function remove(id: string, refetch: () => Promise<unknown>) {
   }
 }
 
-async function revokeOrApprove(
-  apiKey: string,
-  isRevoked: boolean,
-  refetch: () => Promise<unknown>
-) {
+async function revoke(apiKey: string, refetch: () => Promise<unknown>) {
   notifications.create({
-    title: `${isRevoked ? "Approve" : "Revoke"} the API key`,
+    title: `Revoke the API key`,
     message: "Please wait...",
   });
 
@@ -136,21 +124,19 @@ async function revokeOrApprove(
         apiKey: encodeURIComponent(apiKey),
       },
       body: {
-        is_revoked: !isRevoked,
+        is_revoked: true,
       },
     });
 
     notifications.success({
-      title: `API key ${isRevoked ? "approved" : "revoked"}`,
-      message: `The API key was successfully ${
-        isRevoked ? "approved" : "revoked"
-      }`,
+      title: `API key revoked`,
+      message: `The API key was successfully revoked`,
     });
 
     await refetch();
   } catch {
     notifications.error({
-      title: `Error while ${isRevoked ? "approving" : "revoking"} the API key`,
+      title: `Error while revoking the API key`,
       message: "There was an error. Please try again later.",
     });
   }
@@ -197,57 +183,24 @@ export const ApiKeySettings = () => {
   };
 
   const handleRevokeOrApprove = () => {
-    const isRevoked = Boolean(apiKeyDto?.is_revoked);
-
     openConfirmModal({
-      title: `${isRevoked ? "Approve" : "Revoke"} the API key?`,
+      title: `Revoke the API key?`,
       children: (
-        <Text size="sm">
-          {isRevoked
-            ? "Approving the API ket will make it valid"
-            : "Revoking the API key will make it invalid."}
-        </Text>
+        <Text size="sm">Revoking the API key will make it invalid.</Text>
       ),
       labels: {
         cancel: "Cancel",
-        confirm: isRevoked ? "Approve" : "Revoke",
-      },
-      confirmProps: {
-        color: isRevoked ? "blue" : "red",
-        variant: "light",
-      },
-      onConfirm: async () => {
-        await revokeOrApprove(
-          apiKeyDto?.api_key as string,
-          apiKeyDto?.is_revoked as boolean,
-          refetch
-        );
-      },
-    });
-  };
-
-  const handleRemove = () => {
-    openConfirmModal({
-      title: "Remove the API key?",
-      children: (
-        <Text size="sm">
-          Removing the API key will make the current one invalid.
-        </Text>
-      ),
-      labels: {
-        cancel: "Cancel",
-        confirm: "Remove",
+        confirm: "Revoke",
       },
       confirmProps: {
         color: "red",
+        variant: "light",
       },
       onConfirm: async () => {
-        await remove(apiKeyDto?.id as string, refetch);
+        await revoke(apiKeyDto?.api_key as string, refetch);
       },
     });
   };
-
-  const expired = isExpired(apiKeyDto?.expires);
 
   return (
     <Stack align="flex-start">
@@ -262,20 +215,12 @@ export const ApiKeySettings = () => {
 
             <Title order={4}>Expires at:</Title>
             <Text>{formatExpired(apiKeyDto?.expires)}</Text>
-
-            {expired && <Badge color="red">Expired</Badge>}
-
-            {apiKeyDto?.is_revoked && (
-              <Badge color="red" variant="outline">
-                Revoked
-              </Badge>
-            )}
           </Stack>
         </>
       )}
 
       <Skeleton visible={isLoading}>
-        {!apiKeyDto && <Text>The is no valid API key.</Text>}
+        {!apiKeyDto && <Text>The is no active API key.</Text>}
       </Skeleton>
 
       <Group w="100%" position="right">
@@ -290,9 +235,6 @@ export const ApiKeySettings = () => {
               color={apiKeyDto?.is_revoked ? "blue" : "red"}
             >
               {apiKeyDto?.is_revoked ? "Approve" : "Revoke"}
-            </Button>
-            <Button color="red" onClick={handleRemove}>
-              Remove
             </Button>
           </>
         )}
