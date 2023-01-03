@@ -17,10 +17,12 @@ import { ProjectImage } from "../../components/ProjectImage";
 
 import { useSelectedProject } from "../../context/SelectedProjectContext";
 import {
+  fetchApiKeyControllerCreate,
   fetchFileControllerUploadFile,
   fetchProjectControllerCreate,
   useProjectControllerFindAll,
 } from "../../services/api/dev3Components";
+import { getDefaultExpires } from "../../utils/api-key";
 
 const NewProject: NextPage = () => {
   const theme = useMantineTheme();
@@ -84,6 +86,13 @@ const NewProject: NextPage = () => {
           slug,
           logo_id: logoId,
         } as any,
+      });
+
+      await fetchApiKeyControllerCreate({
+        body: {
+          project_id: (project as any)._id,
+          expires: getDefaultExpires(),
+        },
       });
 
       updateNotification({

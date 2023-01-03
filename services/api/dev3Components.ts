@@ -1009,7 +1009,7 @@ export const fetchContractControllerFindAll = (
     {},
     ContractControllerFindAllQueryParams,
     {}
-  >({ url: "/api/v1/contract", method: "get", ...variables, signal });
+  >({ url: "/api/v1/contract-template", method: "get", ...variables, signal });
 
 export const useContractControllerFindAll = <TData = Schemas.PaginatedDto>(
   variables: ContractControllerFindAllVariables,
@@ -1029,7 +1029,7 @@ export const useContractControllerFindAll = <TData = Schemas.PaginatedDto>(
     TData
   >(
     queryKeyFn({
-      path: "/api/v1/contract",
+      path: "/api/v1/contract-template",
       operationId: "contractControllerFindAll",
       variables,
     }),
@@ -1063,7 +1063,7 @@ export const fetchContractControllerUpdateContracts = (
     {},
     {}
   >({
-    url: "/api/v1/contract/update-contracts",
+    url: "/api/v1/contract-template/update-contracts",
     method: "post",
     ...variables,
     signal,
@@ -1091,6 +1091,364 @@ export const useContractControllerUpdateContracts = (
         ...variables,
       }),
     options
+  );
+};
+
+export type DeployedContractControllerCreateError =
+  Fetcher.ErrorWrapper<undefined>;
+
+export type DeployedContractControllerCreateVariables = {
+  body: Schemas.CreateDeployedContractDto;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchDeployedContractControllerCreate = (
+  variables: DeployedContractControllerCreateVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.DeployedContract,
+    DeployedContractControllerCreateError,
+    Schemas.CreateDeployedContractDto,
+    {},
+    {},
+    {}
+  >({ url: "/api/v1/deployed-contract", method: "post", ...variables, signal });
+
+export const useDeployedContractControllerCreate = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.DeployedContract,
+      DeployedContractControllerCreateError,
+      DeployedContractControllerCreateVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.DeployedContract,
+    DeployedContractControllerCreateError,
+    DeployedContractControllerCreateVariables
+  >(
+    (variables: DeployedContractControllerCreateVariables) =>
+      fetchDeployedContractControllerCreate({
+        ...fetcherOptions,
+        ...variables,
+      }),
+    options
+  );
+};
+
+export type DeployedContractControllerFindAllQueryParams = {
+  project_id?: string;
+  offset?: number;
+  limit?: number;
+  alias?: string;
+  status?: "Pending" | "Deployed" | "Failure";
+  tags?: string[];
+  contract_template_id?: void;
+};
+
+export type DeployedContractControllerFindAllError =
+  Fetcher.ErrorWrapper<undefined>;
+
+export type DeployedContractControllerFindAllResponse = {
+  total: number;
+  limit: number;
+  offset: number;
+  count: number;
+  results: Schemas.DeployedContract[];
+};
+
+export type DeployedContractControllerFindAllVariables = {
+  queryParams?: DeployedContractControllerFindAllQueryParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchDeployedContractControllerFindAll = (
+  variables: DeployedContractControllerFindAllVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    DeployedContractControllerFindAllResponse,
+    DeployedContractControllerFindAllError,
+    undefined,
+    {},
+    DeployedContractControllerFindAllQueryParams,
+    {}
+  >({ url: "/api/v1/deployed-contract", method: "get", ...variables, signal });
+
+export const useDeployedContractControllerFindAll = <
+  TData = DeployedContractControllerFindAllResponse
+>(
+  variables: DeployedContractControllerFindAllVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      DeployedContractControllerFindAllResponse,
+      DeployedContractControllerFindAllError,
+      TData
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
+    DeployedContractControllerFindAllResponse,
+    DeployedContractControllerFindAllError,
+    TData
+  >(
+    queryKeyFn({
+      path: "/api/v1/deployed-contract",
+      operationId: "deployedContractControllerFindAll",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchDeployedContractControllerFindAll(
+        { ...fetcherOptions, ...variables },
+        signal
+      ),
+    {
+      ...options,
+      ...queryOptions,
+    }
+  );
+};
+
+export type DeployedContractControllerFindOnePathParams = {
+  uuid: string;
+};
+
+export type DeployedContractControllerFindOneError =
+  Fetcher.ErrorWrapper<undefined>;
+
+export type DeployedContractControllerFindOneVariables = {
+  pathParams: DeployedContractControllerFindOnePathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchDeployedContractControllerFindOne = (
+  variables: DeployedContractControllerFindOneVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.DeployedContract,
+    DeployedContractControllerFindOneError,
+    undefined,
+    {},
+    {},
+    DeployedContractControllerFindOnePathParams
+  >({
+    url: "/api/v1/deployed-contract/{uuid}",
+    method: "get",
+    ...variables,
+    signal,
+  });
+
+export const useDeployedContractControllerFindOne = <
+  TData = Schemas.DeployedContract
+>(
+  variables: DeployedContractControllerFindOneVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.DeployedContract,
+      DeployedContractControllerFindOneError,
+      TData
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
+    Schemas.DeployedContract,
+    DeployedContractControllerFindOneError,
+    TData
+  >(
+    queryKeyFn({
+      path: "/api/v1/deployed-contract/{uuid}",
+      operationId: "deployedContractControllerFindOne",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchDeployedContractControllerFindOne(
+        { ...fetcherOptions, ...variables },
+        signal
+      ),
+    {
+      ...options,
+      ...queryOptions,
+    }
+  );
+};
+
+export type DeployedContractControllerUpdatePathParams = {
+  uuid: string;
+};
+
+export type DeployedContractControllerUpdateError =
+  Fetcher.ErrorWrapper<undefined>;
+
+export type DeployedContractControllerUpdateVariables = {
+  body: Schemas.UpdateDeployedContractDto;
+  pathParams: DeployedContractControllerUpdatePathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchDeployedContractControllerUpdate = (
+  variables: DeployedContractControllerUpdateVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.DeployedContractDto,
+    DeployedContractControllerUpdateError,
+    Schemas.UpdateDeployedContractDto,
+    {},
+    {},
+    DeployedContractControllerUpdatePathParams
+  >({
+    url: "/api/v1/deployed-contract/{uuid}",
+    method: "patch",
+    ...variables,
+    signal,
+  });
+
+export const useDeployedContractControllerUpdate = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      Schemas.DeployedContractDto,
+      DeployedContractControllerUpdateError,
+      DeployedContractControllerUpdateVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    Schemas.DeployedContractDto,
+    DeployedContractControllerUpdateError,
+    DeployedContractControllerUpdateVariables
+  >(
+    (variables: DeployedContractControllerUpdateVariables) =>
+      fetchDeployedContractControllerUpdate({
+        ...fetcherOptions,
+        ...variables,
+      }),
+    options
+  );
+};
+
+export type DeployedContractControllerRemovePathParams = {
+  uuid: string;
+};
+
+export type DeployedContractControllerRemoveError =
+  Fetcher.ErrorWrapper<undefined>;
+
+export type DeployedContractControllerRemoveVariables = {
+  pathParams: DeployedContractControllerRemovePathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchDeployedContractControllerRemove = (
+  variables: DeployedContractControllerRemoveVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    undefined,
+    DeployedContractControllerRemoveError,
+    undefined,
+    {},
+    {},
+    DeployedContractControllerRemovePathParams
+  >({
+    url: "/api/v1/deployed-contract/{uuid}",
+    method: "delete",
+    ...variables,
+    signal,
+  });
+
+export const useDeployedContractControllerRemove = (
+  options?: Omit<
+    reactQuery.UseMutationOptions<
+      undefined,
+      DeployedContractControllerRemoveError,
+      DeployedContractControllerRemoveVariables
+    >,
+    "mutationFn"
+  >
+) => {
+  const { fetcherOptions } = useDev3Context();
+  return reactQuery.useMutation<
+    undefined,
+    DeployedContractControllerRemoveError,
+    DeployedContractControllerRemoveVariables
+  >(
+    (variables: DeployedContractControllerRemoveVariables) =>
+      fetchDeployedContractControllerRemove({
+        ...fetcherOptions,
+        ...variables,
+      }),
+    options
+  );
+};
+
+export type DeployedContractControllerFindByUuidPublicPathParams = {
+  uuid: string;
+};
+
+export type DeployedContractControllerFindByUuidPublicError =
+  Fetcher.ErrorWrapper<undefined>;
+
+export type DeployedContractControllerFindByUuidPublicVariables = {
+  pathParams: DeployedContractControllerFindByUuidPublicPathParams;
+} & Dev3Context["fetcherOptions"];
+
+export const fetchDeployedContractControllerFindByUuidPublic = (
+  variables: DeployedContractControllerFindByUuidPublicVariables,
+  signal?: AbortSignal
+) =>
+  dev3Fetch<
+    Schemas.DeployedContractDto,
+    DeployedContractControllerFindByUuidPublicError,
+    undefined,
+    {},
+    {},
+    DeployedContractControllerFindByUuidPublicPathParams
+  >({
+    url: "/api/v1/deployed-contract/public/{uuid}",
+    method: "get",
+    ...variables,
+    signal,
+  });
+
+export const useDeployedContractControllerFindByUuidPublic = <
+  TData = Schemas.DeployedContractDto
+>(
+  variables: DeployedContractControllerFindByUuidPublicVariables,
+  options?: Omit<
+    reactQuery.UseQueryOptions<
+      Schemas.DeployedContractDto,
+      DeployedContractControllerFindByUuidPublicError,
+      TData
+    >,
+    "queryKey" | "queryFn"
+  >
+) => {
+  const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
+  return reactQuery.useQuery<
+    Schemas.DeployedContractDto,
+    DeployedContractControllerFindByUuidPublicError,
+    TData
+  >(
+    queryKeyFn({
+      path: "/api/v1/deployed-contract/public/{uuid}",
+      operationId: "deployedContractControllerFindByUuidPublic",
+      variables,
+    }),
+    ({ signal }) =>
+      fetchDeployedContractControllerFindByUuidPublic(
+        { ...fetcherOptions, ...variables },
+        signal
+      ),
+    {
+      ...options,
+      ...queryOptions,
+    }
   );
 };
 
@@ -1151,6 +1509,7 @@ export type TransactionRequestControllerFindAllQueryParams = {
   contractId?: string;
   method?: string;
   status?: "Pending" | "Success" | "Failure";
+  type?: "Transaction" | "Payment";
 };
 
 export type TransactionRequestControllerFindAllError =
@@ -1238,7 +1597,7 @@ export const fetchTransactionRequestControllerFindByUuid = (
   signal?: AbortSignal
 ) =>
   dev3Fetch<
-    Schemas.TransactionRequestDto,
+    Schemas.PublicTransactionRequestDto,
     TransactionRequestControllerFindByUuidError,
     undefined,
     {},
@@ -1252,12 +1611,12 @@ export const fetchTransactionRequestControllerFindByUuid = (
   });
 
 export const useTransactionRequestControllerFindByUuid = <
-  TData = Schemas.TransactionRequestDto
+  TData = Schemas.PublicTransactionRequestDto
 >(
   variables: TransactionRequestControllerFindByUuidVariables,
   options?: Omit<
     reactQuery.UseQueryOptions<
-      Schemas.TransactionRequestDto,
+      Schemas.PublicTransactionRequestDto,
       TransactionRequestControllerFindByUuidError,
       TData
     >,
@@ -1266,7 +1625,7 @@ export const useTransactionRequestControllerFindByUuid = <
 ) => {
   const { fetcherOptions, queryOptions, queryKeyFn } = useDev3Context(options);
   return reactQuery.useQuery<
-    Schemas.TransactionRequestDto,
+    Schemas.PublicTransactionRequestDto,
     TransactionRequestControllerFindByUuidError,
     TData
   >(
@@ -1476,9 +1835,24 @@ export type QueryOperation =
       variables: AddressControllerFindOneVariables;
     }
   | {
-      path: "/api/v1/contract";
+      path: "/api/v1/contract-template";
       operationId: "contractControllerFindAll";
       variables: ContractControllerFindAllVariables;
+    }
+  | {
+      path: "/api/v1/deployed-contract";
+      operationId: "deployedContractControllerFindAll";
+      variables: DeployedContractControllerFindAllVariables;
+    }
+  | {
+      path: "/api/v1/deployed-contract/{uuid}";
+      operationId: "deployedContractControllerFindOne";
+      variables: DeployedContractControllerFindOneVariables;
+    }
+  | {
+      path: "/api/v1/deployed-contract/public/{uuid}";
+      operationId: "deployedContractControllerFindByUuidPublic";
+      variables: DeployedContractControllerFindByUuidPublicVariables;
     }
   | {
       path: "/api/v1/transaction-request";

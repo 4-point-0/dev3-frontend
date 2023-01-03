@@ -5,7 +5,6 @@ import React from "react";
 import {
   ArrowsLeftRight,
   Book,
-  Parachute,
   Settings,
   ThreeDCubeSphere,
 } from "tabler-icons-react";
@@ -15,11 +14,6 @@ const topSectionData = [
     icon: <ThreeDCubeSphere size={24} />,
     label: "Contracts",
     href: "/contracts",
-  },
-  {
-    icon: <Parachute size={24} />,
-    label: "Airdrops",
-    href: "/airdrops",
   },
   {
     icon: <ArrowsLeftRight size={24} />,
