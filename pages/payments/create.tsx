@@ -128,7 +128,6 @@ const CreatePayment = () => {
         const decimals = metadata?.["decimals"] ?? 0;
 
         const parsedAmount = parseFtAmount(amount, decimals);
-        console.log(decimals, parseFtAmount);
 
         args = {
           amount: parsedAmount,
@@ -144,6 +143,7 @@ const CreatePayment = () => {
           type: "Payment",
           args,
           contractId: isFungibleToken ? contractId : NEAR_CONTRACT_ID,
+          meta: metadata,
         },
       });
 
