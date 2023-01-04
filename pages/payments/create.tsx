@@ -1,17 +1,28 @@
-import { Button, Checkbox, Group, NumberInput, TextInput } from "@mantine/core";
+import {
+  Avatar,
+  Button,
+  Checkbox,
+  Group,
+  NumberInput,
+  Skeleton,
+  TextInput,
+  Alert,
+  Stack,
+  Badge,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { parseNearAmount } from "near-api-js/lib/utils/format";
 import { useRouter } from "next/router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Check, X } from "tabler-icons-react";
 import { PageContainer } from "../../components/layout/PageContainer";
+import { IconAlertCircle } from "@tabler/icons";
 
 import { AddressSpotlight } from "../../components/payments/AddressSpotlight";
 import { useSelectedProject } from "../../context/SelectedProjectContext";
 import { useWalletSelector } from "../../context/WalletSelectorContext";
 import { fetchTransactionRequestControllerCreate } from "../../services/api/dev3Components";
-import { Address } from "../../services/api/dev3Schemas";
 import {
   FungibleTokenError,
   nearWalletRegex,
@@ -20,6 +31,7 @@ import {
   ReceiverError,
   validateFungibleMetadata,
 } from "../../utils/near";
+import { useMetadata } from "../../hooks/useMetadata";
 
 interface IPaymentFormValues {
   amount: number;
@@ -55,6 +67,11 @@ const CreatePayment = () => {
       amount: (value) => (value > 0 ? null : "Amount must be greater than 0"),
     },
   });
+
+  const { metadata, isLoading: metadataLoading } = useMetadata(
+    form.values.isFungibleToken,
+    form.values.contractId
+  );
 
   const validateReceiver = useCallback(
     async (contractId: string, receiver: string) => {
@@ -106,8 +123,6 @@ const CreatePayment = () => {
           },
         };
       } else {
-        const metadata = await viewMethod(contractId, "ft_metadata", null);
-
         validateFungibleMetadata(metadata);
 
         const decimals = metadata?.["decimals"] ?? 0;
@@ -177,6 +192,13 @@ const CreatePayment = () => {
     form.setFieldValue("receiver", wallet);
   };
 
+  const metadataIsValid = Boolean(metadata) && metadata.spec === "ft-1.0.0";
+
+  const disabled =
+    loading ||
+    metadataLoading ||
+    (form.values.isFungibleToken && !metadataIsValid);
+
   return (
     <PageContainer title="Create payment request">
       <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
@@ -196,12 +218,49 @@ const CreatePayment = () => {
         />
 
         {form.values.isFungibleToken && (
-          <TextInput
-            mt="sm"
-            label="Fungible token contract"
-            placeholder="Enter fungible token contract id"
-            {...form.getInputProps("contractId")}
-          />
+          <Stack align="flex-start">
+            <TextInput
+              w="100%"
+              mt="sm"
+              label="Fungible token contract"
+              placeholder="Enter fungible token contract id"
+              {...form.getInputProps("contractId")}
+            />
+
+            <Skeleton visible={metadataLoading}>
+              {form.values.contractId &&
+                form.isValid("contractId") &&
+                !metadataIsValid && (
+                  <Alert icon={<IconAlertCircle size={16} />} color="red">
+                    {"Can't verify contract is a fungible token."}
+                  </Alert>
+                )}
+            </Skeleton>
+
+            {metadata && (
+              <Badge
+                color="yellow"
+                size="xl"
+                radius="xl"
+                pl={0}
+                leftSection={
+                  <Avatar
+                    alt={metadata.name}
+                    size={32}
+                    mr={6}
+                    radius="xl"
+                    color="yellow"
+                    src={metadata.icon}
+                    variant="filled"
+                  >
+                    {metadata.name?.[0] ?? "?"}
+                  </Avatar>
+                }
+              >
+                {metadata.symbol}
+              </Badge>
+            )}
+          </Stack>
         )}
 
         <NumberInput
@@ -217,7 +276,7 @@ const CreatePayment = () => {
         />
 
         <Group position="right" mt="md">
-          <Button type="submit" variant="light" disabled={loading}>
+          <Button type="submit" variant="light" disabled={disabled}>
             Create payment request
           </Button>
         </Group>
