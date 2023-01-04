@@ -32,7 +32,7 @@ const Payments = () => {
     },
     {
       accessor: "amount",
-      render: ({ args, is_near_token }) => {
+      render: ({ args, is_near_token, meta }) => {
         let amount = "Unknown";
 
         try {
@@ -41,8 +41,14 @@ const Payments = () => {
           amount = is_near_token
             ? formatNearAmount(parsedArgs?.["request"]?.["amount"] as string)
             : parsedArgs?.["amount"];
+
+          const parsedMeta = meta ? JSON.parse(meta) : null;
+
+          if (parsedMeta?.decimals) {
+            amount = (parseInt(amount) / 10 ** parsedMeta.decimals).toString();
+          }
         } catch {
-          amount = "Couldn't parse arguments";
+          amount = "Couldn't parse amount";
         }
 
         return <Text>{amount}</Text>;
@@ -50,8 +56,14 @@ const Payments = () => {
     },
     {
       accessor: "token",
-      render: ({ is_near_token }) => {
-        return <Badge>{is_near_token ? "NEAR" : "Unknown"}</Badge>;
+      render: ({ is_near_token, meta }) => {
+        const parsedMeta = JSON.parse(meta || "null");
+
+        return (
+          <Badge>
+            {is_near_token ? "NEAR" : parsedMeta?.name ?? "Unknown"}
+          </Badge>
+        );
       },
     },
     {
