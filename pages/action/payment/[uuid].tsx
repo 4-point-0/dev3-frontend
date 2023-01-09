@@ -24,6 +24,7 @@ import {
   useProjectControllerFindBySlug,
   useTransactionRequestControllerFindByUuid,
 } from "../../../services/api/dev3Components";
+import { getInfoFromArgs } from "../../../utils/near";
 
 const ICON_SIZE = 80;
 
@@ -94,6 +95,14 @@ const PaymentRequestDetail = () => {
 
     return transactionRequestData.args;
   }, [transactionRequestData?.args]);
+
+  const parsedInfo = useMemo(() => {
+    if (!(parsedArgs && transactionRequestData)) {
+      return;
+    }
+
+    return getInfoFromArgs(parsedArgs, transactionRequestData.meta);
+  }, [parsedArgs, transactionRequestData]);
 
   const handleButtonClick = async () => {
     if (userContext.user === null) {
@@ -242,10 +251,12 @@ const PaymentRequestDetail = () => {
         <Card mt="md" shadow="none" p="lg" radius="md" withBorder>
           <Stack align="center" spacing="sm">
             <Text size="xl" weight={500}>
-              {parsedArgs?.["amount"]}{" "}
+              {parsedInfo?.amount}
             </Text>
             <Badge size="xl">
-              {transactionRequestData?.is_near_token ? "NEAR" : "NOT NEAR"}
+              {transactionRequestData?.is_near_token
+                ? "NEAR"
+                : transactionRequestData?.meta?.name}
             </Badge>
 
             <Text color="dimmed">on Testnet</Text>
@@ -254,7 +265,7 @@ const PaymentRequestDetail = () => {
 
         <Stack mt="xl" align="center" spacing="xs">
           <Text size="xl">Receipient</Text>
-          <Badge size="lg">{parsedArgs?.["receiver_id"]}</Badge>
+          <Badge size="lg">{parsedInfo?.receiver_id}</Badge>
         </Stack>
 
         <Center mt="xl">

@@ -1,7 +1,6 @@
 import { ActionIcon, Badge, Button, Group, Text, Tooltip } from "@mantine/core";
 import { NextLink } from "@mantine/next";
 import { DataTable, DataTableColumn } from "mantine-datatable";
-import { formatNearAmount } from "near-api-js/lib/utils/format";
 import { ExternalLink, Plus, Share } from "tabler-icons-react";
 import { PageContainer } from "../../components/layout/PageContainer";
 import showShareModal from "../../components/ShareModal";
@@ -10,6 +9,7 @@ import { TransactionStatus } from "../../components/transactions/Status";
 
 import { useTransactionRequestControllerFindAll } from "../../services/api/dev3Components";
 import { TransactionRequest } from "../../services/api/dev3Schemas";
+import { getInfoFromArgs } from "../../utils/near";
 
 const Payments = () => {
   const { isLoading, data } = useTransactionRequestControllerFindAll({
@@ -37,16 +37,10 @@ const Payments = () => {
 
         try {
           const parsedArgs = JSON.parse(args);
-
-          amount = is_near_token
-            ? formatNearAmount(parsedArgs?.["request"]?.["amount"] as string)
-            : parsedArgs?.["amount"];
-
           const parsedMeta = meta ? JSON.parse(meta) : null;
 
-          if (parsedMeta?.decimals) {
-            amount = (parseInt(amount) / 10 ** parsedMeta.decimals).toString();
-          }
+          const info = getInfoFromArgs(parsedArgs, parsedMeta);
+          amount = info.amount;
         } catch {
           amount = "Couldn't parse amount";
         }
