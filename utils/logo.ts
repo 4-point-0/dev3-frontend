@@ -9,3 +9,11 @@ export function getLogoUrl(logo: File) {
 
   return `${logo.url}?u=${logo.updatedAt}`;
 }
+
+export function getLogoPlaceholder(projectName: string) {
+  return projectName
+    .split(" ")
+    .map((v) => v[0].toUpperCase())
+    .splice(0, 2)
+    .join("");
+}

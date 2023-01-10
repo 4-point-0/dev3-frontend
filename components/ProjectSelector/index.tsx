@@ -17,7 +17,7 @@ import {
 } from "../../context/SelectedProjectContext";
 import { useProjectControllerFindAll } from "../../services/api/dev3Components";
 import { Project } from "../../services/api/dev3Schemas";
-import { getLogoUrl } from "../../utils/logo";
+import { getLogoPlaceholder, getLogoUrl } from "../../utils/logo";
 
 const ProjectSelector = () => {
   const { project, selectProject } = useSelectedProject();
@@ -75,25 +75,26 @@ const ProjectSelector = () => {
             },
           })}
         >
-          <Group>
-            <Avatar
-              size="lg"
-              radius="sm"
-              alt="Project logo"
-              src={
-                selectedProject?.logo
-                  ? getLogoUrl(selectedProject.logo)
-                  : "https://via.placeholder.com/150"
-              }
-            />
+          {selectedProject && (
+            <Group>
+              <Avatar
+                size="lg"
+                radius="sm"
+                alt="Project logo"
+                src={getLogoUrl(selectedProject.logo)}
+                color="blue"
+              >
+                {getLogoPlaceholder(selectedProject?.name)}
+              </Avatar>
 
-            <Group position="apart" sx={{ flex: 1 }}>
-              <Text size="sm" color="dimmed">
-                {selectedProject?.name ?? ""}
-              </Text>
-              <Selector size={18} />
+              <Group position="apart" sx={{ flex: 1 }}>
+                <Text size="sm" color="dimmed">
+                  {selectedProject?.name ?? ""}
+                </Text>
+                <Selector size={18} />
+              </Group>
             </Group>
-          </Group>
+          )}
         </UnstyledButton>
       </Menu.Target>
       <Menu.Dropdown>
@@ -113,7 +114,10 @@ const ProjectSelector = () => {
                   radius="sm"
                   alt={project.name}
                   src={getLogoUrl(project?.logo)}
-                />
+                  color="blue"
+                >
+                  {getLogoPlaceholder(project.name)}
+                </Avatar>
               }
               rightSection={project.slug === selectedProject?.slug ? "✓" : ""}
               key={project.name}
