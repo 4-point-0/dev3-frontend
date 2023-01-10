@@ -84,7 +84,7 @@ const PaymentRequestDetail = () => {
     }
 
     return args;
-  }, [transactionRequestData?.args]);
+  }, [transactionRequestData?.args, transactionRequestData?.uuid]);
 
   const parsedInfo = useMemo(() => {
     if (!(parsedArgs && transactionRequestData)) {
