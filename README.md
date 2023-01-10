@@ -1,6 +1,14 @@
 ## Getting Started
 
-First, install Husky:
+Make sure you are using `yarn` version 1.
+
+To install it globally run:
+
+```bash
+npm i -g yarn@1
+```
+
+Install Husky:
 
 ```bash
 yarn run prepare
