@@ -145,7 +145,7 @@ const CreatePayment = () => {
         },
       });
 
-      notifications.create({
+      notifications.success({
         title: "Payment request created!",
         message: "Your payment request has been created. You can now share it.",
       });
@@ -167,7 +167,7 @@ const CreatePayment = () => {
         message = error.message;
       }
 
-      notifications.create({
+      notifications.error({
         title,
         message,
       });
