@@ -11,11 +11,9 @@ import {
   Badge,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { showNotification, updateNotification } from "@mantine/notifications";
 import { parseNearAmount } from "near-api-js/lib/utils/format";
 import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
-import { Check, X } from "tabler-icons-react";
+import { useCallback, useState } from "react";
 import { PageContainer } from "../../components/layout/PageContainer";
 import { IconAlertCircle } from "@tabler/icons";
 
@@ -33,6 +31,7 @@ import {
   validateFungibleMetadata,
 } from "../../utils/near";
 import { useMetadata } from "../../hooks/useMetadata";
+import { notifications } from "../../utils/notifications";
 
 interface IPaymentFormValues {
   amount: number;
@@ -92,13 +91,9 @@ const CreatePayment = () => {
     try {
       setLoading(true);
 
-      showNotification({
-        id: "loading-notification",
-        loading: true,
+      notifications.create({
         title: "Creating a new payment request",
         message: "Please wait...",
-        autoClose: false,
-        disallowClose: true,
       });
 
       let args;
@@ -150,13 +145,9 @@ const CreatePayment = () => {
         },
       });
 
-      updateNotification({
-        id: "loading-notification",
-        color: "teal",
+      notifications.create({
         title: "Payment request created!",
         message: "Your payment request has been created. You can now share it.",
-        icon: <Check size={16} />,
-        autoClose: 3000,
       });
 
       router.push(`/payments`);
@@ -176,13 +167,9 @@ const CreatePayment = () => {
         message = error.message;
       }
 
-      updateNotification({
-        id: "loading-notification",
-        color: "red",
+      notifications.create({
         title,
         message,
-        icon: <X size={16} />,
-        autoClose: 3000,
       });
 
       console.log(error);

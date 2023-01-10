@@ -12,15 +12,15 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { showNotification, updateNotification } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { AlertCircle, Check, X } from "tabler-icons-react";
+import { AlertCircle, Check } from "tabler-icons-react";
 
 import { useUserContext } from "../../../context/UserContext";
 import { useWalletSelector } from "../../../context/WalletSelectorContext";
 import { useTransactionRequestControllerFindByUuid } from "../../../services/api/dev3Components";
 import { getInfoFromArgs } from "../../../utils/near";
+import { notifications } from "../../../utils/notifications";
 
 const ICON_SIZE = 80;
 
@@ -105,13 +105,9 @@ const PaymentRequestDetail = () => {
 
     setLoading(true);
 
-    showNotification({
-      id: "loading-notification",
-      loading: true,
+    notifications.create({
       title: "Preparing transaction",
       message: "Please wait...",
-      autoClose: false,
-      disallowClose: true,
     });
 
     try {
@@ -125,14 +121,10 @@ const PaymentRequestDetail = () => {
       });
       await callMethod(contractId as string, method, parsedArgs, deposit, gas);
     } catch (error) {
-      updateNotification({
-        id: "loading-notification",
-        color: "red",
+      notifications.error({
         title: "Error while preparing transaction",
         message:
           "There was an error while preparing the transaction. Please try again.",
-        icon: <X size={16} />,
-        autoClose: 3000,
       });
 
       console.log(error);
