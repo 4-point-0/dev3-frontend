@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Box,
   Button,
   Divider,
   Group,
@@ -47,11 +48,13 @@ const ProjectSelector = () => {
 
   if (!data || data.results?.length === 0) {
     return (
-      <Link href="/new-project" passHref>
-        <Button fullWidth leftIcon={<Plus size={14} />}>
-          Create new project
-        </Button>
-      </Link>
+      <Box p="xs">
+        <Link href="/new-project" passHref>
+          <Button fullWidth leftIcon={<Plus size={14} />}>
+            Create new project
+          </Button>
+        </Link>
+      </Box>
     );
   }
 
