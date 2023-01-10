@@ -2,10 +2,10 @@ import {
   Alert,
   Avatar,
   Badge,
-  Box,
   Button,
   Card,
   Center,
+  Container,
   createStyles,
   Loader,
   Paper,
@@ -142,19 +142,27 @@ const PaymentRequestDetail = () => {
   };
 
   if (transactionRequestIsLoading) {
-    return <Loader />;
+    return (
+      <Container>
+        <Center>
+          <Loader />
+        </Center>
+      </Container>
+    );
   }
 
   if (transactionHashes) {
     return (
-      <Alert icon={<Check size={16} />} title="Success">
-        Transaction has been successfully signed.
-      </Alert>
+      <Container size="xs">
+        <Alert icon={<Check size={16} />} title="Success">
+          Transaction has been successfully signed.
+        </Alert>
+      </Container>
     );
   }
 
   return (
-    <Box>
+    <Container size="xs">
       {errorCode && errorCode === "userRejected" && (
         <Alert
           mb={40}
@@ -176,14 +184,7 @@ const PaymentRequestDetail = () => {
           Please try again.
         </Alert>
       )}
-      <Paper
-        mx="auto"
-        maw={400}
-        radius="md"
-        withBorder
-        className={classes.card}
-        mt={ICON_SIZE / 3}
-      >
+      <Paper radius="md" withBorder className={classes.card} mt={ICON_SIZE / 3}>
         <Avatar
           src={transactionRequestData?.project.logo_url}
           className={classes.icon}
@@ -238,7 +239,7 @@ const PaymentRequestDetail = () => {
           </Button>
         </Center>
       </Paper>
-    </Box>
+    </Container>
   );
 };
 
