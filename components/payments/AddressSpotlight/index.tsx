@@ -1,14 +1,32 @@
-import { ActionIcon, Loader } from "@mantine/core";
+import { ActionIcon } from "@mantine/core";
 import {
-  openSpotlight,
   SpotlightAction,
   SpotlightProvider,
+  useSpotlight,
 } from "@mantine/spotlight";
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AddressBook, Search } from "tabler-icons-react";
 
 import { useAddressControllerFindAll } from "../../../services/api/dev3Components";
 import { useWalletSelector } from "../../../context/WalletSelectorContext";
+
+const SpotlightButton: React.FC<{ isLoading: boolean }> = ({ isLoading }) => {
+  const spotlight = useSpotlight();
+
+  const handleOpen = () => spotlight.openSpotlight();
+
+  return (
+    <ActionIcon
+      hidden={isLoading}
+      size="lg"
+      onClick={handleOpen}
+      variant="filled"
+      radius={0}
+    >
+      <AddressBook size={22} />
+    </ActionIcon>
+  );
+};
 
 interface IAddressSpotlightProps {
   onSelect: (wallet: string) => void;
@@ -29,8 +47,6 @@ export const AddressSpotlight: React.FC<IAddressSpotlightProps> = ({
       keepPreviousData: true,
     }
   );
-
-  const handleOpen = () => openSpotlight();
 
   const handleQueryChange = (newQuery: string) => {
     setQuery(newQuery);
@@ -73,15 +89,7 @@ export const AddressSpotlight: React.FC<IAddressSpotlightProps> = ({
       nothingFoundMessage="No addresses match query"
       onQueryChange={handleQueryChange}
     >
-      <ActionIcon
-        hidden={isLoading}
-        size="lg"
-        onClick={handleOpen}
-        variant="filled"
-        radius={0}
-      >
-        <AddressBook size={22} />
-      </ActionIcon>
+      <SpotlightButton isLoading={isLoading} />
     </SpotlightProvider>
   );
 };
