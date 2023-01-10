@@ -1,21 +1,35 @@
 import { ActionIcon, Badge, Button, Group, Text, Tooltip } from "@mantine/core";
 import { NextLink } from "@mantine/next";
 import { DataTable, DataTableColumn } from "mantine-datatable";
+import { useState } from "react";
 import { ExternalLink, Plus, Share } from "tabler-icons-react";
 import { PageContainer } from "../../components/layout/PageContainer";
 import showShareModal from "../../components/ShareModal";
 import { CopyCell } from "../../components/table/CopyCell";
 import { TransactionStatus } from "../../components/transactions/Status";
+import { usePaginationProps } from "../../hooks/usePaginationProps";
 
 import { useTransactionRequestControllerFindAll } from "../../services/api/dev3Components";
 import { TransactionRequest } from "../../services/api/dev3Schemas";
 import { getInfoFromArgs } from "../../utils/near";
 
+const PAGE_LIMIT = 10;
+
 const Payments = () => {
+  const [page, setPage] = useState(1);
   const { isLoading, data } = useTransactionRequestControllerFindAll({
     queryParams: {
       type: "Payment",
+      offset: (page - 1) * PAGE_LIMIT,
+      limit: PAGE_LIMIT,
     },
+  });
+
+  const paginationProps = usePaginationProps({
+    page,
+    onPageChange: setPage,
+    limit: PAGE_LIMIT,
+    total: data?.total,
   });
 
   const columns: Array<DataTableColumn<TransactionRequest>> = [
@@ -139,6 +153,7 @@ const Payments = () => {
         noRecordsText="No payment requests"
         records={data?.results}
         fetching={isLoading}
+        {...paginationProps}
       />
     </PageContainer>
   );

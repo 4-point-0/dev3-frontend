@@ -8,6 +8,7 @@ import { Edit, Plus, Trash, X } from "tabler-icons-react";
 import { PageContainer } from "../../components/layout/PageContainer";
 
 import { CopyCell } from "../../components/table/CopyCell";
+import { usePaginationProps } from "../../hooks/usePaginationProps";
 import {
   fetchAddressControllerRemove,
   useAddressControllerFindAll,
@@ -30,6 +31,13 @@ const AddressBook = () => {
       refetchOnWindowFocus: false,
     }
   );
+
+  const paginationProps = usePaginationProps({
+    page,
+    onPageChange: setPage,
+    limit: PAGE_LIMIT,
+    total: data?.total,
+  });
 
   const handleDelete = (address: Address) =>
     openConfirmModal({
@@ -126,16 +134,6 @@ const AddressBook = () => {
       },
     },
   ];
-
-  const paginationProps =
-    (data?.total || 0) <= PAGE_LIMIT
-      ? {}
-      : {
-          totalRecords: data?.total,
-          recordsPerPage: PAGE_LIMIT,
-          onPageChange: setPage,
-          page,
-        };
 
   return (
     <PageContainer title="Address Book" containerProps={{ fluid: true }}>
