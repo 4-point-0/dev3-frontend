@@ -3,12 +3,13 @@ import { NextLink } from "@mantine/next";
 import { DataTable, DataTableColumn } from "mantine-datatable";
 import { useState } from "react";
 import { ExternalLink, Plus, Share } from "tabler-icons-react";
+
 import { PageContainer } from "../../components/layout/PageContainer";
 import showShareModal from "../../components/ShareModal";
 import { CopyCell } from "../../components/table/CopyCell";
 import { TransactionStatus } from "../../components/transactions/Status";
+import { useSelectedProject } from "../../context/SelectedProjectContext";
 import { usePaginationProps } from "../../hooks/usePaginationProps";
-
 import { useTransactionRequestControllerFindAll } from "../../services/api/dev3Components";
 import { TransactionRequest } from "../../services/api/dev3Schemas";
 import { getInfoFromArgs } from "../../utils/near";
@@ -17,11 +18,14 @@ const PAGE_LIMIT = 10;
 
 const Payments = () => {
   const [page, setPage] = useState(1);
+  const { projectId } = useSelectedProject();
+
   const { isLoading, data } = useTransactionRequestControllerFindAll({
     queryParams: {
       type: "Payment",
       offset: (page - 1) * PAGE_LIMIT,
       limit: PAGE_LIMIT,
+      project_id: projectId as string,
     },
   });
 
