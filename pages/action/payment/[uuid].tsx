@@ -68,7 +68,7 @@ const PaymentRequestDetail = () => {
       return null;
     }
 
-    let { args } = transactionRequestData;
+    let args = transactionRequestData.args;
 
     if (typeof args === "string") {
       args = JSON.parse(args);
