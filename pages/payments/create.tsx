@@ -29,6 +29,7 @@ import {
   NEAR_CONTRACT_ID,
   parseFtAmount,
   ReceiverError,
+  THIRTY_TGAS,
   validateFungibleMetadata,
 } from "../../utils/near";
 import { useMetadata } from "../../hooks/useMetadata";
@@ -144,6 +145,8 @@ const CreatePayment = () => {
           args,
           contractId: isFungibleToken ? contractId : NEAR_CONTRACT_ID,
           meta: metadata,
+          deposit,
+          gas: THIRTY_TGAS,
         },
       });
 
