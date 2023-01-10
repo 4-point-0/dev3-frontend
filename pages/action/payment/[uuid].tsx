@@ -13,17 +13,13 @@ import {
   Text,
 } from "@mantine/core";
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { utils } from "near-api-js";
 import { useRouter } from "next/router";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AlertCircle, Check, X } from "tabler-icons-react";
+
 import { useUserContext } from "../../../context/UserContext";
 import { useWalletSelector } from "../../../context/WalletSelectorContext";
-import {
-  useProjectControllerFindById,
-  useProjectControllerFindBySlug,
-  useTransactionRequestControllerFindByUuid,
-} from "../../../services/api/dev3Components";
+import { useTransactionRequestControllerFindByUuid } from "../../../services/api/dev3Components";
 import { getInfoFromArgs } from "../../../utils/near";
 
 const ICON_SIZE = 80;
@@ -48,7 +44,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 const PaymentRequestDetail = () => {
-  const { selector } = useWalletSelector();
+  const { selector, callMethod } = useWalletSelector();
   const { classes } = useStyles();
   const router = useRouter();
   const { params, errorCode, errorMessage, transactionHashes, uuid } =
@@ -67,33 +63,27 @@ const PaymentRequestDetail = () => {
     },
   });
 
-  // const {
-  //   isLoading: projectIsLoading,
-  //   data: projectData,
-  //   error: projectError,
-  // } = useProjectControllerFindById(
-  //   {
-  //     pathParams: {
-  //       id: paymentRequestData?.project_id as string,
-  //     },
-  //   },
-  //   {
-  //     enabled: Boolean(paymentRequestData?.project_id),
-  //   }
-  // );
-
-  console.log(transactionRequestData);
-
   const parsedArgs = useMemo(() => {
     if (!transactionRequestData?.args) {
       return null;
     }
 
-    if (typeof transactionRequestData.args === "string") {
-      return JSON.parse(transactionRequestData.args);
+    let { args } = transactionRequestData;
+
+    if (typeof args === "string") {
+      args = JSON.parse(args);
     }
 
-    return transactionRequestData.args;
+    if (args.request) {
+      return {
+        request: {
+          ...args.request,
+          id: transactionRequestData.uuid,
+        },
+      };
+    }
+
+    return args;
   }, [transactionRequestData?.args]);
 
   const parsedInfo = useMemo(() => {
@@ -109,6 +99,10 @@ const PaymentRequestDetail = () => {
       return;
     }
 
+    if (!transactionRequestData) {
+      return;
+    }
+
     setLoading(true);
 
     showNotification({
@@ -121,49 +115,15 @@ const PaymentRequestDetail = () => {
     });
 
     try {
-      const wallet = await selector.wallet();
-
-      // let args: {
-      //   request: {
-      //     id: string | undefined;
-      //     amount?: string | null;
-      //     receiver_account_id: string | undefined;
-      //     ft_token_account_id?: string | undefined;
-      //   };
-      // } = {
-      //   request: {
-      //     id: paymentRequestData?.uid,
-      //     receiver_account_id: paymentRequestData?.receiver,
-      //   },
-      // };
-
-      // if (
-      //   paymentRequestData?.receiver_fungible !== undefined &&
-      //   paymentRequestData?.receiver_fungible !== null &&
-      //   paymentRequestData?.receiver_fungible !== ""
-      // ) {
-      //   args.request.ft_token_account_id =
-      //     paymentRequestData?.receiver_fungible;
-      // }
-
-      // args.request.amount = args.request.ft_token_account_id
-      //   ? paymentRequestData?.amount
-      //   : utils.format.parseNearAmount(paymentRequestData?.amount);
-
-      await wallet.signAndSendTransaction({
-        signerId: userContext.user?.nearWalletAccountId,
-        actions: [
-          {
-            type: "FunctionCall",
-            params: {
-              methodName: transactionRequestData?.method as string,
-              args: parsedArgs,
-              gas: transactionRequestData?.gas ?? "1000000000000",
-              deposit: "10000000000",
-            },
-          },
-        ],
+      const { contractId, method, deposit, gas } = transactionRequestData;
+      console.log({
+        contractId,
+        method,
+        parsedArgs,
+        deposit,
+        gas,
       });
+      await callMethod(contractId as string, method, parsedArgs, deposit, gas);
     } catch (error) {
       updateNotification({
         id: "loading-notification",
@@ -192,16 +152,6 @@ const PaymentRequestDetail = () => {
       </Alert>
     );
   }
-
-  // if (paymentRequestData?.receiver_fungible !== "") {
-  //   return (
-  //     <Alert icon={<AlertCircle size={16} />} color="red" title="WIP">
-  //       Sorry, Fungible tokens are not yet supported.
-  //     </Alert>
-  //   );
-  // }
-
-  console.log(parsedArgs);
 
   return (
     <Box>
@@ -250,13 +200,22 @@ const PaymentRequestDetail = () => {
 
         <Card mt="md" shadow="none" p="lg" radius="md" withBorder>
           <Stack align="center" spacing="sm">
+            {transactionRequestData?.meta?.icon && (
+              <Avatar src={transactionRequestData.meta.icon} size={40} />
+            )}
+            {transactionRequestData?.meta?.name && (
+              <Text size="xl" weight={500}>
+                {transactionRequestData.meta.name}
+              </Text>
+            )}
+
             <Text size="xl" weight={500}>
               {parsedInfo?.amount}
             </Text>
             <Badge size="xl">
               {transactionRequestData?.is_near_token
                 ? "NEAR"
-                : transactionRequestData?.meta?.name}
+                : transactionRequestData?.meta?.symbol}
             </Badge>
 
             <Text color="dimmed">on Testnet</Text>
