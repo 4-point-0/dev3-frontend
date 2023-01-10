@@ -32,20 +32,29 @@ const Payments = () => {
     },
     {
       accessor: "amount",
-      render: ({ args, is_near_token, meta }) => {
-        let amount = "Unknown";
-
+      render: ({ args, meta }) => {
         try {
           const parsedArgs = JSON.parse(args);
           const parsedMeta = meta ? JSON.parse(meta) : null;
+          const { amount } = getInfoFromArgs(parsedArgs, parsedMeta);
 
-          const info = getInfoFromArgs(parsedArgs, parsedMeta);
-          amount = info.amount;
+          return <Text>{amount}</Text>;
         } catch {
-          amount = "Couldn't parse amount";
+          return <Text>{`Couldn't parse amount`}</Text>;
         }
+      },
+    },
+    {
+      accessor: "receiver",
+      render: ({ args }) => {
+        try {
+          const parsedArgs = JSON.parse(args);
+          const { receiver_id } = getInfoFromArgs(parsedArgs);
 
-        return <Text>{amount}</Text>;
+          return <Text>{receiver_id}</Text>;
+        } catch {
+          return <Text>{`Couldn't parse receiver`}</Text>;
+        }
       },
     },
     {
