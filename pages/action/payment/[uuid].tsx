@@ -20,6 +20,7 @@ import { useUserContext } from "../../../context/UserContext";
 import { useWalletSelector } from "../../../context/WalletSelectorContext";
 import { useTransactionRequestControllerFindByUuid } from "../../../services/api/dev3Components";
 import { getInfoFromArgs, NEAR_CONTRACT_ID } from "../../../utils/near";
+import { getLogoPlaceholder } from "../../../utils/logo";
 import { notifications } from "../../../utils/notifications";
 
 const ICON_SIZE = 80;
@@ -183,7 +184,10 @@ const PaymentRequestDetail = () => {
           className={classes.icon}
           size={ICON_SIZE}
           radius={ICON_SIZE}
-        />
+          color="blue"
+        >
+          {getLogoPlaceholder(transactionRequestData?.project.name ?? "")}
+        </Avatar>
 
         <Text align="center" weight={700} className={classes.title}>
           {transactionRequestData?.project.name}
