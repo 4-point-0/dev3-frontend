@@ -159,7 +159,7 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
       ],
     });
     const _modal = setupModal(_selector, {
-      contractId: NEAR_CONTRACT_ID,
+      contractId: NEAR_CONTRACT_ID as string,
       // theme: "light", // doesn't work, need to open an issue on github
     });
     const state = _selector.store.getState();
