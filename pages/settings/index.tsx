@@ -132,7 +132,7 @@ const Settings: NextPage = () => {
 
         <Skeleton visible={isLoading}>
           <ProjectImage
-            key={project?.logo.key}
+            key={project?.logo?.key}
             imgUrl={project?.logo && getLogoUrl(project.logo)}
             onUpload={handleImageUpload}
           />

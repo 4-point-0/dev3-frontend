@@ -41,6 +41,7 @@ export default function App(props: AppProps) {
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
+        <link rel="icon" type="image/x-icon" href="./dev3-favicon.png"></link>
       </Head>
 
       <QueryClientProvider client={queryClient}>

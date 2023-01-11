@@ -3,6 +3,8 @@ import { useForm } from "@mantine/form";
 import React from "react";
 import { isValidPhoneNumber } from "react-phone-number-input";
 
+import { nearWalletRegex } from "../../../utils/near";
+
 export interface IAddressFormValues {
   alias: string;
   wallet: string;
@@ -16,9 +18,6 @@ interface IAddressFormProps {
   handleSubmit: (values: IAddressFormValues) => Promise<void>;
   initialValues?: IAddressFormValues;
 }
-
-const nearWalletRegex =
-  /^((\w|(?<!\.)\.)+(?<!\.)\.(testnet|near)|[A-Fa-f0-9]{64})$/;
 
 export const AccountForm: React.FC<IAddressFormProps> = ({
   disabled,

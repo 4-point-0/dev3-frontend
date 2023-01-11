@@ -17,7 +17,7 @@ const topSectionData = [
   },
   {
     icon: <ArrowsLeftRight size={24} />,
-    label: "Payments",
+    label: "Payment Requests",
     href: "/payments",
   },
   {

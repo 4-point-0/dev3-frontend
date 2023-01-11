@@ -1,12 +1,14 @@
-import { ActionIcon, Button, Group, Paper, Stack, Text } from "@mantine/core";
+import { ActionIcon, Button, Group, Text, Tooltip } from "@mantine/core";
 import { openConfirmModal } from "@mantine/modals";
 import { NextLink } from "@mantine/next";
 import { showNotification } from "@mantine/notifications";
 import { DataTable, DataTableColumn } from "mantine-datatable";
-import { useCallback, useMemo, useState } from "react";
+import { useState } from "react";
 import { Edit, Plus, Trash, X } from "tabler-icons-react";
+import { PageContainer } from "../../components/layout/PageContainer";
 
 import { CopyCell } from "../../components/table/CopyCell";
+import { usePaginationProps } from "../../hooks/usePaginationProps";
 import {
   fetchAddressControllerRemove,
   useAddressControllerFindAll,
@@ -29,6 +31,13 @@ const AddressBook = () => {
       refetchOnWindowFocus: false,
     }
   );
+
+  const paginationProps = usePaginationProps({
+    page,
+    onPageChange: setPage,
+    limit: PAGE_LIMIT,
+    total: data?.total,
+  });
 
   const handleDelete = (address: Address) =>
     openConfirmModal({
@@ -98,41 +107,36 @@ const AddressBook = () => {
       render: (address) => {
         return (
           <Group spacing={4} noWrap>
-            <ActionIcon
-              component={NextLink}
-              href="/address-book/[id]/edit"
-              as={`/address-book/${(address as any)._id}/edit`}
-              color="blue"
-            >
-              <Edit size={16} />
-            </ActionIcon>
-            <ActionIcon color="red" onClick={() => handleDelete(address)}>
-              <Trash size={16} />
-            </ActionIcon>
+            <Tooltip label="Edit" position="bottom" withArrow>
+              <ActionIcon
+                component={NextLink}
+                href="/address-book/[id]/edit"
+                as={`/address-book/${(address as any)._id}/edit`}
+                color="blue"
+                radius="xl"
+                variant="light"
+              >
+                <Edit size={16} />
+              </ActionIcon>
+            </Tooltip>
+            <Tooltip label="Delete" position="bottom" withArrow>
+              <ActionIcon
+                color="red"
+                radius="xl"
+                variant="light"
+                onClick={() => handleDelete(address)}
+              >
+                <Trash size={16} />
+              </ActionIcon>
+            </Tooltip>
           </Group>
         );
       },
     },
   ];
 
-  const paginationProps =
-    (data?.total ?? -1) < PAGE_LIMIT
-      ? {}
-      : {
-          totalRecords: data?.total,
-          recordsPerPage: PAGE_LIMIT,
-          onPageChange: setPage,
-          page,
-        };
-
-  console.log(data?.total ?? 0 < PAGE_LIMIT, paginationProps);
-
   return (
-    <Stack align="flex-start">
-      <Text size="xl" weight={500}>
-        Addresses
-      </Text>
-
+    <PageContainer title="Address Book" containerProps={{ fluid: true }}>
       <Button
         sx={{ alignSelf: "self-end" }}
         component={NextLink}
@@ -143,17 +147,17 @@ const AddressBook = () => {
         Add new address
       </Button>
 
-      <Paper sx={{ width: "100%" }} shadow="sm" p="md" withBorder>
-        <DataTable
-          highlightOnHover
-          idAccessor="alias"
-          columns={columns}
-          records={data?.results}
-          fetching={isFetching}
-          {...paginationProps}
-        ></DataTable>
-      </Paper>
-    </Stack>
+      <DataTable
+        highlightOnHover
+        idAccessor="alias"
+        minHeight={164}
+        noRecordsText="No addresses"
+        columns={columns}
+        records={data?.results}
+        fetching={isFetching}
+        {...paginationProps}
+      ></DataTable>
+    </PageContainer>
   );
 };
 

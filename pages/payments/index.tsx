@@ -1,109 +1,144 @@
-import {
-  ActionIcon,
-  Badge,
-  Button,
-  CopyButton,
-  Group,
-  Loader,
-  Paper,
-  Stack,
-  Table,
-  Text,
-  Tooltip,
-} from "@mantine/core";
+import { ActionIcon, Badge, Button, Group, Text, Tooltip } from "@mantine/core";
 import { NextLink } from "@mantine/next";
-import { Check, Copy, ExternalLink, Plus, Share } from "tabler-icons-react";
+import { DataTable, DataTableColumn } from "mantine-datatable";
+import { useState } from "react";
+import { ExternalLink, Plus, Share } from "tabler-icons-react";
 
+import { PageContainer } from "../../components/layout/PageContainer";
 import showShareModal from "../../components/ShareModal";
+import { CopyCell } from "../../components/table/CopyCell";
 import { useSelectedProject } from "../../context/SelectedProjectContext";
-import { usePaymentControllerFindAll } from "../../services/api/dev3Components";
+import { usePaginationProps } from "../../hooks/usePaginationProps";
+import { useTransactionRequestControllerFindAll } from "../../services/api/dev3Components";
+import { TransactionRequest } from "../../services/api/dev3Schemas";
+import { getInfoFromArgs } from "../../utils/near";
+
+const PAGE_LIMIT = 10;
 
 const Payments = () => {
-  const projectContext = useSelectedProject();
-  const { isLoading, data } = usePaymentControllerFindAll({});
+  const [page, setPage] = useState(1);
+  const { projectId } = useSelectedProject();
 
-  const showModal = (title: string, id: string) => {
-    showShareModal({
-      title,
-      url: `${window.location.origin}/${getUrl(id)}`,
-    });
-  };
+  const { isLoading, data } = useTransactionRequestControllerFindAll({
+    queryParams: {
+      type: "Payment",
+      offset: (page - 1) * PAGE_LIMIT,
+      limit: PAGE_LIMIT,
+      project_id: projectId as string,
+    },
+  });
 
-  const getUrl = (id: string) =>
-    `action/payment/${projectContext.project?.slug}/${id}`;
+  const paginationProps = usePaginationProps({
+    page,
+    onPageChange: setPage,
+    limit: PAGE_LIMIT,
+    total: data?.total,
+  });
 
-  const rows = data?.results?.map((element) => (
-    <tr key={element.uid}>
-      <td>{element.receiver}</td>
-      <td>{element.amount}</td>
-      <td>
-        {element.receiver_fungible.length > 0
-          ? element.receiver_fungible
-          : "NEAR"}
-      </td>
-      <td>
-        <Badge size="md">{element.status.toUpperCase()}</Badge>
-      </td>
-      <td>{new Date(element.updatedAt).toLocaleString()}</td>
-      <td>
-        <Group>
-          <CopyButton
-            value={`${window.location.origin}/${getUrl(element.uid)}`}
-            timeout={2000}
-          >
-            {({ copied, copy }) => (
-              <Tooltip
-                label={copied ? "Copied" : "Copy"}
-                withArrow
-                position="bottom"
-              >
+  const columns: Array<DataTableColumn<TransactionRequest>> = [
+    {
+      accessor: "createdAt",
+      render: ({ createdAt }) => {
+        const formatedDate = new Intl.DateTimeFormat("en-GB", {
+          dateStyle: "short",
+          timeStyle: "short",
+        }).format(new Date(createdAt));
+
+        return <Text>{formatedDate}</Text>;
+      },
+    },
+    {
+      accessor: "token",
+      render: ({ is_near_token, meta }) => {
+        const parsedMeta = JSON.parse(meta || "null");
+
+        return (
+          <Badge>
+            {is_near_token ? "NEAR" : parsedMeta?.name ?? "Unknown"}
+          </Badge>
+        );
+      },
+    },
+    {
+      accessor: "amount",
+      render: ({ args, meta }) => {
+        try {
+          const parsedArgs = JSON.parse(args);
+          const parsedMeta = meta ? JSON.parse(meta) : null;
+          const { amount } = getInfoFromArgs(parsedArgs, parsedMeta);
+
+          return <Text>{amount}</Text>;
+        } catch {
+          return <Text>{`Couldn't parse amount`}</Text>;
+        }
+      },
+    },
+    {
+      accessor: "receiver",
+      render: ({ args }) => {
+        try {
+          const parsedArgs = JSON.parse(args);
+          const { receiver_id } = getInfoFromArgs(parsedArgs);
+
+          return <Text>{receiver_id}</Text>;
+        } catch {
+          return <Text>{`Couldn't parse receiver`}</Text>;
+        }
+      },
+    },
+    // {
+    //   accessor: "status",
+    //   render: ({ status }) => <TransactionStatus status={status} />,
+    // },
+    {
+      accessor: "actions",
+      render: ({ uuid }) => {
+        const url = `${window.location.origin}/action/payment/${uuid}`;
+
+        const handleShare = (url: string) => {
+          return () => {
+            showShareModal({
+              url,
+              title: "Share the payment request:",
+            });
+          };
+        };
+
+        return (
+          <CopyCell value={url}>
+            <Group>
+              <Tooltip position="bottom" label="Open" withArrow>
+                <ActionIcon
+                  component="a"
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  radius="xl"
+                  variant="light"
+                  color="blue"
+                >
+                  <ExternalLink size={16} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip position="bottom" label="Share" withArrow>
                 <ActionIcon
                   radius="xl"
                   variant="light"
-                  color={copied ? "teal" : "primary"}
-                  onClick={copy}
+                  color="blue"
+                  onClick={handleShare(url)}
                 >
-                  {copied ? <Check size={16} /> : <Copy size={16} />}
+                  <Share size={16} />
                 </ActionIcon>
               </Tooltip>
-            )}
-          </CopyButton>
-          <Tooltip label="Open url" withArrow position="bottom">
-            <ActionIcon
-              radius="xl"
-              variant="light"
-              color="primary"
-              component={NextLink}
-              target="_blank"
-              href={getUrl(element.uid)}
-            >
-              <ExternalLink size={16} />
-            </ActionIcon>
-          </Tooltip>
-          <Tooltip label="Share" withArrow position="bottom">
-            <ActionIcon
-              radius="xl"
-              variant="light"
-              color="primary"
-              onClick={() => showModal(`Request for payment`, element.uid)}
-            >
-              <Share size={16} />
-            </ActionIcon>
-          </Tooltip>
-        </Group>
-      </td>
-    </tr>
-  ));
-
-  if (isLoading) {
-    return <Loader size="lg" />;
-  }
+            </Group>
+          </CopyCell>
+        );
+      },
+    },
+  ];
 
   return (
-    <Stack align="flex-start">
-      <Text size="xl" weight={500}>
-        Payment Requests
-      </Text>
+    <PageContainer title="Payment Requests" containerProps={{ fluid: true }}>
       <Button
         sx={{ alignSelf: "self-end" }}
         component={NextLink}
@@ -113,22 +148,17 @@ const Payments = () => {
       >
         Create payment request
       </Button>
-      <Paper sx={{ width: "100%" }} shadow="sm" p="md" withBorder>
-        <Table highlightOnHover>
-          <thead>
-            <tr>
-              <th>Reciever Address</th>
-              <th>Amount</th>
-              <th>Token</th>
-              <th>Status</th>
-              <th>Created At</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>{rows}</tbody>
-        </Table>
-      </Paper>
-    </Stack>
+
+      <DataTable
+        minHeight={164}
+        idAccessor="_id"
+        columns={columns}
+        noRecordsText="No payment requests"
+        records={data?.results}
+        fetching={isLoading}
+        {...paginationProps}
+      />
+    </PageContainer>
   );
 };
 
