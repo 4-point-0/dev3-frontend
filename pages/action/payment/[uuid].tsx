@@ -112,13 +112,7 @@ const PaymentRequestDetail = () => {
 
     try {
       const { contractId, method, deposit, gas } = transactionRequestData;
-      console.log({
-        contractId,
-        method,
-        parsedArgs,
-        deposit,
-        gas,
-      });
+
       await callMethod(contractId as string, method, parsedArgs, deposit, gas);
     } catch (error) {
       notifications.error({
