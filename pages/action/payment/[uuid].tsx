@@ -19,7 +19,7 @@ import { AlertCircle, Check } from "tabler-icons-react";
 import { useUserContext } from "../../../context/UserContext";
 import { useWalletSelector } from "../../../context/WalletSelectorContext";
 import { useTransactionRequestControllerFindByUuid } from "../../../services/api/dev3Components";
-import { getInfoFromArgs } from "../../../utils/near";
+import { getInfoFromArgs, NEAR_CONTRACT_ID } from "../../../utils/near";
 import { notifications } from "../../../utils/notifications";
 
 const ICON_SIZE = 80;
@@ -111,9 +111,16 @@ const PaymentRequestDetail = () => {
     });
 
     try {
-      const { contractId, method, deposit, gas } = transactionRequestData;
+      const { contractId, method, deposit, gas, is_near_token } =
+        transactionRequestData;
 
-      await callMethod(contractId as string, method, parsedArgs, deposit, gas);
+      await callMethod(
+        (is_near_token ? NEAR_CONTRACT_ID : contractId) as string,
+        method,
+        parsedArgs,
+        deposit,
+        gas
+      );
     } catch (error) {
       notifications.error({
         title: "Error while preparing transaction",
