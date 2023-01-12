@@ -1,4 +1,4 @@
-import { ActionIcon, Badge, Button, Group, Tooltip } from "@mantine/core";
+import { ActionIcon, Badge, Group, Tooltip } from "@mantine/core";
 import { DataTable, DataTableColumn } from "mantine-datatable";
 import React, { useState } from "react";
 import { Trash } from "tabler-icons-react";

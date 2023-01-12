@@ -16,7 +16,7 @@ const Contracts: NextPage = () => {
       <Button
         sx={{ alignSelf: "self-end" }}
         component={NextLink}
-        href="/contracts/deploy"
+        href="/contracts/create"
         variant="light"
         leftIcon={<Plus />}
       >
