@@ -1,22 +1,42 @@
-import { Stack } from "@mantine/core";
-import React from "react";
+import { Button, Group, Stack, Text } from "@mantine/core";
+import React, { useState } from "react";
+import { Reload } from "tabler-icons-react";
 
-import { useContractControllerFindAll } from "../../../services/api/dev3Components";
 import { TemplateList } from "../TemplateList";
 
 export const CreateContract = () => {
-  const { data } = useContractControllerFindAll({});
-
-  console.log({ data });
+  const [contractTemplateId, setContractTemplateId] = useState<string | null>(
+    null
+  );
 
   const handleSelect = (id: string) => {
-    console.log(id);
+    setContractTemplateId(id);
+  };
+
+  const handleReset = () => {
+    setContractTemplateId(null);
   };
 
   return (
     <Stack>
-      {data?.results && (
-        <TemplateList contracts={data.results} onSelect={handleSelect} />
+      {!contractTemplateId && (
+        <>
+          <TemplateList onSelect={handleSelect} />
+        </>
+      )}
+      {contractTemplateId && (
+        <>
+          <Group position="right">
+            <Button
+              variant="default"
+              leftIcon={<Reload size={14} />}
+              onClick={handleReset}
+            >
+              Reset template
+            </Button>
+          </Group>
+          <Text>{contractTemplateId}</Text>
+        </>
       )}
     </Stack>
   );
