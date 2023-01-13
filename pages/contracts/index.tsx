@@ -1,6 +1,7 @@
 import { Button, Group, Tabs } from "@mantine/core";
 import { NextLink } from "@mantine/next";
 import { NextPage } from "next";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { Plus, ThreeDCubeSphere, ClockHour4 } from "tabler-icons-react";
 
@@ -9,7 +10,11 @@ import { PendingTransactions } from "../../components/contracts/PendingTransacti
 import { PageContainer } from "../../components/layout/PageContainer";
 
 const Contracts: NextPage = () => {
-  const [activeTab, setActiveTab] = useState<string | null>("contracts");
+  const router = useRouter();
+
+  const [activeTab, setActiveTab] = useState<string | null>(
+    () => (router.query.tab as string) ?? "contracts"
+  );
 
   return (
     <PageContainer title="Contracts" containerProps={{ fluid: true }}>
@@ -28,7 +33,7 @@ const Contracts: NextPage = () => {
           <Tabs.Tab value="contracts" icon={<ThreeDCubeSphere size={14} />}>
             Contracts
           </Tabs.Tab>
-          <Tabs.Tab value="transactions" icon={<ClockHour4 size={14} />}>
+          <Tabs.Tab value="pending" icon={<ClockHour4 size={14} />}>
             Pending Transactions
           </Tabs.Tab>
         </Tabs.List>
@@ -36,7 +41,7 @@ const Contracts: NextPage = () => {
         <Tabs.Panel value="contracts">
           <DeployedContracts />
         </Tabs.Panel>
-        <Tabs.Panel value="transactions">
+        <Tabs.Panel value="pending">
           <PendingTransactions />
         </Tabs.Panel>
       </Tabs>

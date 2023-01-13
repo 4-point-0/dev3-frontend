@@ -2,7 +2,6 @@ import {
   Badge,
   Button,
   Checkbox,
-  Grid,
   Group,
   Stack,
   Text,
@@ -16,19 +15,11 @@ import { Plus, Search } from "tabler-icons-react";
 import { usePaginationProps } from "../../../hooks/usePaginationProps";
 
 import { useContractControllerFindAll } from "../../../services/api/dev3Components";
+import { IContractTemplate } from "../CreateContract";
 import { AuditedIcon } from "./AuditedIcon";
 
-interface IContractTemplate {
-  _id: string;
-  name: string;
-  is_audited: boolean;
-  tags: Array<string>;
-  creator_name: string;
-  description: string;
-}
-
 interface ITemplateListProps {
-  onSelect: (id: string) => void;
+  onSelect: (template: IContractTemplate) => void;
 }
 
 const PAGE_LIMIT = 20;
@@ -55,9 +46,9 @@ export const TemplateList: React.FC<ITemplateListProps> = ({ onSelect }) => {
     total: data?.total,
   });
 
-  const handleSelect = (id: string) => {
+  const handleSelect = (template: IContractTemplate) => {
     return () => {
-      onSelect(id);
+      onSelect(template);
     };
   };
 
@@ -110,13 +101,13 @@ export const TemplateList: React.FC<ITemplateListProps> = ({ onSelect }) => {
     {
       accessor: "actions",
       title: "",
-      render: ({ _id }) => {
+      render: (template) => {
         return (
           <Group position="right">
             <Button
               variant="light"
               leftIcon={<Plus size={14} />}
-              onClick={handleSelect(_id)}
+              onClick={handleSelect(template)}
             >
               Select
             </Button>
@@ -149,6 +140,7 @@ export const TemplateList: React.FC<ITemplateListProps> = ({ onSelect }) => {
         columns={columns}
         records={data?.results}
         fetching={isLoading}
+        idAccessor="_id"
         emptyState="No templates found"
         {...paginationProps}
       />

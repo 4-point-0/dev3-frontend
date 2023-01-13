@@ -6,7 +6,7 @@ import { PageContainer } from "../../components/layout/PageContainer";
 const CreateContractPage: NextPage = () => {
   return (
     <PageContainer
-      title="Deploy Contract from Template"
+      title="Create contract deployment request"
       containerProps={{ size: "xl" }}
     >
       <CreateContract />
