@@ -55,7 +55,7 @@ export function AppLink({ icon, label, href, disabled }: MainLinkProps) {
             // padding: theme.spacing.xs,
             borderRadius: theme.radius.sm,
           })}
-          active={router.pathname === href}
+          active={router.pathname.startsWith(href)}
           icon={icon}
         />
       </Link>
