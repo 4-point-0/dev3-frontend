@@ -22,7 +22,7 @@ const Deployment = () => {
   const router = useRouter();
   const userContext = useUserContext();
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const [isDeploying] = useState<boolean>(false);
 
   const { data, isLoading } = useDeployedContractControllerFindByUuidPublic({
     pathParams: {
@@ -42,7 +42,8 @@ const Deployment = () => {
 
   return (
     <ProjectTransactionContainer
-      projectName="Remove placeholder"
+      logoUrl={data?.project_logo_url}
+      projectName={data?.project_name}
       description="is requesting you to deploy"
     >
       <Stack mt="md">
@@ -59,7 +60,7 @@ const Deployment = () => {
         </Card>
 
         <Button
-          disabled={userContext.user === null || loading}
+          disabled={userContext.user === null || isDeploying}
           fullWidth
           variant="light"
           onClick={handleDeployButtonClick}

@@ -213,6 +213,8 @@ export type DeployedContractDto = {
   deployer_address?: string;
   txHash: string;
   txDetails: string;
+  project_name: string;
+  project_logo_url: string;
   /**
    * @format date-time
    */
