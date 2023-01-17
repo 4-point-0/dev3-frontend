@@ -1,6 +1,6 @@
 import { NextPage } from "next";
-import { CreateContract } from "../../components/contracts/CreateContract";
 
+import { CreateContract } from "../../components/contracts/CreateContract";
 import { PageContainer } from "../../components/layout/PageContainer";
 
 const CreateContractPage: NextPage = () => {

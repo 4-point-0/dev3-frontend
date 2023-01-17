@@ -11,6 +11,7 @@ import { setupNightlyConnect } from "@near-wallet-selector/nightly-connect";
 import { setupSender } from "@near-wallet-selector/sender";
 import { setupWalletConnect } from "@near-wallet-selector/wallet-connect";
 import * as nearApi from "near-api-js";
+import { ContractCodeView } from "near-api-js/lib/providers/provider";
 import React, {
   useCallback,
   useContext,
@@ -43,6 +44,7 @@ interface WalletSelectorContextValue {
     deposit?: string,
     gas?: string
   ) => Promise<void | nearApi.providers.FinalExecutionOutcome>;
+  getViewCode(contractId: string): Promise<ContractCodeView | undefined>;
 }
 
 const WalletSelectorContext =
@@ -78,6 +80,19 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
       });
 
       return JSON.parse(Buffer.from((res as any).result).toString());
+    },
+    [provider]
+  );
+
+  const getViewCode = useCallback(
+    async (contractId: string) => {
+      if (!provider) return;
+
+      return await provider.query<ContractCodeView>({
+        account_id: contractId,
+        finality: "final",
+        request_type: "view_code",
+      });
     },
     [provider]
   );
@@ -217,6 +232,7 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
         callMethod,
         viewMethod,
         provider,
+        getViewCode,
       }}
     >
       {children}
