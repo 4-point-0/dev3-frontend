@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Plus, ThreeDCubeSphere, ClockHour4 } from "tabler-icons-react";
 
 import { DeployedContracts } from "../../components/contracts/DeployedContracts";
+import { DeployRequests } from "../../components/contracts/DeployRequests";
 import { PendingTransactions } from "../../components/contracts/PendingTransactions";
 import { PageContainer } from "../../components/layout/PageContainer";
 
@@ -36,6 +37,9 @@ const Contracts: NextPage = () => {
           <Tabs.Tab value="pending" icon={<ClockHour4 size={14} />}>
             Pending Transactions
           </Tabs.Tab>
+          <Tabs.Tab value="deploy" icon={<ClockHour4 size={14} />}>
+            Deploy Requests
+          </Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="contracts">
@@ -43,6 +47,9 @@ const Contracts: NextPage = () => {
         </Tabs.Panel>
         <Tabs.Panel value="pending">
           <PendingTransactions />
+        </Tabs.Panel>
+        <Tabs.Panel value="deploy">
+          <DeployRequests />
         </Tabs.Panel>
       </Tabs>
     </PageContainer>

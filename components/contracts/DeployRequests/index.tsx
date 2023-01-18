@@ -5,22 +5,21 @@ import { ExternalLink, Share } from "tabler-icons-react";
 
 import { useSelectedProject } from "../../../context/SelectedProjectContext";
 import { usePaginationProps } from "../../../hooks/usePaginationProps";
-import { useTransactionRequestControllerFindAll } from "../../../services/api/dev3Components";
-import { TransactionRequest } from "../../../services/api/dev3Schemas";
+import { useDeployedContractControllerFindAll } from "../../../services/api/dev3Components";
+import { DeployedContract } from "../../../services/api/dev3Schemas";
 import showShareModal from "../../ShareModal";
 import { CopyCell } from "../../table/CopyCell";
 
 const PAGE_LIMIT = 20;
 
-export const PendingTransactions = () => {
+export const DeployRequests = () => {
   const [page, setPage] = useState(1);
   const { projectId } = useSelectedProject();
 
-  const { data, isLoading } = useTransactionRequestControllerFindAll({
+  const { data, isLoading } = useDeployedContractControllerFindAll({
     queryParams: {
       project_id: projectId ?? undefined,
       status: "Pending",
-      type: "Transaction",
     },
   });
 
@@ -31,18 +30,17 @@ export const PendingTransactions = () => {
     total: data?.total,
   });
 
-  const columns: Array<DataTableColumn<TransactionRequest>> = [
+  const columns: Array<DataTableColumn<DeployedContract>> = [
     {
-      accessor: "method",
-      render: ({ method }) => {
-        return <Text fw={700}>{method}</Text>;
+      accessor: "alias",
+      render: ({ alias }) => {
+        return <Text fw={700}>{alias}</Text>;
       },
     },
     {
-      accessor: "contractId",
-      title: "Contract Address",
-      render: ({ contractId }) => {
-        return <Text>{contractId}</Text>;
+      accessor: "template",
+      render: ({ contract_template }) => {
+        return <Text>{contract_template?.name}</Text>;
       },
     },
     {
@@ -60,7 +58,7 @@ export const PendingTransactions = () => {
     {
       accessor: "actions",
       render: ({ uuid }) => {
-        const url = `${window.location.origin}/action/change/${uuid}`;
+        const url = `${window.location.origin}/action/deployment/${uuid}`;
 
         const handleShare = (url: string) => {
           return () => {

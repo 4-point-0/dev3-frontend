@@ -69,7 +69,7 @@ export const CreateContract = () => {
         title: "Created contract deployment request",
       });
 
-      router.push("/contracts?tab=pending");
+      router.push("/contracts?tab=deploy");
     } catch {
       notifications.error({
         title: `Failed to create contract deployment request`,
