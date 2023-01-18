@@ -1,9 +1,20 @@
 import { DataTable, DataTableColumn } from "mantine-datatable";
 import React, { useCallback, useReducer, useState } from "react";
-import Form, { IChangeEvent } from "@rjsf/core";
+import { IChangeEvent, withTheme } from "@rjsf/core";
 import validator from "@rjsf/validator-ajv8";
 import { Edit, Eye } from "tabler-icons-react";
-import { Badge, Group, Paper, Text, ThemeIcon, Title } from "@mantine/core";
+import Form from "@rjsf/fluent-ui";
+import {
+  Badge,
+  Code,
+  Group,
+  Paper,
+  Text,
+  ThemeIcon,
+  Title,
+  Stack,
+  Skeleton,
+} from "@mantine/core";
 
 import { getMethodsFromSchema } from "../../../utils/raen";
 import { CopyCell } from "../../table/CopyCell";
@@ -17,6 +28,19 @@ interface IContractMethodsProps {
   schema: any;
 }
 
+interface IResult {
+  error?: any;
+  data?: any;
+  isLoading: boolean;
+}
+
+function getInitialResults(methods: Array<string>): Record<string, IResult> {
+  return methods.reduce((results, method) => {
+    results[method] = { isLoading: false };
+    return results;
+  }, {} as Record<string, IResult>);
+}
+
 export const ContractMethods: React.FC<IContractMethodsProps> = ({
   contractId,
   schema,
@@ -24,13 +48,15 @@ export const ContractMethods: React.FC<IContractMethodsProps> = ({
   const methods = getMethodsFromSchema(schema);
   const { projectId } = useSelectedProject();
   const { viewMethod } = useWalletSelector();
-  const [results, setResults] = useState<Record<string, any>>({});
+  const [results, setResults] = useState<Record<string, any>>(() => {
+    return getInitialResults(methods.map(({ method }) => method));
+  });
 
   const setResult = useCallback(
-    (key: string, value: any) => {
+    (method: string, value: any) => {
       setResults((previousResults) => ({
         ...previousResults,
-        [key]: value,
+        [method]: value,
       }));
     },
     [setResults]
@@ -78,34 +104,47 @@ export const ContractMethods: React.FC<IContractMethodsProps> = ({
     return async (data: IChangeEvent) => {
       let result;
 
-      if (type === "view") {
-        result = await viewMethod(contractId, method, data.formData.args);
-      }
+      setResult(method, {
+        isLoading: true,
+      });
 
-      if (type === "change") {
-        const { args, options } = data.formData;
+      try {
+        if (type === "view") {
+          result = await viewMethod(contractId, method, data.formData.args);
+        }
 
-        result = await fetchTransactionRequestControllerCreate({
-          body: {
-            contractId,
-            type: "Transaction",
-            method,
-            args,
-            gas: options.gas || THIRTY_TGAS,
-            deposit: options.attachedDeposit || "0",
-            project_id: projectId as string,
-            is_near_token: false,
-          },
+        if (type === "change") {
+          const { args, options } = data.formData;
+
+          result = await fetchTransactionRequestControllerCreate({
+            body: {
+              contractId,
+              type: "Transaction",
+              method,
+              args,
+              gas: options.gas || THIRTY_TGAS,
+              deposit: options.attachedDeposit || "0",
+              project_id: projectId as string,
+              is_near_token: false,
+            },
+          });
+        }
+
+        setResult(method, {
+          data: result,
+          isLoading: false,
+        });
+      } catch (error) {
+        setResult(method, {
+          error,
+          isLoading: false,
         });
       }
-
-      setResult(method, result);
     };
   };
 
   return (
     <>
-      <pre>{JSON.stringify(results, null, 2)}</pre>
       <DataTable
         highlightOnHover
         sx={{ thead: { display: "none" } }}
@@ -115,13 +154,34 @@ export const ContractMethods: React.FC<IContractMethodsProps> = ({
         rowExpansion={{
           allowMultiple: true,
           content: ({ record }) => {
+            const { data, error, isLoading } = results[record.method];
+
+            const showFor = !isLoading && data == undefined;
+
             return (
               <Paper p="md">
-                <Form
-                  schema={record.schema}
-                  validator={validator}
-                  onSubmit={handleSubmit(record.method, record.type)}
-                />
+                <Stack>
+                  <Form
+                    schema={record.schema}
+                    validator={validator}
+                    onSubmit={handleSubmit(record.method, record.type)}
+                  />
+
+                  {data !== undefined && (
+                    <Skeleton visible={isLoading}>
+                      <Title order={5}>Result: </Title>
+                      <Code block>{JSON.stringify(data, null, 2)}</Code>
+                    </Skeleton>
+                  )}
+                  {error && (
+                    <>
+                      <Title order={5}>Error: </Title>
+                      <Code block color="red">
+                        {JSON.stringify(error, null, 2)}
+                      </Code>
+                    </>
+                  )}
+                </Stack>
               </Paper>
             );
           },
