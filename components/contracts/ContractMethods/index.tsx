@@ -154,6 +154,7 @@ export const ContractMethods: React.FC<IContractMethodsProps> = ({
         rowExpansion={{
           allowMultiple: true,
           content: ({ record }) => {
+            const { type, method, schema } = record;
             const { data, error, isLoading } = results[record.method];
 
             const showFor = !isLoading && data == undefined;
@@ -162,9 +163,9 @@ export const ContractMethods: React.FC<IContractMethodsProps> = ({
               <Paper p="md">
                 <Stack>
                   <Form
-                    schema={record.schema}
+                    schema={schema}
                     validator={validator}
-                    onSubmit={handleSubmit(record.method, record.type)}
+                    onSubmit={handleSubmit(method, type)}
                   />
 
                   {data !== undefined && (
