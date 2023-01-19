@@ -64,7 +64,7 @@ export const DeployRequests = () => {
           return () => {
             showShareModal({
               url,
-              title: "Share the payment request:",
+              title: "Share the deployment request:",
             });
           };
         };
@@ -107,7 +107,7 @@ export const DeployRequests = () => {
       minHeight={164}
       idAccessor="_id"
       columns={columns}
-      noRecordsText="No pending transactions"
+      noRecordsText="No deploy requests"
       records={data?.results}
       fetching={isLoading}
       {...paginationProps}

@@ -1,27 +1,28 @@
 import {
   Alert,
-  Avatar,
-  Badge,
   Button,
   Card,
   Center,
+  Code,
   Container,
+  Group,
   Loader,
   Stack,
   Text,
+  ThemeIcon,
+  Title,
 } from "@mantine/core";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { AlertCircle, Check } from "tabler-icons-react";
+import { AlertCircle, Check, Code as CodeIcon } from "tabler-icons-react";
 
 import { useUserContext } from "../../../context/UserContext";
 import { useWalletSelector } from "../../../context/WalletSelectorContext";
 import { useTransactionRequestControllerFindByUuid } from "../../../services/api/dev3Components";
-import { getInfoFromArgs, NEAR_CONTRACT_ID } from "../../../utils/near";
 import { notifications } from "../../../utils/notifications";
 import { ProjectTransactionContainer } from "../../../components/action/ProjectTransactionContainer";
 
-const PaymentRequestDetail = () => {
+const TransactionRequestDetail = () => {
   const { callMethod } = useWalletSelector();
   const router = useRouter();
   const { errorCode, errorMessage, transactionHashes, uuid } = router.query;
@@ -38,6 +39,7 @@ const PaymentRequestDetail = () => {
       uuid: uuid as string,
     },
   });
+  console.log(transactionRequestData);
 
   const parsedArgs = useMemo(() => {
     if (!transactionRequestData?.args) {
@@ -62,14 +64,6 @@ const PaymentRequestDetail = () => {
     return args;
   }, [transactionRequestData?.args, transactionRequestData?.uuid]);
 
-  const parsedInfo = useMemo(() => {
-    if (!(parsedArgs && transactionRequestData)) {
-      return;
-    }
-
-    return getInfoFromArgs(parsedArgs, transactionRequestData.meta);
-  }, [parsedArgs, transactionRequestData]);
-
   const handleButtonClick = async () => {
     if (userContext.user === null) {
       return;
@@ -87,16 +81,9 @@ const PaymentRequestDetail = () => {
     });
 
     try {
-      const { contractId, method, deposit, gas, is_near_token } =
-        transactionRequestData;
+      const { contractId, method, deposit, gas } = transactionRequestData;
 
-      await callMethod(
-        (is_near_token ? NEAR_CONTRACT_ID : contractId) as string,
-        method,
-        parsedArgs,
-        deposit,
-        gas
-      );
+      await callMethod(contractId as string, method, parsedArgs, deposit, gas);
     } catch (error) {
       notifications.error({
         title: "Error while preparing transaction",
@@ -134,36 +121,39 @@ const PaymentRequestDetail = () => {
     <ProjectTransactionContainer
       projectName={transactionRequestData?.project.name}
       logoUrl={transactionRequestData?.project.logo_url}
-      description="is requesting payment"
+      description="is requesting a transaction"
     >
       <Card mt="md" shadow="none" p="lg" radius="md" withBorder>
-        <Stack align="center" spacing="sm">
-          {transactionRequestData?.meta?.icon && (
-            <Avatar src={transactionRequestData.meta.icon} size={40} />
-          )}
-          {transactionRequestData?.meta?.name && (
-            <Text size="xl" weight={500}>
-              {transactionRequestData.meta.name}
-            </Text>
+        <Stack>
+          <Group>
+            <ThemeIcon size="xl" variant="default">
+              <CodeIcon />
+            </ThemeIcon>
+
+            <Stack spacing={0}>
+              <Title order={5}>Method</Title>
+              <Text>{transactionRequestData?.method}</Text>
+            </Stack>
+          </Group>
+
+          <Title order={5}>With arguments:</Title>
+          <Code block>{JSON.stringify(parsedArgs, null, 2)}</Code>
+
+          {transactionRequestData?.gas !== undefined && (
+            <Stack spacing={0}>
+              <Title order={5}>Gas</Title>
+              <Text c="dimmed">{transactionRequestData?.gas}</Text>
+            </Stack>
           )}
 
-          <Text size="xl" weight={500}>
-            {parsedInfo?.amount}
-          </Text>
-          <Badge size="xl">
-            {transactionRequestData?.is_near_token
-              ? "NEAR"
-              : transactionRequestData?.meta?.symbol}
-          </Badge>
-
-          <Text color="dimmed">on Testnet</Text>
+          {transactionRequestData?.deposit !== undefined && (
+            <Stack spacing={0}>
+              <Title order={5}>Deposit</Title>
+              <Text c="dimmed">{transactionRequestData?.deposit}</Text>
+            </Stack>
+          )}
         </Stack>
       </Card>
-
-      <Stack mt="xl" align="center" spacing="xs">
-        <Text size="xl">Receipient</Text>
-        <Badge size="lg">{parsedInfo?.receiver_id}</Badge>
-      </Stack>
 
       <Stack mt="xl">
         <Button
@@ -172,7 +162,9 @@ const PaymentRequestDetail = () => {
           variant="light"
           onClick={handleButtonClick}
         >
-          {userContext.user === null ? "You need to connect a wallet" : "Pay"}
+          {userContext.user === null
+            ? "You need to connect a wallet"
+            : "Execute transaction"}
         </Button>
 
         {errorCode && errorCode === "userRejected" && (
@@ -201,4 +193,4 @@ const PaymentRequestDetail = () => {
   );
 };
 
-export default PaymentRequestDetail;
+export default TransactionRequestDetail;

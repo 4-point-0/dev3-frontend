@@ -3,7 +3,7 @@ import { NextLink } from "@mantine/next";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { Plus, ThreeDCubeSphere, ClockHour4 } from "tabler-icons-react";
+import { Plus, ThreeDCubeSphere, ClockHour4, Rocket } from "tabler-icons-react";
 
 import { DeployedContracts } from "../../components/contracts/DeployedContracts";
 import { DeployRequests } from "../../components/contracts/DeployRequests";
@@ -37,7 +37,7 @@ const Contracts: NextPage = () => {
           <Tabs.Tab value="pending" icon={<ClockHour4 size={14} />}>
             Pending Transactions
           </Tabs.Tab>
-          <Tabs.Tab value="deploy" icon={<ClockHour4 size={14} />}>
+          <Tabs.Tab value="deploy" icon={<Rocket size={14} />}>
             Deploy Requests
           </Tabs.Tab>
         </Tabs.List>

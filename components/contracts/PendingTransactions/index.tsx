@@ -60,13 +60,13 @@ export const PendingTransactions = () => {
     {
       accessor: "actions",
       render: ({ uuid }) => {
-        const url = `${window.location.origin}/action/change/${uuid}`;
+        const url = `${window.location.origin}/action/transaction/${uuid}`;
 
         const handleShare = (url: string) => {
           return () => {
             showShareModal({
               url,
-              title: "Share the payment request:",
+              title: "Share the transcation request:",
             });
           };
         };
