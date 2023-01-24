@@ -1,21 +1,15 @@
 import { DataTable, DataTableColumn } from "mantine-datatable";
-import React, { useCallback, useMemo, useReducer, useState } from "react";
-import { IChangeEvent, withTheme } from "@rjsf/core";
-import validator from "@rjsf/validator-ajv8";
-import { Edit, ExternalLink, Eye, Refresh } from "tabler-icons-react";
-import Form from "@rjsf/fluent-ui";
+import React, { useCallback, useState } from "react";
+import { IChangeEvent } from "@rjsf/core";
+import { Edit, Eye } from "tabler-icons-react";
 import {
   Badge,
-  Code,
   Group,
   Paper,
   Text,
   ThemeIcon,
   Title,
   Stack,
-  Skeleton,
-  Card,
-  Button,
 } from "@mantine/core";
 
 import { getMethodsFromSchema } from "../../../utils/raen";
@@ -24,7 +18,8 @@ import { useWalletSelector } from "../../../context/WalletSelectorContext";
 import { fetchTransactionRequestControllerCreate } from "../../../services/api/dev3Components";
 import { useSelectedProject } from "../../../context/SelectedProjectContext";
 import { THIRTY_TGAS } from "../../../utils/near";
-import { CopyActionButton } from "../../core/CopyActionButton";
+import { FormThemeProvider } from "../../form";
+import { MethodDetails } from "./MethodDetails";
 
 interface IContractMethodsProps {
   contractId: string;
@@ -147,7 +142,7 @@ export const ContractMethods: React.FC<IContractMethodsProps> = ({
   };
 
   return (
-    <>
+    <FormThemeProvider>
       <DataTable
         highlightOnHover
         sx={{ thead: { display: "none" } }}
@@ -160,88 +155,28 @@ export const ContractMethods: React.FC<IContractMethodsProps> = ({
             const { type, method, schema } = record;
             const { data, error, isLoading } = results[record.method];
 
-            const transactionUrl = (data as any)?.uuid
-              ? `${window.location.origin}/action/transaction/${data.uuid}`
-              : null;
-
             const handleReset = () => {
               setResult(method, { isLoading: false });
             };
 
-            const hideForm = data !== undefined && type === "change";
-
             return (
               <Paper p="md">
                 <Stack>
-                  {!hideForm && (
-                    <Form
-                      schema={schema}
-                      validator={validator}
-                      onSubmit={handleSubmit(method, type)}
-                      disabled={isLoading}
-                      uiSchema={{
-                        "ui:submitButtonOptions": {
-                          norender: type === "change" && data !== undefined,
-                          submitText: type === "view" ? "View" : "Change",
-                          props: {
-                            disabled: isLoading,
-                          },
-                        },
-                      }}
-                    />
-                  )}
-
-                  {type === "change" && data !== undefined && (
-                    <>
-                      <Skeleton visible={isLoading}>
-                        <Group w="100%" noWrap>
-                          <Button
-                            variant="default"
-                            leftIcon={<Refresh size={14} />}
-                            onClick={handleReset}
-                          >
-                            Reset
-                          </Button>
-
-                          {transactionUrl && (
-                            <>
-                              <Button
-                                variant="light"
-                                leftIcon={<ExternalLink size={14} />}
-                                component="a"
-                                href={transactionUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                Execute transaction now
-                              </Button>
-                              <CopyActionButton value={transactionUrl} />
-                            </>
-                          )}
-                        </Group>
-                      </Skeleton>
-                    </>
-                  )}
-                  {type === "view" && data !== undefined && (
-                    <Skeleton visible={isLoading}>
-                      <Title order={5}>Result: </Title>
-                      <Code block>{JSON.stringify(data, null, 2)}</Code>
-                    </Skeleton>
-                  )}
-                  {error && (
-                    <>
-                      <Title order={5}>Error: </Title>
-                      <Code block color="red">
-                        {JSON.stringify(error, null, 2)}
-                      </Code>
-                    </>
-                  )}
+                  <MethodDetails
+                    type={type}
+                    schema={schema}
+                    data={data}
+                    error={error}
+                    isLoading={isLoading}
+                    onReset={handleReset}
+                    onSubmit={handleSubmit(method, type)}
+                  />
                 </Stack>
               </Paper>
             );
           },
         }}
       />
-    </>
+    </FormThemeProvider>
   );
 };
