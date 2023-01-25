@@ -10,7 +10,7 @@ export const config = {
   },
 };
 
-export default (
+const handler = (
   req: NextApiRequest,
   res: NextApiResponse<any>
 ): Promise<void> => {
@@ -23,3 +23,5 @@ export default (
     });
   });
 };
+
+export default handler;
