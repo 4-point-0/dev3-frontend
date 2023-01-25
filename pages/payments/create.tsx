@@ -178,8 +178,12 @@ const CreatePayment = () => {
     }
   };
 
-  const handleAddressSelect = (wallet: string) => {
+  const handleReceiverSelect = (wallet: string) => {
     form.setFieldValue("receiver", wallet);
+  };
+
+  const handleContractIdSelect = (wallet: string) => {
+    form.setFieldValue("contractId", wallet);
   };
 
   const metadataIsValid = Boolean(metadata) && metadata.spec === "ft-1.0.0";
@@ -197,7 +201,7 @@ const CreatePayment = () => {
           label="Receiver account id"
           description="The account to which the funds will be sent"
           placeholder="Enter receiver account id"
-          rightSection={<AddressSpotlight onSelect={handleAddressSelect} />}
+          rightSection={<AddressSpotlight onSelect={handleReceiverSelect} />}
           {...form.getInputProps("receiver")}
         />
 
@@ -214,6 +218,9 @@ const CreatePayment = () => {
               mt="sm"
               label="Fungible token contract"
               placeholder="Enter fungible token contract id"
+              rightSection={
+                <AddressSpotlight onSelect={handleContractIdSelect} />
+              }
               {...form.getInputProps("contractId")}
             />
 
