@@ -1,6 +1,6 @@
 import { Dev3Context } from "./dev3Context";
 
-const baseUrl = `${process.env.NEXT_PUBLIC_API_URL}`;
+const baseUrl = ``;
 
 export type ErrorWrapper<TError> =
   | TError
