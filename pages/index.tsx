@@ -1,5 +1,6 @@
 import { Box, useMantineTheme } from "@mantine/core";
 import type { NextPage } from "next";
+
 import WalletConnectButton from "../components/WalletConnectButton";
 
 const Home: NextPage = () => {

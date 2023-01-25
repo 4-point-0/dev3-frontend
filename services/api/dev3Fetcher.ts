@@ -1,6 +1,9 @@
 import { Dev3Context } from "./dev3Context";
+import fetch from "isomorphic-fetch";
 
-const baseUrl = ``;
+const isServer = typeof window === "undefined";
+
+const baseUrl = isServer ? process.env.API_URL : ``;
 
 export type ErrorWrapper<TError> =
   | TError
@@ -25,8 +28,6 @@ function serilazeBody(body: unknown) {
     const fd = new FormData();
 
     fd.append("file", (body as any).file);
-
-    console.log(fd.get("file"));
 
     return fd;
   }
@@ -56,7 +57,7 @@ export async function dev3Fetch<
   TPathParams
 >): Promise<TData> {
   try {
-    const token = localStorage.getItem("token");
+    const token = !isServer ? localStorage?.getItem("token") : undefined;
     const isFileUpload = body?.hasOwnProperty("file");
 
     let newHeaders = {
@@ -72,7 +73,7 @@ export async function dev3Fetch<
       (newHeaders as any)["authorization"] = token ? `Bearer ${token}` : "";
     }
 
-    const response = await window.fetch(
+    const response = await fetch(
       `${baseUrl}${resolveUrl(url, queryParams, pathParams)}`,
       {
         signal,
