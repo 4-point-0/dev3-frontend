@@ -166,6 +166,7 @@ export const CreateContract: React.FC = () => {
       </Group>
 
       <DataTable
+        highlightOnHover
         minHeight={200}
         sx={{ thead: { display: "none" } }}
         columns={columns}

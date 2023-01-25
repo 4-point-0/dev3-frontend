@@ -15,6 +15,8 @@ export function usePaginationProps({
     return {};
   }
 
+  console.log(total);
+
   return {
     totalRecords: total,
     recordsPerPage: limit,
