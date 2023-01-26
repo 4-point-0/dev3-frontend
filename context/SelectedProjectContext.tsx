@@ -43,9 +43,6 @@ export function useSelectedProject() {
     },
     {
       enabled: Boolean(router.query.slug),
-      onError: (error) => {
-        // console.log(error);
-      },
     }
   );
 

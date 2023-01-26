@@ -5,10 +5,13 @@ import {
   Divider,
   Group,
   Menu,
+  Skeleton,
   Text,
   UnstyledButton,
 } from "@mantine/core";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useMemo } from "react";
 import { Plus, Selector } from "tabler-icons-react";
 
 import { useSelectedProject } from "../../context/SelectedProjectContext";
@@ -16,18 +19,26 @@ import { useProjectControllerFindAll } from "../../services/api/dev3Components";
 import { getLogoPlaceholder, getLogoUrl } from "../../utils/logo";
 
 const ProjectSelector = () => {
-  const { project: selectedProject } = useSelectedProject();
-  const { isLoading, error, data } = useProjectControllerFindAll({});
+  const { isLoading, error, data } = useProjectControllerFindAll({
+    queryParams: { limit: 100 },
+  });
+  const router = useRouter();
 
-  if (isLoading) {
-    return <Text>Loading...</Text>;
-  }
+  const selectedProject = useMemo(() => {
+    if (!data?.results) {
+      return null;
+    }
+
+    return data.results.find(({ slug }) => {
+      return slug === router.query.slug;
+    });
+  }, [router.query.slug, data?.results]);
 
   if (error) {
     return <Text>Error: {error.payload}</Text>;
   }
 
-  if (!data || data.results?.length === 0) {
+  if (data?.results?.length === 0) {
     return (
       <Box p="xs">
         <Link href="/new-project" passHref>
@@ -59,16 +70,18 @@ const ProjectSelector = () => {
             },
           })}
         >
-          {selectedProject && (
+          <Skeleton visible={isLoading}>
             <Group>
               <Avatar
                 size="lg"
                 radius="sm"
                 alt="Project logo"
-                src={selectedProject.logo_url}
+                src={selectedProject ? getLogoUrl(selectedProject.logo) : null}
                 color="blue"
               >
-                {getLogoPlaceholder(selectedProject?.name)}
+                {selectedProject
+                  ? getLogoPlaceholder(selectedProject?.name)
+                  : ""}
               </Avatar>
 
               <Group position="apart" sx={{ flex: 1 }}>
@@ -78,7 +91,7 @@ const ProjectSelector = () => {
                 <Selector size={18} />
               </Group>
             </Group>
-          )}
+          </Skeleton>
         </UnstyledButton>
       </Menu.Target>
       <Menu.Dropdown>
