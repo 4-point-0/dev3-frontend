@@ -1,6 +1,7 @@
 import { ActionIcon, Badge, Button, Group, Text, Tooltip } from "@mantine/core";
 import { NextLink } from "@mantine/next";
 import { DataTable, DataTableColumn } from "mantine-datatable";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { ExternalLink, Plus, Share } from "tabler-icons-react";
 
@@ -18,6 +19,7 @@ const PAGE_LIMIT = 10;
 const Payments = () => {
   const [page, setPage] = useState(1);
   const { projectId } = useSelectedProject();
+  const router = useRouter();
 
   const { isLoading, data } = useTransactionRequestControllerFindAll({
     queryParams: {
@@ -142,7 +144,8 @@ const Payments = () => {
       <Button
         sx={{ alignSelf: "self-end" }}
         component={NextLink}
-        href="/payments/create"
+        href="/[slug]/payments/create"
+        as={`/${router.query.slug}/payments/create`}
         variant="light"
         leftIcon={<Plus />}
       >

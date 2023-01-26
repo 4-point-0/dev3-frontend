@@ -16,7 +16,7 @@ import { useProjectControllerFindAll } from "../../services/api/dev3Components";
 import { getLogoPlaceholder, getLogoUrl } from "../../utils/logo";
 
 const ProjectSelector = () => {
-  const { projectId, project: selectedProject } = useSelectedProject();
+  const { project: selectedProject } = useSelectedProject();
   const { isLoading, error, data } = useProjectControllerFindAll({});
 
   if (isLoading) {

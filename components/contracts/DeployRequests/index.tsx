@@ -18,8 +18,10 @@ export const DeployRequests = () => {
 
   const { data, isLoading } = useDeployedContractControllerFindAll({
     queryParams: {
-      project_id: projectId ?? undefined,
+      project_id: projectId,
       status: "Pending",
+      offset: (page - 1) * PAGE_LIMIT,
+      limit: PAGE_LIMIT,
     },
   });
 

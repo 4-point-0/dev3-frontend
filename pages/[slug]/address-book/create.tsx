@@ -51,7 +51,7 @@ const CreateAddress = () => {
         autoClose: 3000,
       });
 
-      router.push(`/address-book`);
+      router.push(`/${router.query.slug}/address-book`);
     } catch (error) {
       updateNotification({
         id: "loading-notification",

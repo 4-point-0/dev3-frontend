@@ -150,7 +150,7 @@ const CreatePayment = () => {
         message: "Your payment request has been created. You can now share it.",
       });
 
-      router.push(`/payments`);
+      router.push(`/${router.query.slug}/payments`);
     } catch (error) {
       let title = "Error creating payment request";
       let message =

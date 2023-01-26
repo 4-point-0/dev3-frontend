@@ -3,6 +3,7 @@ import { openConfirmModal } from "@mantine/modals";
 import { NextLink } from "@mantine/next";
 import { showNotification } from "@mantine/notifications";
 import { DataTable, DataTableColumn } from "mantine-datatable";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { Edit, Plus, Trash, X } from "tabler-icons-react";
 import { PageContainer } from "../../../components/layout/PageContainer";
@@ -19,6 +20,7 @@ const PAGE_LIMIT = 20;
 
 const AddressBook = () => {
   const [page, setPage] = useState(1);
+  const router = useRouter();
 
   const { isFetching, refetch, data } = useAddressControllerFindAll(
     {
@@ -110,8 +112,10 @@ const AddressBook = () => {
             <Tooltip label="Edit" position="bottom" withArrow>
               <ActionIcon
                 component={NextLink}
-                href="/address-book/[id]/edit"
-                as={`/address-book/${(address as any)._id}/edit`}
+                href="/[slug]/address-book/[id]/edit"
+                as={`/${router.query.slug}/address-book/${
+                  (address as any)._id
+                }/edit`}
                 color="blue"
                 radius="xl"
                 variant="light"
@@ -140,7 +144,8 @@ const AddressBook = () => {
       <Button
         sx={{ alignSelf: "self-end" }}
         component={NextLink}
-        href="/address-book/create"
+        href="/[slug]/address-book/create"
+        as={`/${router.query.slug}/address-book/create`}
         variant="light"
         leftIcon={<Plus />}
       >
