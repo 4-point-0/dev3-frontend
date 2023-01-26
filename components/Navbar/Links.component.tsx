@@ -8,30 +8,35 @@ import {
   Settings,
   ThreeDCubeSphere,
 } from "tabler-icons-react";
+import { useSelectedProject } from "../../context/SelectedProjectContext";
 
-const topSectionData = [
+const getTopSectionData = (projectSlug?: string) => [
   {
     icon: <ThreeDCubeSphere size={24} />,
     label: "Contracts",
-    href: "/contracts",
+    href: `/[slug]/contracts`,
+    as: `/${projectSlug}/contracts`,
   },
   {
     icon: <ArrowsLeftRight size={24} />,
     label: "Payment Requests",
-    href: "/payments",
+    href: `/[slug]/payments`,
+    as: `/${projectSlug}/payments`,
   },
   {
     icon: <Book size={24} />,
     label: "Address Book",
-    href: "/address-book",
+    href: "/[slug]/address-book",
+    as: `/${projectSlug}/address-book`,
   },
 ];
 
-const bottomSectionData = [
+const getBottomSectionData = (projectSlug?: string) => [
   {
     icon: <Settings size={24} />,
     label: "Settings",
-    href: "/settings",
+    href: `/[slug]/settings`,
+    as: `/${projectSlug}/settings`,
   },
 ];
 
@@ -39,15 +44,16 @@ export interface MainLinkProps {
   icon: React.ReactNode;
   label: string;
   href: string;
+  as?: string;
   disabled: boolean;
 }
 
-export function AppLink({ icon, label, href, disabled }: MainLinkProps) {
+export function AppLink({ icon, label, href, disabled, as }: MainLinkProps) {
   const router = useRouter();
 
   return (
     <Box mb={8}>
-      <Link href={href} passHref>
+      <Link href={href} as={as} passHref>
         <NavLink
           disabled={disabled}
           label={label}
@@ -68,14 +74,18 @@ export interface LinksProps {
 }
 
 export function AppLinks({ disabled }: LinksProps) {
-  const links = topSectionData.map((link) => (
+  const { project } = useSelectedProject();
+
+  const links = getTopSectionData(project?.slug).map((link) => (
     <AppLink {...link} key={link.label} disabled={disabled} />
   ));
   return <div>{links}</div>;
 }
 
 export function AppLinksBottom({ disabled }: LinksProps) {
-  const links = bottomSectionData.map((link) => (
+  const { project } = useSelectedProject();
+
+  const links = getBottomSectionData(project?.slug).map((link) => (
     <AppLink {...link} disabled={disabled} key={link.label} />
   ));
   return <div>{links}</div>;

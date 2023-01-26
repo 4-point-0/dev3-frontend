@@ -9,34 +9,15 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import Link from "next/link";
-import { useMemo } from "react";
 import { Plus, Selector } from "tabler-icons-react";
 
-import {
-  isSameProject,
-  useSelectedProject,
-} from "../../context/SelectedProjectContext";
+import { useSelectedProject } from "../../context/SelectedProjectContext";
 import { useProjectControllerFindAll } from "../../services/api/dev3Components";
-import { Project } from "../../services/api/dev3Schemas";
 import { getLogoPlaceholder, getLogoUrl } from "../../utils/logo";
 
 const ProjectSelector = () => {
-  const { project, selectProject } = useSelectedProject();
+  const { projectId, project: selectedProject } = useSelectedProject();
   const { isLoading, error, data } = useProjectControllerFindAll({});
-
-  const selectedProject = useMemo(() => {
-    if (!(data?.results && project)) {
-      return null;
-    }
-
-    return data.results.find(isSameProject(project));
-  }, [data, project]);
-
-  const handleSelect = (project: Project) => {
-    return () => {
-      selectProject(project);
-    };
-  };
 
   if (isLoading) {
     return <Text>Loading...</Text>;
@@ -84,7 +65,7 @@ const ProjectSelector = () => {
                 size="lg"
                 radius="sm"
                 alt="Project logo"
-                src={getLogoUrl(selectedProject.logo)}
+                src={selectedProject.logo_url}
                 color="blue"
               >
                 {getLogoPlaceholder(selectedProject?.name)}
@@ -124,7 +105,6 @@ const ProjectSelector = () => {
               }
               rightSection={project.slug === selectedProject?.slug ? "✓" : ""}
               key={project.name}
-              onClick={handleSelect(project)}
             >
               {project.name}
             </Menu.Item>

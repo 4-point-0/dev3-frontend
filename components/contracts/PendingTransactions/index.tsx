@@ -16,9 +16,11 @@ export const PendingTransactions = () => {
   const [page, setPage] = useState(1);
   const { projectId } = useSelectedProject();
 
+  console.log({ projectId });
+
   const { data, isLoading } = useTransactionRequestControllerFindAll({
     queryParams: {
-      project_id: projectId ?? undefined,
+      project_id: projectId,
       status: "Pending",
       type: "Transaction",
     },

@@ -14,13 +14,13 @@ import { useForm } from "@mantine/form";
 import { parseNearAmount } from "near-api-js/lib/utils/format";
 import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
-import { PageContainer } from "../../components/layout/PageContainer";
+import { PageContainer } from "../../../components/layout/PageContainer";
 import { IconAlertCircle } from "@tabler/icons";
 
-import { AddressSpotlight } from "../../components/payments/AddressSpotlight";
-import { useSelectedProject } from "../../context/SelectedProjectContext";
-import { useWalletSelector } from "../../context/WalletSelectorContext";
-import { fetchTransactionRequestControllerCreate } from "../../services/api/dev3Components";
+import { AddressSpotlight } from "../../../components/payments/AddressSpotlight";
+import { useSelectedProject } from "../../../context/SelectedProjectContext";
+import { useWalletSelector } from "../../../context/WalletSelectorContext";
+import { fetchTransactionRequestControllerCreate } from "../../../services/api/dev3Components";
 import {
   FungibleTokenError,
   nearWalletRegex,
@@ -29,9 +29,9 @@ import {
   ReceiverError,
   THIRTY_TGAS,
   validateFungibleMetadata,
-} from "../../utils/near";
-import { useMetadata } from "../../hooks/useMetadata";
-import { notifications } from "../../utils/notifications";
+} from "../../../utils/near";
+import { useMetadata } from "../../../hooks/useMetadata";
+import { notifications } from "../../../utils/notifications";
 
 interface IPaymentFormValues {
   amount: number;
@@ -43,7 +43,7 @@ interface IPaymentFormValues {
 const CreatePayment = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { project } = useSelectedProject();
+  const { projectId } = useSelectedProject();
   const { viewMethod } = useWalletSelector();
 
   const form = useForm<IPaymentFormValues>({
@@ -133,7 +133,7 @@ const CreatePayment = () => {
 
       await fetchTransactionRequestControllerCreate({
         body: {
-          project_id: (project as any)._id,
+          project_id: projectId as string,
           method,
           is_near_token: !isFungibleToken,
           type: "Payment",

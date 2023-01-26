@@ -1,16 +1,18 @@
 import { Button, Group, Tabs } from "@mantine/core";
 import { NextLink } from "@mantine/next";
-import { NextPage } from "next";
+import { InferGetServerSidePropsType, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { Plus, ThreeDCubeSphere, ClockHour4, Rocket } from "tabler-icons-react";
 
-import { DeployedContracts } from "../../components/contracts/DeployedContracts";
-import { DeployRequests } from "../../components/contracts/DeployRequests";
-import { PendingTransactions } from "../../components/contracts/PendingTransactions";
-import { PageContainer } from "../../components/layout/PageContainer";
+import { DeployedContracts } from "../../../components/contracts/DeployedContracts";
+import { DeployRequests } from "../../../components/contracts/DeployRequests";
+import { PendingTransactions } from "../../../components/contracts/PendingTransactions";
+import { PageContainer } from "../../../components/layout/PageContainer";
+import { useSelectedProject } from "../../../context/SelectedProjectContext";
 
 const Contracts: NextPage = () => {
+  const { project } = useSelectedProject();
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState<string | null>(
@@ -22,7 +24,8 @@ const Contracts: NextPage = () => {
       <Button
         sx={{ alignSelf: "self-end" }}
         component={NextLink}
-        href="/contracts/create"
+        href={`./contracts/create`}
+        as={`/${project?.slug}/contracts/create`}
         variant="light"
         leftIcon={<Plus />}
       >

@@ -4,14 +4,14 @@ import { DataTable, DataTableColumn } from "mantine-datatable";
 import { useState } from "react";
 import { ExternalLink, Plus, Share } from "tabler-icons-react";
 
-import { PageContainer } from "../../components/layout/PageContainer";
-import showShareModal from "../../components/ShareModal";
-import { CopyCell } from "../../components/table/CopyCell";
-import { useSelectedProject } from "../../context/SelectedProjectContext";
-import { usePaginationProps } from "../../hooks/usePaginationProps";
-import { useTransactionRequestControllerFindAll } from "../../services/api/dev3Components";
-import { TransactionRequest } from "../../services/api/dev3Schemas";
-import { getInfoFromArgs } from "../../utils/near";
+import { PageContainer } from "../../../components/layout/PageContainer";
+import showShareModal from "../../../components/ShareModal";
+import { CopyCell } from "../../../components/table/CopyCell";
+import { useSelectedProject } from "../../../context/SelectedProjectContext";
+import { usePaginationProps } from "../../../hooks/usePaginationProps";
+import { useTransactionRequestControllerFindAll } from "../../../services/api/dev3Components";
+import { TransactionRequest } from "../../../services/api/dev3Schemas";
+import { getInfoFromArgs } from "../../../utils/near";
 
 const PAGE_LIMIT = 10;
 

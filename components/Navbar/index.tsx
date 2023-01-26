@@ -13,7 +13,7 @@ export interface AdminNavbarProps {
 
 const AppNavbar = ({ opened }: AdminNavbarProps) => {
   const userData = useUserContext();
-  const { project } = useSelectedProject();
+  const { projectId } = useSelectedProject();
 
   return (
     <Navbar hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200, lg: 300 }}>
@@ -26,11 +26,11 @@ const AppNavbar = ({ opened }: AdminNavbarProps) => {
       </Navbar.Section>
       <Divider />
       <Navbar.Section p="sm">
-        <AppLinks disabled={!project === null} />
+        <AppLinks disabled={!projectId === null} />
       </Navbar.Section>
       <Divider />
       <Navbar.Section grow p="sm">
-        <AppLinksBottom disabled={project === null} />
+        <AppLinksBottom disabled={projectId === null} />
       </Navbar.Section>
       <Navbar.Section>
         <MediaQuery largerThan="md" styles={{ display: "none" }}>

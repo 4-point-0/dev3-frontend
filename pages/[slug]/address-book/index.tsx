@@ -5,15 +5,15 @@ import { showNotification } from "@mantine/notifications";
 import { DataTable, DataTableColumn } from "mantine-datatable";
 import { useState } from "react";
 import { Edit, Plus, Trash, X } from "tabler-icons-react";
-import { PageContainer } from "../../components/layout/PageContainer";
+import { PageContainer } from "../../../components/layout/PageContainer";
 
-import { CopyCell } from "../../components/table/CopyCell";
-import { usePaginationProps } from "../../hooks/usePaginationProps";
+import { CopyCell } from "../../../components/table/CopyCell";
+import { usePaginationProps } from "../../../hooks/usePaginationProps";
 import {
   fetchAddressControllerRemove,
   useAddressControllerFindAll,
-} from "../../services/api/dev3Components";
-import { Address } from "../../services/api/dev3Schemas";
+} from "../../../services/api/dev3Components";
+import { Address } from "../../../services/api/dev3Schemas";
 
 const PAGE_LIMIT = 20;
 

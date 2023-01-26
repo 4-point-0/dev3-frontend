@@ -7,9 +7,9 @@ import { Check, X } from "tabler-icons-react";
 import {
   AccountForm,
   IAddressFormValues,
-} from "../../components/address-book/AddressForm";
-import { PageContainer } from "../../components/layout/PageContainer";
-import { fetchAddressControllerCreate } from "../../services/api/dev3Components";
+} from "../../../components/address-book/AddressForm";
+import { PageContainer } from "../../../components/layout/PageContainer";
+import { fetchAddressControllerCreate } from "../../../services/api/dev3Components";
 
 const CreateAddress = () => {
   const [loading, setLoading] = useState(false);

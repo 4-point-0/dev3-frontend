@@ -13,9 +13,8 @@ import { NextPage } from "next";
 import { useState } from "react";
 import { Check, X } from "tabler-icons-react";
 import { PageContainer } from "../../components/layout/PageContainer";
-import { ProjectImage } from "../../components/ProjectImage";
+import { ProjectImage } from "../../components/settings/ProjectImage";
 
-import { useSelectedProject } from "../../context/SelectedProjectContext";
 import {
   fetchApiKeyControllerCreate,
   fetchFileControllerUploadFile,
@@ -31,7 +30,6 @@ const NewProject: NextPage = () => {
   const [logoFile, setLogoFile] = useState<FileWithPath | null>(null);
 
   const { refetch: refetchProjects } = useProjectControllerFindAll({});
-  const { selectProject } = useSelectedProject();
 
   const form = useForm({
     validateInputOnChange: true,
@@ -106,7 +104,6 @@ const NewProject: NextPage = () => {
       });
 
       await refetchProjects();
-      selectProject(project);
     } catch (error) {
       updateNotification({
         id: "loading-notification",

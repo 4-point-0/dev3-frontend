@@ -46,7 +46,15 @@ export default function App(props: AppProps) {
 
       <QueryClientProvider client={queryClient}>
         <UserContextProvider>
-          <SelectedProjectProvider>
+          <SelectedProjectProvider
+            project={{
+              id: "639c8b1bdc6040d3bf0f97b0",
+              name: "Biohazards",
+              slug: "bio-k1m1bn",
+              logo_url:
+                "https://dev3-dev.s3.amazonaws.com/b2e89841-58f6-4e70-b5d6-8d5750ef20a5",
+            }}
+          >
             <WalletSelectorContextProvider>
               <AccountProvider>
                 <ColorSchemeProvider

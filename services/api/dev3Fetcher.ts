@@ -86,6 +86,7 @@ export async function dev3Fetch<
       let error: ErrorWrapper<TError>;
       try {
         error = await response.json();
+        console.log({ error });
       } catch (e) {
         error = {
           status: "unknown" as const,
