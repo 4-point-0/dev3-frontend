@@ -34,6 +34,12 @@ const ProjectSelector = () => {
     });
   }, [router.query.slug, data?.results]);
 
+  const handleSelect = (slug: string) => {
+    return () => {
+      router.push(`/${slug}/contracts`);
+    };
+  };
+
   if (error) {
     return <Text>Error: {error.payload}</Text>;
   }
@@ -118,6 +124,7 @@ const ProjectSelector = () => {
               }
               rightSection={project.slug === selectedProject?.slug ? "✓" : ""}
               key={project.name}
+              onClick={handleSelect(project.slug)}
             >
               {project.name}
             </Menu.Item>
