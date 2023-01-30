@@ -1,4 +1,4 @@
-import { Button, Group, Tabs } from "@mantine/core";
+import { Button, Tabs } from "@mantine/core";
 import { NextLink } from "@mantine/next";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -9,6 +9,7 @@ import { DeployedContracts } from "../../components/contracts/DeployedContracts"
 import { DeployRequests } from "../../components/contracts/DeployRequests";
 import { PendingTransactions } from "../../components/contracts/PendingTransactions";
 import { PageContainer } from "../../components/layout/PageContainer";
+import { useSelectedProject } from "../../context/SelectedProjectContext";
 
 const Contracts: NextPage = () => {
   const router = useRouter();
@@ -22,7 +23,7 @@ const Contracts: NextPage = () => {
       <Button
         sx={{ alignSelf: "self-end" }}
         component={NextLink}
-        href="/contracts/create"
+        href={`/contracts/create`}
         variant="light"
         leftIcon={<Plus />}
       >

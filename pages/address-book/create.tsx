@@ -1,8 +1,6 @@
-import { showNotification, updateNotification } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import "react-phone-number-input/style.css";
-import { Check, X } from "tabler-icons-react";
 
 import {
   AccountForm,
@@ -10,6 +8,7 @@ import {
 } from "../../components/address-book/AddressForm";
 import { PageContainer } from "../../components/layout/PageContainer";
 import { fetchAddressControllerCreate } from "../../services/api/dev3Components";
+import { notifications } from "../../utils/notifications";
 
 const CreateAddress = () => {
   const [loading, setLoading] = useState(false);
@@ -24,13 +23,9 @@ const CreateAddress = () => {
     try {
       setLoading(true);
 
-      showNotification({
-        id: "loading-notification",
-        loading: true,
+      notifications.create({
         title: "Adding a new address",
         message: "Please wait...",
-        autoClose: false,
-        disallowClose: true,
       });
 
       await fetchAddressControllerCreate({
@@ -42,25 +37,17 @@ const CreateAddress = () => {
         },
       });
 
-      updateNotification({
-        id: "loading-notification",
-        color: "teal",
+      notifications.success({
         title: "New address created!",
         message: "New address has been created. You can now use it.",
-        icon: <Check size={16} />,
-        autoClose: 3000,
       });
 
       router.push(`/address-book`);
     } catch (error) {
-      updateNotification({
-        id: "loading-notification",
-        color: "red",
+      notifications.error({
         title: "Error while adding address",
         message:
           "There was an error adding new address. Please try again later.",
-        icon: <X size={16} />,
-        autoClose: 3000,
       });
 
       console.error(error);

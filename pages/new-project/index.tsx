@@ -8,14 +8,11 @@ import {
 } from "@mantine/core";
 import { FileWithPath } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
-import { showNotification, updateNotification } from "@mantine/notifications";
 import { NextPage } from "next";
 import { useState } from "react";
-import { Check, X } from "tabler-icons-react";
 import { PageContainer } from "../../components/layout/PageContainer";
-import { ProjectImage } from "../../components/ProjectImage";
+import { ProjectImage } from "../../components/settings/ProjectImage";
 
-import { useSelectedProject } from "../../context/SelectedProjectContext";
 import {
   fetchApiKeyControllerCreate,
   fetchFileControllerUploadFile,
@@ -23,6 +20,7 @@ import {
   useProjectControllerFindAll,
 } from "../../services/api/dev3Components";
 import { getDefaultExpires } from "../../utils/api-key";
+import { notifications } from "../../utils/notifications";
 
 const NewProject: NextPage = () => {
   const theme = useMantineTheme();
@@ -31,7 +29,6 @@ const NewProject: NextPage = () => {
   const [logoFile, setLogoFile] = useState<FileWithPath | null>(null);
 
   const { refetch: refetchProjects } = useProjectControllerFindAll({});
-  const { selectProject } = useSelectedProject();
 
   const form = useForm({
     validateInputOnChange: true,
@@ -59,13 +56,9 @@ const NewProject: NextPage = () => {
     try {
       setLoading(true);
 
-      showNotification({
-        id: "loading-notification",
-        loading: true,
+      notifications.create({
         title: "Creating a new project",
         message: "Please wait...",
-        autoClose: false,
-        disallowClose: true,
       });
 
       let logoId;
@@ -95,27 +88,18 @@ const NewProject: NextPage = () => {
         },
       });
 
-      updateNotification({
-        id: "loading-notification",
-        color: "teal",
+      notifications.success({
         title: "Project created!",
         message:
           "Your project has been created. You can now start adding contracts to it.",
-        icon: <Check size={16} />,
-        autoClose: 3000,
       });
 
       await refetchProjects();
-      selectProject(project);
     } catch (error) {
-      updateNotification({
-        id: "loading-notification",
-        color: "red",
+      notifications.error({
         title: "Error creating project",
         message:
           "There was an error creating your project. Please try again later.",
-        icon: <X size={16} />,
-        autoClose: 3000,
       });
 
       console.log(error);

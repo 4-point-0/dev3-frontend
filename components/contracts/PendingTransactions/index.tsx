@@ -18,9 +18,11 @@ export const PendingTransactions = () => {
 
   const { data, isLoading } = useTransactionRequestControllerFindAll({
     queryParams: {
-      project_id: projectId ?? undefined,
+      project_id: projectId,
       status: "Pending",
       type: "Transaction",
+      offset: (page - 1) * PAGE_LIMIT,
+      limit: PAGE_LIMIT,
     },
   });
 

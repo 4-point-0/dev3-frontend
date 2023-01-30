@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { AppProps } from "next/app";
 import Head from "next/head";
+
 import AppLayout from "../components/layout/app.layout";
 import { AccountProvider } from "../context/AccountContext";
 import { SelectedProjectProvider } from "../context/SelectedProjectContext";

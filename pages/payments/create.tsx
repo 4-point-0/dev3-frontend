@@ -14,9 +14,9 @@ import { useForm } from "@mantine/form";
 import { parseNearAmount } from "near-api-js/lib/utils/format";
 import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
-import { PageContainer } from "../../components/layout/PageContainer";
 import { IconAlertCircle } from "@tabler/icons";
 
+import { PageContainer } from "../../components/layout/PageContainer";
 import { AddressSpotlight } from "../../components/payments/AddressSpotlight";
 import { useSelectedProject } from "../../context/SelectedProjectContext";
 import { useWalletSelector } from "../../context/WalletSelectorContext";
@@ -43,7 +43,7 @@ interface IPaymentFormValues {
 const CreatePayment = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { project } = useSelectedProject();
+  const { projectId } = useSelectedProject();
   const { viewMethod } = useWalletSelector();
 
   const form = useForm<IPaymentFormValues>({
@@ -133,7 +133,7 @@ const CreatePayment = () => {
 
       await fetchTransactionRequestControllerCreate({
         body: {
-          project_id: (project as any)._id,
+          project_id: projectId as string,
           method,
           is_near_token: !isFungibleToken,
           type: "Payment",

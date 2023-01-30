@@ -2,22 +2,18 @@ import { Button, Group, Skeleton, Stack, Text, Title } from "@mantine/core";
 import { openConfirmModal } from "@mantine/modals";
 import React, { useMemo } from "react";
 
-import { useSelectedProject } from "../../context/SelectedProjectContext";
+import { useSelectedProject } from "../../../context/SelectedProjectContext";
 import {
   fetchApiKeyControllerCreate,
   fetchApiKeyControllerRegenerate,
   fetchApiKeyControllerRemove,
   fetchApiKeyControllerRevoke,
   useApiKeyControllerFindOne,
-} from "../../services/api/dev3Components";
-import { ApiKey } from "../../services/api/dev3Schemas";
-import {
-  formatExpired,
-  getDefaultExpires,
-  isExpired,
-} from "../../utils/api-key";
-import { notifications } from "../../utils/notifications";
-import { CopyActionButton } from "../core/CopyActionButton";
+} from "../../../services/api/dev3Components";
+import { ApiKey } from "../../../services/api/dev3Schemas";
+import { formatExpired, getDefaultExpires } from "../../../utils/api-key";
+import { notifications } from "../../../utils/notifications";
+import { CopyActionButton } from "../../core/CopyActionButton";
 
 interface IApiKeyDTO extends ApiKey {
   id: string;
@@ -144,6 +140,7 @@ async function revoke(apiKey: string, refetch: () => Promise<unknown>) {
 
 export const ApiKeySettings = () => {
   const { projectId } = useSelectedProject();
+
   const { data, refetch, error, isLoading } =
     useApiKeyControllerFindOne<IApiKeyDTO>(
       {
