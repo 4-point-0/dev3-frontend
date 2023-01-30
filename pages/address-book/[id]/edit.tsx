@@ -7,12 +7,12 @@ import { Check, X } from "tabler-icons-react";
 import {
   AccountForm,
   IAddressFormValues,
-} from "../../../../components/address-book/AddressForm";
-import { PageContainer } from "../../../../components/layout/PageContainer";
+} from "../../../components/address-book/AddressForm";
+import { PageContainer } from "../../../components/layout/PageContainer";
 import {
   fetchAddressControllerUpdate,
   useAddressControllerFindOne,
-} from "../../../../services/api/dev3Components";
+} from "../../../services/api/dev3Components";
 
 export const EditAddress = () => {
   const router = useRouter();
@@ -57,7 +57,7 @@ export const EditAddress = () => {
         autoClose: 3000,
       });
 
-      router.push(`/${router.query.slug}/address-book`);
+      router.push(`/address-book`);
     } catch (error) {
       updateNotification({
         id: "loading-notification",

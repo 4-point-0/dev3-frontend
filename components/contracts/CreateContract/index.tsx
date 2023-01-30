@@ -99,7 +99,7 @@ export const CreateContract: React.FC = () => {
           title: "Created contract deployment request",
         });
 
-        router.push(`/${router.query.slug}/contracts?tab=deploy`);
+        router.push(`/contracts?tab=deploy`);
       } catch {
         notifications.error({
           title: `Failed to create contract deployment request`,

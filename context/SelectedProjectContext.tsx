@@ -1,30 +1,28 @@
 import { useRouter } from "next/router";
-import React, { PropsWithChildren, useContext } from "react";
-import { useProjectControllerFindBySlug } from "../services/api/dev3Components";
+import React, { PropsWithChildren, useContext, useState } from "react";
 
-import { Project, ProjectDto } from "../services/api/dev3Schemas";
+import { Project } from "../services/api/dev3Schemas";
 
 interface UseSelectedProject {
-  project?: ProjectDto;
+  project?: Project;
   projectId?: string;
+  setProject: (project: Project) => void;
 }
 
 const ProjectContext = React.createContext<UseSelectedProject | null>(null);
 
-interface ISelectedProjectProviderProps extends PropsWithChildren {
-  project?: ProjectDto;
-}
+export const SelectedProjectProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
+  const [project, setProject] = useState<Project>();
 
-export const SelectedProjectProvider: React.FC<
-  ISelectedProjectProviderProps
-> = ({ children, project }) => {
-  const router = useRouter();
-
+ 
   return (
     <ProjectContext.Provider
       value={{
         project,
-        projectId: project?.id,
+        projectId: (project as any)?.,_id,
+        setProject
       }}
     >
       {children}
@@ -34,20 +32,17 @@ export const SelectedProjectProvider: React.FC<
 
 export function useSelectedProject() {
   const router = useRouter();
+  const context = useContext(ProjectContext);
 
-  const { data: project } = useProjectControllerFindBySlug(
-    {
-      pathParams: {
-        slug: router.query.slug as string,
-      },
-    },
-    {
-      enabled: Boolean(router.query.slug),
-    }
-  );
+  if (!context) {
+    throw new Error(
+      "useSelectedProject must be used within a SelectedProjectProvider"
+    );
+  }
 
-  return {
-    project,
-    projectId: project?.id,
-  };
+  if (!(context.project || router.pathname === "")) {
+    router.push("/");
+  }
+
+  return context;
 }

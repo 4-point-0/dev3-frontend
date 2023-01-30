@@ -11,6 +11,7 @@ import { usePaginationProps } from "../hooks/usePaginationProps";
 import { useProjectControllerFindAll } from "../services/api/dev3Components";
 import { Project } from "../services/api/dev3Schemas";
 import { getLogoPlaceholder, getLogoUrl } from "../utils/logo";
+import { useSelectedProject } from "../context/SelectedProjectContext";
 
 const PAGE_LIMIT = 20;
 
@@ -28,6 +29,7 @@ const Home: NextPage = () => {
       enabled: Boolean(user),
     }
   );
+  const { setProject } = useSelectedProject();
 
   const paginationProps = usePaginationProps({
     page,
@@ -61,15 +63,17 @@ const Home: NextPage = () => {
     },
     {
       accessor: "actions",
-      render: ({ slug }) => {
+      render: (project) => {
+        const handleClick = () => {
+          setProject(project);
+        };
+
         return (
           <Group position="right">
             <Button
               variant="default"
-              component={NextLink}
-              href="/[slug]/contracts"
-              as={`/${slug}/contracts`}
               rightIcon={<ArrowRight size={14} />}
+              onClick={handleClick}
             >
               Open
             </Button>

@@ -3,24 +3,22 @@ import { openConfirmModal } from "@mantine/modals";
 import { NextLink } from "@mantine/next";
 import { showNotification } from "@mantine/notifications";
 import { DataTable, DataTableColumn } from "mantine-datatable";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { Edit, Plus, Trash, X } from "tabler-icons-react";
-import { PageContainer } from "../../../components/layout/PageContainer";
 
-import { CopyCell } from "../../../components/table/CopyCell";
-import { usePaginationProps } from "../../../hooks/usePaginationProps";
+import { PageContainer } from "../../components/layout/PageContainer";
+import { CopyCell } from "../../components/table/CopyCell";
+import { usePaginationProps } from "../../hooks/usePaginationProps";
 import {
   fetchAddressControllerRemove,
   useAddressControllerFindAll,
-} from "../../../services/api/dev3Components";
-import { Address } from "../../../services/api/dev3Schemas";
+} from "../../services/api/dev3Components";
+import { Address } from "../../services/api/dev3Schemas";
 
 const PAGE_LIMIT = 20;
 
 const AddressBook = () => {
   const [page, setPage] = useState(1);
-  const router = useRouter();
 
   const { isFetching, refetch, data } = useAddressControllerFindAll(
     {
@@ -112,10 +110,8 @@ const AddressBook = () => {
             <Tooltip label="Edit" position="bottom" withArrow>
               <ActionIcon
                 component={NextLink}
-                href="/[slug]/address-book/[id]/edit"
-                as={`/${router.query.slug}/address-book/${
-                  (address as any)._id
-                }/edit`}
+                href="/address-book/[id]/edit"
+                as={`/address-book/${(address as any)._id}/edit`}
                 color="blue"
                 radius="xl"
                 variant="light"
@@ -144,8 +140,8 @@ const AddressBook = () => {
       <Button
         sx={{ alignSelf: "self-end" }}
         component={NextLink}
-        href="/[slug]/address-book/create"
-        as={`/${router.query.slug}/address-book/create`}
+        href="/address-book/create"
+        as={`/address-book/create`}
         variant="light"
         leftIcon={<Plus />}
       >

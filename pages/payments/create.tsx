@@ -14,13 +14,13 @@ import { useForm } from "@mantine/form";
 import { parseNearAmount } from "near-api-js/lib/utils/format";
 import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
-import { PageContainer } from "../../../components/layout/PageContainer";
+import { PageContainer } from "../../components/layout/PageContainer";
 import { IconAlertCircle } from "@tabler/icons";
 
-import { AddressSpotlight } from "../../../components/payments/AddressSpotlight";
-import { useSelectedProject } from "../../../context/SelectedProjectContext";
-import { useWalletSelector } from "../../../context/WalletSelectorContext";
-import { fetchTransactionRequestControllerCreate } from "../../../services/api/dev3Components";
+import { AddressSpotlight } from "../../components/payments/AddressSpotlight";
+import { useSelectedProject } from "../../context/SelectedProjectContext";
+import { useWalletSelector } from "../../context/WalletSelectorContext";
+import { fetchTransactionRequestControllerCreate } from "../../services/api/dev3Components";
 import {
   FungibleTokenError,
   nearWalletRegex,
@@ -29,9 +29,9 @@ import {
   ReceiverError,
   THIRTY_TGAS,
   validateFungibleMetadata,
-} from "../../../utils/near";
-import { useMetadata } from "../../../hooks/useMetadata";
-import { notifications } from "../../../utils/notifications";
+} from "../../utils/near";
+import { useMetadata } from "../../hooks/useMetadata";
+import { notifications } from "../../utils/notifications";
 
 interface IPaymentFormValues {
   amount: number;
@@ -150,7 +150,7 @@ const CreatePayment = () => {
         message: "Your payment request has been created. You can now share it.",
       });
 
-      router.push(`/${router.query.slug}/payments`);
+      router.push(`/payments`);
     } catch (error) {
       let title = "Error creating payment request";
       let message =

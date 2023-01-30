@@ -11,11 +11,11 @@ import {
 } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useMemo } from "react";
 import { Plus, Selector } from "tabler-icons-react";
 
 import { useSelectedProject } from "../../context/SelectedProjectContext";
 import { useProjectControllerFindAll } from "../../services/api/dev3Components";
+import { Project } from "../../services/api/dev3Schemas";
 import { getLogoPlaceholder, getLogoUrl } from "../../utils/logo";
 
 const ProjectSelector = () => {
@@ -23,20 +23,11 @@ const ProjectSelector = () => {
     queryParams: { limit: 100 },
   });
   const router = useRouter();
+  const { setProject, project: selectedProject } = useSelectedProject();
 
-  const selectedProject = useMemo(() => {
-    if (!data?.results) {
-      return null;
-    }
-
-    return data.results.find(({ slug }) => {
-      return slug === router.query.slug;
-    });
-  }, [router.query.slug, data?.results]);
-
-  const handleSelect = (slug: string) => {
+  const handleSelect = (project: Project) => {
     return () => {
-      router.push(`/${slug}/contracts`);
+      setProject(project);
     };
   };
 
@@ -124,7 +115,7 @@ const ProjectSelector = () => {
               }
               rightSection={project.slug === selectedProject?.slug ? "✓" : ""}
               key={project.name}
-              onClick={handleSelect(project.slug)}
+              onClick={handleSelect(project)}
             >
               {project.name}
             </Menu.Item>

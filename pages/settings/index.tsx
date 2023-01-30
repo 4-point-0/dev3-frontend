@@ -1,11 +1,11 @@
 import { Skeleton } from "@mantine/core";
 import { NextPage } from "next";
 
-import { PageContainer } from "../../../components/layout/PageContainer";
-import { ApiKeySettings } from "../../../components/settings/ApiKeySettings";
-import { SettingsForm } from "../../../components/settings/SettingsForm";
-import { useSelectedProject } from "../../../context/SelectedProjectContext";
-import { useProjectControllerFindById } from "../../../services/api/dev3Components";
+import { PageContainer } from "../../components/layout/PageContainer";
+import { ApiKeySettings } from "../../components/settings/ApiKeySettings";
+import { SettingsForm } from "../../components/settings/SettingsForm";
+import { useSelectedProject } from "../../context/SelectedProjectContext";
+import { useProjectControllerFindById } from "../../services/api/dev3Components";
 
 const Settings: NextPage = () => {
   const { projectId } = useSelectedProject();
