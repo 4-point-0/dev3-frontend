@@ -4,6 +4,7 @@ import {
   Group,
   Paper,
   Stack,
+  Tabs,
   Text,
   TextInput,
   Title,
@@ -12,7 +13,7 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { DataTable, DataTableColumn } from "mantine-datatable";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { Search } from "tabler-icons-react";
+import { InfoCircle, Rocket, Search } from "tabler-icons-react";
 
 import { useSelectedProject } from "../../../context/SelectedProjectContext";
 import { usePaginationProps } from "../../../hooks/usePaginationProps";
@@ -22,6 +23,7 @@ import {
 } from "../../../services/api/dev3Components";
 import { notifications } from "../../../utils/notifications";
 import { ContractForm, IContractFormValues } from "../ContractForm";
+import { ContractInfo } from "../ContractInfo";
 import { AuditedIcon } from "../TemplateList/AuditedIcon";
 
 export interface IContractTemplate {
@@ -179,11 +181,29 @@ export const CreateContract: React.FC = () => {
           content: ({ record }) => {
             return (
               <Paper p="lg">
-                <Stack></Stack>
-                <ContractForm
-                  disabled={isCreating}
-                  handleSubmit={handleSubmit((record as IContractTemplate)._id)}
-                />
+                <Tabs defaultValue="create">
+                  <Tabs.List>
+                    <Tabs.Tab value="create" icon={<Rocket size={14} />}>
+                      Create
+                    </Tabs.Tab>
+                    <Tabs.Tab value="info" icon={<InfoCircle size={14} />}>
+                      Contract Info
+                    </Tabs.Tab>
+                  </Tabs.List>
+
+                  <Tabs.Panel value="create" pt="xs">
+                    <ContractForm
+                      disabled={isCreating}
+                      handleSubmit={handleSubmit(
+                        (record as IContractTemplate)._id
+                      )}
+                    />
+                  </Tabs.Panel>
+
+                  <Tabs.Panel value="info" pt="xs">
+                    <ContractInfo url="https://raw.githubusercontent.com/0xDev3/dev3-contracts/master/contracts/dev3/nft-basic-mintable/info.md" />
+                  </Tabs.Panel>
+                </Tabs>
               </Paper>
             );
           },
