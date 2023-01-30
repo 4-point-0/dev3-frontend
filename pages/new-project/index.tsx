@@ -1,18 +1,12 @@
-import {
-  Button,
-  Group,
-  Stack,
-  Text,
-  TextInput,
-  useMantineTheme,
-} from "@mantine/core";
+import { Button, Group, Stack, Text, TextInput } from "@mantine/core";
 import { FileWithPath } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
 import { NextPage } from "next";
+import { useRouter } from "next/router";
 import { useState } from "react";
+
 import { PageContainer } from "../../components/layout/PageContainer";
 import { ProjectImage } from "../../components/settings/ProjectImage";
-
 import {
   fetchApiKeyControllerCreate,
   fetchFileControllerUploadFile,
@@ -23,10 +17,9 @@ import { getDefaultExpires } from "../../utils/api-key";
 import { notifications } from "../../utils/notifications";
 
 const NewProject: NextPage = () => {
-  const theme = useMantineTheme();
-
   const [loading, setLoading] = useState(false);
   const [logoFile, setLogoFile] = useState<FileWithPath | null>(null);
+  const router = useRouter();
 
   const { refetch: refetchProjects } = useProjectControllerFindAll({});
 
@@ -95,6 +88,7 @@ const NewProject: NextPage = () => {
       });
 
       await refetchProjects();
+      router.push("/");
     } catch (error) {
       notifications.error({
         title: "Error creating project",
