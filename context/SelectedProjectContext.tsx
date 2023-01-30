@@ -16,13 +16,12 @@ export const SelectedProjectProvider: React.FC<PropsWithChildren> = ({
 }) => {
   const [project, setProject] = useState<Project>();
 
- 
   return (
     <ProjectContext.Provider
       value={{
         project,
-        projectId: (project as any)?.,_id,
-        setProject
+        projectId: (project as any)?._id,
+        setProject,
       }}
     >
       {children}
@@ -40,7 +39,7 @@ export function useSelectedProject() {
     );
   }
 
-  if (!(context.project || router.pathname === "")) {
+  if (!(context.project || router.route === "/")) {
     router.push("/");
   }
 

@@ -12,6 +12,7 @@ import { useProjectControllerFindAll } from "../services/api/dev3Components";
 import { Project } from "../services/api/dev3Schemas";
 import { getLogoPlaceholder, getLogoUrl } from "../utils/logo";
 import { useSelectedProject } from "../context/SelectedProjectContext";
+import { useRouter } from "next/router";
 
 const PAGE_LIMIT = 20;
 
@@ -30,6 +31,7 @@ const Home: NextPage = () => {
     }
   );
   const { setProject } = useSelectedProject();
+  const router = useRouter();
 
   const paginationProps = usePaginationProps({
     page,
@@ -66,6 +68,7 @@ const Home: NextPage = () => {
       render: (project) => {
         const handleClick = () => {
           setProject(project);
+          router.push("/contracts");
         };
 
         return (
