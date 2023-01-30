@@ -14,9 +14,9 @@ import { useForm } from "@mantine/form";
 import { parseNearAmount } from "near-api-js/lib/utils/format";
 import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
-import { PageContainer } from "../../components/layout/PageContainer";
 import { IconAlertCircle } from "@tabler/icons";
 
+import { PageContainer } from "../../components/layout/PageContainer";
 import { AddressSpotlight } from "../../components/payments/AddressSpotlight";
 import { useSelectedProject } from "../../context/SelectedProjectContext";
 import { useWalletSelector } from "../../context/WalletSelectorContext";

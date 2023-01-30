@@ -1,8 +1,6 @@
 import { Flex, Loader } from "@mantine/core";
-import { showNotification, updateNotification } from "@mantine/notifications";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
-import { Check, X } from "tabler-icons-react";
 
 import {
   AccountForm,
@@ -13,6 +11,7 @@ import {
   fetchAddressControllerUpdate,
   useAddressControllerFindOne,
 } from "../../../services/api/dev3Components";
+import { notifications } from "../../../utils/notifications";
 
 export const EditAddress = () => {
   const router = useRouter();
@@ -31,13 +30,9 @@ export const EditAddress = () => {
     setIsEditing(true);
 
     try {
-      showNotification({
-        id: "loading-notification",
-        loading: true,
+      notifications.create({
         title: "Editing the address",
         message: "Please wait...",
-        autoClose: false,
-        disallowClose: true,
       });
 
       await fetchAddressControllerUpdate({
@@ -48,25 +43,17 @@ export const EditAddress = () => {
         },
       });
 
-      updateNotification({
-        id: "loading-notification",
-        color: "teal",
+      notifications.success({
         title: "Address edited!",
         message: "The address was successfully edited.",
-        icon: <Check size={16} />,
-        autoClose: 3000,
       });
 
       router.push(`/address-book`);
     } catch (error) {
-      updateNotification({
-        id: "loading-notification",
-        color: "red",
+      notifications.error({
         title: "Error while editing address",
         message:
           "There was an error editing the address. Please try again later.",
-        icon: <X size={16} />,
-        autoClose: 3000,
       });
       console.error(error);
     } finally {
