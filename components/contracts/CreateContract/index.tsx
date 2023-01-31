@@ -11,11 +11,13 @@ import {
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { DataTable, DataTableColumn } from "mantine-datatable";
+import { CodeResult } from "near-api-js/lib/providers/provider";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { InfoCircle, Rocket, Search } from "tabler-icons-react";
 
 import { useSelectedProject } from "../../../context/SelectedProjectContext";
+import { useWalletSelector } from "../../../context/WalletSelectorContext";
 import { usePaginationProps } from "../../../hooks/usePaginationProps";
 import {
   fetchDeployedContractControllerCreate,
@@ -33,10 +35,14 @@ export interface IContractTemplate {
   tags: Array<string>;
   creator_name: string;
   description: string;
+  github_url: string;
 }
 
 const PAGE_LIMIT = 20;
 
+function getTemplateFolderName(githubUrl: string) {
+  return new URL(githubUrl).pathname.split("/").slice(-2)[0];
+}
 export const CreateContract: React.FC = () => {
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
@@ -44,6 +50,7 @@ export const CreateContract: React.FC = () => {
   const { projectId } = useSelectedProject();
   const router = useRouter();
   const [isCreating, setIsCreating] = useState(false);
+  const { provider } = useWalletSelector();
 
   const [debouncedQuery] = useDebouncedValue(query, 300);
 
@@ -62,6 +69,22 @@ export const CreateContract: React.FC = () => {
     total: data?.total,
   });
 
+  const getAvailableContracts = useCallback(async () => {
+    if (!provider) {
+      return;
+    }
+
+    const result = await provider.query<CodeResult>({
+      request_type: "call_function",
+      account_id: "dev3_contracts.testnet",
+      method_name: "get_contracts",
+      args_base64: "",
+      finality: "optimistic",
+    });
+
+    return JSON.parse(Buffer.from(result.result).toString()) as Array<string>;
+  }, [provider]);
+
   const handleQueryChange = (event: React.SyntheticEvent<HTMLInputElement>) => {
     setPage(1);
     setQuery(event.currentTarget.value);
@@ -76,8 +99,7 @@ export const CreateContract: React.FC = () => {
 
   const handleSubmit = (templateId: string) => {
     return async (values: IContractFormValues) => {
-      console.log(values);
-      if (!(projectId && templateId)) {
+      if (!(projectId && templateId && data)) {
         return;
       }
 
@@ -88,12 +110,28 @@ export const CreateContract: React.FC = () => {
           title: "Creating contract deployment request",
         });
 
+        const template: IContractTemplate = data.results.find(
+          (t) => t._id === templateId
+        );
+        const folderName = getTemplateFolderName(template.github_url);
+        const availableContracts = await getAvailableContracts();
+        const contractId = availableContracts?.find((name) =>
+          name.startsWith(folderName)
+        );
+
+        if (!contractId) {
+          throw new Error("Could not determing contract template");
+        }
+
         await fetchDeployedContractControllerCreate({
           body: {
             alias: values.alias,
             project_id: projectId,
             contract_template_id: templateId,
-            args: {},
+            args: {
+              contract_id: contractId,
+              name: values.alias,
+            },
           },
         });
 

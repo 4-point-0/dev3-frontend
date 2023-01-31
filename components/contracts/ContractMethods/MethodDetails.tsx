@@ -23,7 +23,6 @@ export const MethodDetails: React.FC<IMethodDetailsProps> = ({
   data,
   error,
   isLoading,
-
   onReset,
   onSubmit,
 }) => {
