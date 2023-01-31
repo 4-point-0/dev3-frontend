@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Box, Image, Text, Stack, Group } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
-import { IconPhoto } from "@tabler/icons";
+import { Photo } from "tabler-icons-react";
 
 const IMAGE_MIME_TYPE = ["image/png", "image/gif", "image/jpeg"];
 
@@ -59,7 +59,7 @@ export const ProjectImage: React.FC<IProjectImage> = ({ onUpload, imgUrl }) => {
             spacing="xl"
             style={{ minHeight: 220, pointerEvents: "none" }}
           >
-            <IconPhoto size={50} stroke={1.5} />
+            <Photo size={50} />
 
             <div>
               <Text size="xl" inline>
