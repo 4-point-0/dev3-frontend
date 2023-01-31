@@ -14,7 +14,7 @@ import { useForm } from "@mantine/form";
 import { parseNearAmount } from "near-api-js/lib/utils/format";
 import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
-import { IconAlertCircle } from "@tabler/icons";
+import { AlertCircle } from "tabler-icons-react";
 
 import { PageContainer } from "../../components/layout/PageContainer";
 import { AddressSpotlight } from "../../components/payments/AddressSpotlight";
@@ -221,7 +221,7 @@ const CreatePayment = () => {
               {form.values.contractId &&
                 form.isValid("contractId") &&
                 !metadataIsValid && (
-                  <Alert icon={<IconAlertCircle size={16} />} color="red">
+                  <Alert icon={<AlertCircle size={16} />} color="red">
                     {"Can't verify contract is a fungible token."}
                   </Alert>
                 )}
