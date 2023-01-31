@@ -36,6 +36,7 @@ export interface IContractTemplate {
   creator_name: string;
   description: string;
   github_url: string;
+  info_markdown_url: string;
 }
 
 const PAGE_LIMIT = 20;
@@ -239,7 +240,9 @@ export const CreateContract: React.FC = () => {
                   </Tabs.Panel>
 
                   <Tabs.Panel value="info" pt="xs">
-                    <ContractInfo url="https://raw.githubusercontent.com/0xDev3/dev3-contracts/master/contracts/dev3/nft-basic-mintable/info.md" />
+                    <ContractInfo
+                      url={(record as IContractTemplate).info_markdown_url}
+                    />
                   </Tabs.Panel>
                 </Tabs>
               </Paper>
