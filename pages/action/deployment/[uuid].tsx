@@ -92,7 +92,7 @@ const Deployment = () => {
         uuid: uuid as string,
       },
     });
-  }, [transactionHashes, updateDeployedContract]);
+  }, [transactionHashes, updateDeployedContract, uuid, selector.store]);
 
   const handleDeployButtonClick = async () => {
     notifications.create({

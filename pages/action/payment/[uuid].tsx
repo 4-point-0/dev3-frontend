@@ -11,18 +11,21 @@ import {
   Text,
 } from "@mantine/core";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlertCircle, Check } from "tabler-icons-react";
 
 import { useUserContext } from "../../../context/UserContext";
 import { useWalletSelector } from "../../../context/WalletSelectorContext";
-import { useTransactionRequestControllerFindByUuid } from "../../../services/api/dev3Components";
+import {
+  useTransactionRequestControllerFindByUuid,
+  useTransactionRequestControllerUpdate,
+} from "../../../services/api/dev3Components";
 import { getInfoFromArgs, DEV3_CONTRACT_ID } from "../../../utils/near";
 import { notifications } from "../../../utils/notifications";
 import { ProjectTransactionContainer } from "../../../components/action/ProjectTransactionContainer";
 
 const PaymentRequestDetail = () => {
-  const { callMethod } = useWalletSelector();
+  const { callMethod, selector } = useWalletSelector();
   const router = useRouter();
   const { errorCode, errorMessage, transactionHashes, uuid } = router.query;
 
@@ -69,6 +72,27 @@ const PaymentRequestDetail = () => {
 
     return getInfoFromArgs(parsedArgs, transactionRequestData.meta);
   }, [parsedArgs, transactionRequestData]);
+
+  const updateTransactionRequest = useTransactionRequestControllerUpdate();
+
+  useEffect(() => {
+    if (!(transactionHashes && updateTransactionRequest.isIdle)) {
+      return;
+    }
+
+    const state = selector.store.getState();
+    const accountId = state.accounts?.[0]?.accountId;
+
+    updateTransactionRequest.mutate({
+      body: {
+        caller_address: accountId,
+        txHash: transactionHashes as string,
+      },
+      pathParams: {
+        uuid: uuid as string,
+      },
+    });
+  }, [transactionHashes, updateTransactionRequest, uuid, selector.store]);
 
   const handleButtonClick = async () => {
     if (userContext.user === null) {

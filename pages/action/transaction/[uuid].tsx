@@ -85,7 +85,7 @@ const TransactionRequestDetail = () => {
         uuid: uuid as string,
       },
     });
-  }, [transactionHashes, updateTransactionRequest]);
+  }, [transactionHashes, updateTransactionRequest, uuid, selector.store]);
 
   const handleButtonClick = async () => {
     if (userContext.user === null) {
