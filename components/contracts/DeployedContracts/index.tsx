@@ -1,5 +1,6 @@
 import { ActionIcon, Badge, Group, Tooltip } from "@mantine/core";
 import { DataTable, DataTableColumn } from "mantine-datatable";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { Trash } from "tabler-icons-react";
 
@@ -7,6 +8,7 @@ import { useSelectedProject } from "../../../context/SelectedProjectContext";
 import { usePaginationProps } from "../../../hooks/usePaginationProps";
 import { useDeployedContractControllerFindAll } from "../../../services/api/dev3Components";
 import { DeployedContract } from "../../../services/api/dev3Schemas";
+import { AddressCell } from "../../table/AddressCell";
 import { CopyCell } from "../../table/CopyCell";
 
 const PAGE_LIMIT = 20;
@@ -14,6 +16,7 @@ const PAGE_LIMIT = 20;
 export const DeployedContracts = () => {
   const [page, setPage] = useState(1);
   const { projectId } = useSelectedProject();
+  const router = useRouter();
 
   const { data, isLoading } = useDeployedContractControllerFindAll({
     queryParams: {
@@ -49,8 +52,8 @@ export const DeployedContracts = () => {
     },
     {
       accessor: "address",
-      render: ({ address }) => {
-        return <CopyCell value={address ?? ""} />;
+      render: ({ alias }) => {
+        return <AddressCell alias={alias} />;
       },
     },
 
@@ -60,7 +63,12 @@ export const DeployedContracts = () => {
         return (
           <Group>
             <Tooltip label="Delete" position="bottom" withArrow>
-              <ActionIcon color="red" radius="xl" variant="light">
+              <ActionIcon
+                color="red"
+                radius="xl"
+                variant="light"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <Trash size={16} />
               </ActionIcon>
             </Tooltip>
@@ -70,6 +78,10 @@ export const DeployedContracts = () => {
     },
   ];
 
+  const handleRowClick = (contract: DeployedContract) => {
+    router.push(`/contracts/${contract.uuid}`);
+  };
+
   return (
     <DataTable
       minHeight={164}
@@ -78,6 +90,8 @@ export const DeployedContracts = () => {
       noRecordsText="No deployed contracts"
       records={data?.results}
       fetching={isLoading}
+      onRowClick={handleRowClick}
+      highlightOnHover
       {...paginationProps}
     />
   );

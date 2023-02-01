@@ -45,3 +45,13 @@ export function getInfoFromArgs(args: any, meta?: any) {
     receiver_id: args.receiver_id,
   };
 }
+
+export function getContractIdFromAlias(alias: string) {
+  return `${alias}.${DEV3_CONTRACT_ID}`;
+}
+
+export function getNearBlocksUrl(contractId: string, testnet = true) {
+  return `https://${
+    testnet ? "testnet." : ""
+  }nearblocks.io/address/${contractId}`;
+}

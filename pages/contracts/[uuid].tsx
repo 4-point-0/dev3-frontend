@@ -5,7 +5,7 @@ import { PageContainer } from "../../components/layout/PageContainer";
 
 const DeployedContract: NextPage = () => {
   return (
-    <PageContainer title="Deployed contract WIP">
+    <PageContainer>
       <ContractDetails />
     </PageContainer>
   );

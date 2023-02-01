@@ -1,10 +1,15 @@
+import { Badge, Group, Skeleton, Table, Text } from "@mantine/core";
+import { useRouter } from "next/router";
 import React, { useEffect, useRef, useState } from "react";
 
 import { useWalletSelector } from "../../../context/WalletSelectorContext";
+import { useDeployedContractControllerFindOne } from "../../../services/api/dev3Components";
 import {
   getMethodsFromSchema,
   getSchemaFromCodeView,
 } from "../../../utils/raen";
+import { AddressCell } from "../../table/AddressCell";
+import { CopyCell } from "../../table/CopyCell";
 import { ContractMethods } from "../ContractMethods";
 
 const EXAMPLE_CONTRACT = "advanced.statusmessage.raendev.testnet";
@@ -119,6 +124,13 @@ const schema = {
 export const ContractDetails = () => {
   const { getViewCode } = useWalletSelector();
   const schemaRef = useRef<string>();
+  const router = useRouter();
+
+  const { data, isLoading } = useDeployedContractControllerFindOne({
+    pathParams: {
+      uuid: router.query.uuid as string,
+    },
+  });
 
   // useEffect(() => {
   //   const work = async () => {
@@ -138,7 +150,67 @@ export const ContractDetails = () => {
 
   return (
     <>
-      <ContractMethods contractId={EXAMPLE_CONTRACT} schema={schema} />
+      <Skeleton visible={isLoading}>
+        <Table verticalSpacing={20}>
+          <tr>
+            <Text component="td" fw={700}>
+              Name:
+            </Text>
+            <td>{data?.contract_template?.name}</td>
+          </tr>
+
+          <tr>
+            <Text component="td" fw={700}>
+              Description:
+            </Text>
+            <td>{data?.contract_template?.description}</td>
+          </tr>
+
+          <tr>
+            <Text component="td" fw={700}>
+              Tags:
+            </Text>
+            <td>
+              <Group>
+                {data?.contract_template?.tags.map((tag) => (
+                  <Badge key={tag}>{tag}</Badge>
+                ))}
+              </Group>
+            </td>
+          </tr>
+
+          <tr>
+            <Text component="td" fw={700}>
+              Alias:
+            </Text>
+            <td>
+              <CopyCell value={data?.alias || "-"}></CopyCell>
+            </td>
+          </tr>
+
+          <tr>
+            <Text component="td" fw={700}>
+              Created At:
+            </Text>
+            <td>
+              {data?.createdAt &&
+                new Intl.DateTimeFormat("en-GB", {
+                  dateStyle: "short",
+                  timeStyle: "short",
+                }).format(new Date(data?.createdAt))}
+            </td>
+          </tr>
+
+          <tr>
+            <Text component="td" fw={700}>
+              Address:
+            </Text>
+            <td>{data?.alias && <AddressCell alias={data?.alias} />}</td>
+          </tr>
+        </Table>
+      </Skeleton>
+
+      {/* <ContractMethods contractId={EXAMPLE_CONTRACT} schema={schema} /> */}
     </>
   );
 };
