@@ -62,7 +62,7 @@ export const DeployRequests = () => {
       accessor: "status",
       render: ({ status }) => {
         return (
-          <Badge color={status === "Deployed" ? "blue" : "yellow"}>
+          <Badge color={status === "Deployed" ? "green" : "blue"}>
             {status}
           </Badge>
         );
@@ -71,11 +71,10 @@ export const DeployRequests = () => {
     {
       accessor: "actions",
       render: ({ uuid, status, txHash }) => {
-        const deployed = status === "Deployed";
-        const url =
-          deployed && txHash
-            ? getNearBlockTxnUrl(txHash)
-            : `${window.location.origin}/action/deployment/${uuid}`;
+        const hasTransaction = Boolean(txHash);
+        const url = txHash
+          ? getNearBlockTxnUrl(txHash)
+          : `${window.location.origin}/action/deployment/${uuid}`;
 
         const handleShare = (url: string) => {
           return () => {
@@ -102,7 +101,7 @@ export const DeployRequests = () => {
                   <ExternalLink size={16} />
                 </ActionIcon>
               </Tooltip>
-              {!deployed && (
+              {!hasTransaction && (
                 <Tooltip position="bottom" label="Share" withArrow>
                   <ActionIcon
                     radius="xl"
