@@ -3,7 +3,7 @@ import { formatNearAmount } from "near-api-js/lib/utils/format";
 export const THIRTY_TGAS = "30000000000000" as const;
 export const NO_DEPOSIT = "0";
 
-export const NEAR_CONTRACT_ID = process.env.NEXT_PUBLIC_CONTRACT_ID;
+export const DEV3_CONTRACT_ID = process.env.NEXT_PUBLIC_DEV3_CONTRACT_ID;
 
 export class FungibleTokenError extends Error {}
 

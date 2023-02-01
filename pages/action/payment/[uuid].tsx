@@ -17,7 +17,7 @@ import { AlertCircle, Check } from "tabler-icons-react";
 import { useUserContext } from "../../../context/UserContext";
 import { useWalletSelector } from "../../../context/WalletSelectorContext";
 import { useTransactionRequestControllerFindByUuid } from "../../../services/api/dev3Components";
-import { getInfoFromArgs, NEAR_CONTRACT_ID } from "../../../utils/near";
+import { getInfoFromArgs, DEV3_CONTRACT_ID } from "../../../utils/near";
 import { notifications } from "../../../utils/notifications";
 import { ProjectTransactionContainer } from "../../../components/action/ProjectTransactionContainer";
 
@@ -91,7 +91,7 @@ const PaymentRequestDetail = () => {
         transactionRequestData;
 
       await callMethod(
-        (is_near_token ? NEAR_CONTRACT_ID : contractId) as string,
+        (is_near_token ? DEV3_CONTRACT_ID : contractId) as string,
         method,
         parsedArgs,
         deposit,

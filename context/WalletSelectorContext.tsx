@@ -20,7 +20,7 @@ import React, {
   useState,
 } from "react";
 import { distinctUntilChanged, map } from "rxjs";
-import { NEAR_CONTRACT_ID, NO_DEPOSIT, THIRTY_TGAS } from "../utils/near";
+import { DEV3_CONTRACT_ID, NO_DEPOSIT, THIRTY_TGAS } from "../utils/near";
 
 declare global {
   interface Window {
@@ -174,7 +174,7 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
       ],
     });
     const _modal = setupModal(_selector, {
-      contractId: NEAR_CONTRACT_ID as string,
+      contractId: DEV3_CONTRACT_ID as string,
       // theme: "light", // doesn't work, need to open an issue on github
     });
     const state = _selector.store.getState();

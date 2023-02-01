@@ -24,7 +24,7 @@ import { fetchTransactionRequestControllerCreate } from "../../services/api/dev3
 import {
   FungibleTokenError,
   nearWalletRegex,
-  NEAR_CONTRACT_ID,
+  DEV3_CONTRACT_ID,
   parseFtAmount,
   ReceiverError,
   THIRTY_TGAS,
@@ -138,7 +138,7 @@ const CreatePayment = () => {
           is_near_token: !isFungibleToken,
           type: "Payment",
           args,
-          contractId: isFungibleToken ? contractId : NEAR_CONTRACT_ID,
+          contractId: isFungibleToken ? contractId : DEV3_CONTRACT_ID,
           meta: metadata,
           deposit,
           gas: THIRTY_TGAS,
