@@ -77,7 +77,7 @@ const AddressBook = () => {
           notifications.error({
             title: "Error while deleting the address",
             message:
-              "There was an error adding deleting the address. Please try again later.",
+              "There was an error deleting the address. Please try again later.",
           });
 
           console.error(error);
