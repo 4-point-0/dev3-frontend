@@ -31,11 +31,19 @@ export const getMethodsFromSchema = (schema: any) => {
     return [];
   }
 
-  return Object.entries(schema.definitions)
-    .filter(([key, value]) => {
+  const methods = Object.entries(schema.definitions)
+    .filter(([_, value]) => {
       return (value as any).hasOwnProperty("contractMethod");
     })
     .map(([key, value]) => {
+      // remove args from required if there are no properties
+      if (!schema.definitions[key].properties.args.properties) {
+        delete schema.definitions[key].properties.args;
+        schema.definitions[key].required = schema.definitions[
+          key
+        ].required.filter((k: string) => k !== "args");
+      }
+
       return {
         key,
         type: (value as any).contractMethod,
@@ -46,4 +54,6 @@ export const getMethodsFromSchema = (schema: any) => {
         },
       };
     });
+
+  return methods;
 };

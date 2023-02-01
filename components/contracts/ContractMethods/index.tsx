@@ -20,10 +20,10 @@ import { useSelectedProject } from "../../../context/SelectedProjectContext";
 import { THIRTY_TGAS } from "../../../utils/near";
 import { FormThemeProvider } from "../../form";
 import { MethodDetails } from "./MethodDetails";
+import { useGetSchema } from "../../../hooks/useGetSchema";
 
 interface IContractMethodsProps {
   contractId: string;
-  schema: any;
 }
 
 interface IResult {
@@ -41,14 +41,15 @@ function getInitialResults(methods: Array<string>): Record<string, IResult> {
 
 export const ContractMethods: React.FC<IContractMethodsProps> = ({
   contractId,
-  schema,
 }) => {
-  const methods = getMethodsFromSchema(schema);
+  const { data: schema, isLoading } = useGetSchema(contractId);
+
+  const methods = schema && getMethodsFromSchema(JSON.parse(schema));
+
   const { projectId } = useSelectedProject();
   const { viewMethod } = useWalletSelector();
-  const [results, setResults] = useState<Record<string, any>>(() => {
-    return getInitialResults(methods.map(({ method }) => method));
-  });
+
+  const [results, setResults] = useState<Record<string, any>>();
 
   const setResult = useCallback(
     (method: string, value: any) => {
@@ -59,6 +60,12 @@ export const ContractMethods: React.FC<IContractMethodsProps> = ({
     },
     [setResults]
   );
+
+  React.useEffect(() => {
+    if (methods && !results) {
+      setResults(getInitialResults(methods.map(({ method }) => method)));
+    }
+  }, [methods, results, setResults]);
 
   const columns: Array<DataTableColumn<any>> = [
     {
@@ -119,7 +126,7 @@ export const ContractMethods: React.FC<IContractMethodsProps> = ({
               contractId,
               type: "Transaction",
               method,
-              args,
+              args: args || {},
               gas: options.gas || THIRTY_TGAS,
               deposit: options.attachedDeposit || "0",
               project_id: projectId as string,
@@ -142,41 +149,45 @@ export const ContractMethods: React.FC<IContractMethodsProps> = ({
   };
 
   return (
-    <FormThemeProvider>
-      <DataTable
-        highlightOnHover
-        sx={{ thead: { display: "none" } }}
-        records={methods}
-        columns={columns}
-        idAccessor="key"
-        rowExpansion={{
-          allowMultiple: true,
-          content: ({ record }) => {
-            const { type, method, schema } = record;
-            const { data, error, isLoading } = results[record.method];
+    <Stack>
+      <Title order={4}>Methods</Title>
+      <FormThemeProvider>
+        <DataTable
+          highlightOnHover
+          sx={{ thead: { display: "none" } }}
+          records={methods || []}
+          fetching={isLoading}
+          columns={columns}
+          idAccessor="key"
+          rowExpansion={{
+            allowMultiple: true,
+            content: ({ record }) => {
+              const { type, method, schema } = record;
+              const { data, error, isLoading } = results?.[record.method];
 
-            const handleReset = () => {
-              setResult(method, { isLoading: false });
-            };
+              const handleReset = () => {
+                setResult(method, { isLoading: false });
+              };
 
-            return (
-              <Paper p="md">
-                <Stack>
-                  <MethodDetails
-                    type={type}
-                    schema={schema}
-                    data={data}
-                    error={error}
-                    isLoading={isLoading}
-                    onReset={handleReset}
-                    onSubmit={handleSubmit(method, type)}
-                  />
-                </Stack>
-              </Paper>
-            );
-          },
-        }}
-      />
-    </FormThemeProvider>
+              return (
+                <Paper p="md">
+                  <Stack>
+                    <MethodDetails
+                      type={type}
+                      schema={schema}
+                      data={data}
+                      error={error}
+                      isLoading={isLoading}
+                      onReset={handleReset}
+                      onSubmit={handleSubmit(method, type)}
+                    />
+                  </Stack>
+                </Paper>
+              );
+            },
+          }}
+        />
+      </FormThemeProvider>
+    </Stack>
   );
 };
