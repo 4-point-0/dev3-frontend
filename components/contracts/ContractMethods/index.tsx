@@ -154,6 +154,8 @@ export const ContractMethods: React.FC<IContractMethodsProps> = ({
       <FormThemeProvider>
         <DataTable
           highlightOnHover
+          striped
+          withBorder
           sx={{ thead: { display: "none" } }}
           records={methods || []}
           fetching={isLoading}

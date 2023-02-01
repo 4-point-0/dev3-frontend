@@ -1,4 +1,4 @@
-import { ActionIcon, Badge, Button, Group, Text, Tooltip } from "@mantine/core";
+import { ActionIcon, Badge, Group, Text, Tooltip } from "@mantine/core";
 import { DataTable, DataTableColumn } from "mantine-datatable";
 import React, { useState } from "react";
 import { ExternalLink, Share } from "tabler-icons-react";
@@ -7,6 +7,7 @@ import { useSelectedProject } from "../../../context/SelectedProjectContext";
 import { usePaginationProps } from "../../../hooks/usePaginationProps";
 import { useDeployedContractControllerFindAll } from "../../../services/api/dev3Components";
 import { DeployedContract } from "../../../services/api/dev3Schemas";
+import { getNearBlockTxnUrl } from "../../../utils/near";
 import showShareModal from "../../ShareModal";
 import { CopyCell } from "../../table/CopyCell";
 
@@ -19,7 +20,6 @@ export const DeployRequests = () => {
   const { data, isLoading } = useDeployedContractControllerFindAll({
     queryParams: {
       project_id: projectId,
-      status: "Pending",
       offset: (page - 1) * PAGE_LIMIT,
       limit: PAGE_LIMIT,
     },
@@ -45,6 +45,7 @@ export const DeployRequests = () => {
         return <Text>{contract_template?.name}</Text>;
       },
     },
+
     {
       accessor: "createdAt",
       title: "Created At",
@@ -58,9 +59,23 @@ export const DeployRequests = () => {
       },
     },
     {
+      accessor: "status",
+      render: ({ status }) => {
+        return (
+          <Badge color={status === "Deployed" ? "blue" : "yellow"}>
+            {status}
+          </Badge>
+        );
+      },
+    },
+    {
       accessor: "actions",
-      render: ({ uuid }) => {
-        const url = `${window.location.origin}/action/deployment/${uuid}`;
+      render: ({ uuid, status, txHash }) => {
+        const deployed = status === "Deployed";
+        const url =
+          deployed && txHash
+            ? getNearBlockTxnUrl(txHash)
+            : `${window.location.origin}/action/deployment/${uuid}`;
 
         const handleShare = (url: string) => {
           return () => {
@@ -87,16 +102,18 @@ export const DeployRequests = () => {
                   <ExternalLink size={16} />
                 </ActionIcon>
               </Tooltip>
-              <Tooltip position="bottom" label="Share" withArrow>
-                <ActionIcon
-                  radius="xl"
-                  variant="light"
-                  color="blue"
-                  onClick={handleShare(url)}
-                >
-                  <Share size={16} />
-                </ActionIcon>
-              </Tooltip>
+              {!deployed && (
+                <Tooltip position="bottom" label="Share" withArrow>
+                  <ActionIcon
+                    radius="xl"
+                    variant="light"
+                    color="blue"
+                    onClick={handleShare(url)}
+                  >
+                    <Share size={16} />
+                  </ActionIcon>
+                </Tooltip>
+              )}
             </Group>
           </CopyCell>
         );

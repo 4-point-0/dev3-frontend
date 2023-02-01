@@ -2,7 +2,10 @@ import { ActionIcon, Group, Tooltip } from "@mantine/core";
 import React from "react";
 import { ExternalLink } from "tabler-icons-react";
 
-import { getContractIdFromAlias, getNearBlocksUrl } from "../../../utils/near";
+import {
+  getContractIdFromAlias,
+  getNearBlocksContractUrl,
+} from "../../../utils/near";
 import { CopyCell } from "../CopyCell";
 
 interface IAddressCellProps {
@@ -18,7 +21,7 @@ export const AddressCell: React.FC<IAddressCellProps> = ({ alias }) => {
       <Tooltip position="bottom" label="Open" withArrow>
         <ActionIcon
           component="a"
-          href={getNearBlocksUrl(contractId)}
+          href={getNearBlocksContractUrl(contractId)}
           target="_blank"
           rel="noopener noreferrer"
           radius="xl"

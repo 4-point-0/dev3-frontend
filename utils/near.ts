@@ -50,8 +50,11 @@ export function getContractIdFromAlias(alias: string) {
   return `${alias}.${DEV3_CONTRACT_ID}`;
 }
 
-export function getNearBlocksUrl(contractId: string, testnet = true) {
+export function getNearBlocksContractUrl(contractId: string, testnet = true) {
   return `https://${
     testnet ? "testnet." : ""
   }nearblocks.io/address/${contractId}`;
+}
+export function getNearBlockTxnUrl(txHash: string, testnet = true) {
+  return `https://${testnet ? "testnet." : ""}nearblocks.io/txns/${txHash}`;
 }
