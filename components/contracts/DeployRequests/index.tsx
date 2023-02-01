@@ -62,7 +62,7 @@ export const DeployRequests = () => {
       accessor: "status",
       render: ({ status }) => {
         return (
-          <Badge color={status === "Deployed" ? "green" : "blue"}>
+          <Badge size="lg" color={status === "Deployed" ? "green" : "yellow"}>
             {status}
           </Badge>
         );

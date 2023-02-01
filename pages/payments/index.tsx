@@ -7,6 +7,7 @@ import { ExternalLink, Plus, Share } from "tabler-icons-react";
 import { PageContainer } from "../../components/layout/PageContainer";
 import showShareModal from "../../components/ShareModal";
 import { CopyCell } from "../../components/table/CopyCell";
+import { TransactionStatus } from "../../components/transactions/Status";
 import { useSelectedProject } from "../../context/SelectedProjectContext";
 import { usePaginationProps } from "../../hooks/usePaginationProps";
 import { useTransactionRequestControllerFindAll } from "../../services/api/dev3Components";
@@ -86,10 +87,10 @@ const Payments = () => {
         }
       },
     },
-    // {
-    //   accessor: "status",
-    //   render: ({ status }) => <TransactionStatus status={status} />,
-    // },
+    {
+      accessor: "status",
+      render: ({ status }) => <TransactionStatus status={status} />,
+    },
     {
       accessor: "actions",
       render: ({ uuid }) => {
