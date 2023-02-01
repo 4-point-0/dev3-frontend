@@ -53,7 +53,7 @@ export const ContractDetails = () => {
                 Tags:
               </Text>
               <td>
-                <Group>
+                <Group spacing={4}>
                   {data?.contract_template?.tags.map((tag) => (
                     <Badge key={tag}>{tag}</Badge>
                   ))}

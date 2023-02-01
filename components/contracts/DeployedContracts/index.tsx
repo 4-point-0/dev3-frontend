@@ -42,7 +42,7 @@ export const DeployedContracts = () => {
       accessor: "tags",
       render: ({ tags }) => {
         return (
-          <Group>
+          <Group spacing={4}>
             {tags.map((tag) => (
               <Badge key={tag}>{tag}</Badge>
             ))}

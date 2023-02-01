@@ -13,17 +13,20 @@ import {
   Title,
 } from "@mantine/core";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AlertCircle, Check, Code as CodeIcon } from "tabler-icons-react";
 
 import { useUserContext } from "../../../context/UserContext";
 import { useWalletSelector } from "../../../context/WalletSelectorContext";
-import { useTransactionRequestControllerFindByUuid } from "../../../services/api/dev3Components";
+import {
+  useTransactionRequestControllerFindByUuid,
+  useTransactionRequestControllerUpdate,
+} from "../../../services/api/dev3Components";
 import { notifications } from "../../../utils/notifications";
 import { ProjectTransactionContainer } from "../../../components/action/ProjectTransactionContainer";
 
 const TransactionRequestDetail = () => {
-  const { callMethod } = useWalletSelector();
+  const { callMethod, selector } = useWalletSelector();
   const router = useRouter();
   const { errorCode, errorMessage, transactionHashes, uuid } = router.query;
 
@@ -39,7 +42,6 @@ const TransactionRequestDetail = () => {
       uuid: uuid as string,
     },
   });
-  console.log(transactionRequestData);
 
   const parsedArgs = useMemo(() => {
     if (!transactionRequestData?.args) {
@@ -63,6 +65,27 @@ const TransactionRequestDetail = () => {
 
     return args;
   }, [transactionRequestData?.args, transactionRequestData?.uuid]);
+
+  const updateTransactionRequest = useTransactionRequestControllerUpdate();
+
+  useEffect(() => {
+    if (!(transactionHashes && updateTransactionRequest.isIdle)) {
+      return;
+    }
+
+    const state = selector.store.getState();
+    const accountId = state.accounts?.[0]?.accountId;
+
+    updateTransactionRequest.mutate({
+      body: {
+        caller_address: accountId,
+        txHash: transactionHashes as string,
+      },
+      pathParams: {
+        uuid: uuid as string,
+      },
+    });
+  }, [transactionHashes, updateTransactionRequest]);
 
   const handleButtonClick = async () => {
     if (userContext.user === null) {

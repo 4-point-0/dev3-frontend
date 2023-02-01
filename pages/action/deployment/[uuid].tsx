@@ -1,8 +1,10 @@
 import {
+  Alert,
   Box,
   Button,
   Card,
   Center,
+  Container,
   Group,
   Loader,
   Skeleton,
@@ -11,31 +13,33 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
-import { useQuery } from "@tanstack/react-query";
+import { Query, useMutation, useQuery } from "@tanstack/react-query";
 import { BN } from "bn.js";
 import {
   formatNearAmount,
   parseNearAmount,
 } from "near-api-js/lib/utils/format";
 import { useRouter } from "next/router";
-import { useMemo, useState } from "react";
-import { ThreeDCubeSphere } from "tabler-icons-react";
+import { useEffect, useMemo, useState } from "react";
+import { AlertCircle, Check, ThreeDCubeSphere } from "tabler-icons-react";
 
 import { ProjectTransactionContainer } from "../../../components/action/ProjectTransactionContainer";
 import { useUserContext } from "../../../context/UserContext";
 import { useWalletSelector } from "../../../context/WalletSelectorContext";
-import { useDeployedContractControllerFindByUuidPublic } from "../../../services/api/dev3Components";
+import {
+  useDeployedContractControllerFindByUuidPublic,
+  useDeployedContractControllerUpdate,
+} from "../../../services/api/dev3Components";
 import { THIRTY_TGAS } from "../../../utils/near";
+import { notifications } from "../../../utils/notifications";
 
 const DEV3_CONTRACT = "dev3_contracts.testnet";
 
-// TODO: patch the request with information
-// transactionHashes=5nqBUXHzcMEx1MoPbUGiEXuQEeTVYXjjuKAE9SeNjmhd
-
 const Deployment = () => {
   const router = useRouter();
+  const { errorCode, errorMessage, transactionHashes, uuid } = router.query;
   const userContext = useUserContext();
-  const { viewMethod, callMethod } = useWalletSelector();
+  const { viewMethod, callMethod, selector } = useWalletSelector();
 
   const [isDeploying] = useState<boolean>(false);
 
@@ -69,14 +73,45 @@ const Deployment = () => {
     return new BN(fixed as string).add(new BN(deploymentPrice)).toString();
   }, [deploymentPrice]);
 
+  const updateDeployedContract = useDeployedContractControllerUpdate();
+
+  useEffect(() => {
+    if (!(transactionHashes && updateDeployedContract.isIdle)) {
+      return;
+    }
+
+    const state = selector.store.getState();
+    const accountId = state.accounts?.[0]?.accountId;
+
+    updateDeployedContract.mutate({
+      body: {
+        deployer_address: accountId,
+        txHash: transactionHashes as string,
+      },
+      pathParams: {
+        uuid: uuid as string,
+      },
+    });
+  }, [transactionHashes, updateDeployedContract]);
+
   const handleDeployButtonClick = async () => {
-    await callMethod(
-      DEV3_CONTRACT,
-      "create_factory_subaccount_and_deploy",
-      data?.args,
-      deposit,
-      THIRTY_TGAS
-    );
+    notifications.create({
+      title: "Deploying the contract",
+    });
+
+    try {
+      await callMethod(
+        DEV3_CONTRACT,
+        "create_factory_subaccount_and_deploy",
+        data?.args,
+        deposit,
+        THIRTY_TGAS
+      );
+    } catch {
+      notifications.error({
+        title: "Failed to deploy!",
+      });
+    }
   };
 
   if (isLoading) {
@@ -84,6 +119,16 @@ const Deployment = () => {
       <Center>
         <Loader />
       </Center>
+    );
+  }
+
+  if (transactionHashes) {
+    return (
+      <Container size="xs">
+        <Alert icon={<Check size={16} />} title="Success">
+          Transaction has been successfully signed.
+        </Alert>
+      </Container>
     );
   }
 
@@ -122,6 +167,28 @@ const Deployment = () => {
             ? "You need to connect a wallet"
             : "Deploy"}
         </Button>
+
+        {errorCode && errorCode === "userRejected" && (
+          <Alert
+            mb={40}
+            icon={<AlertCircle size={16} />}
+            title="Transaction rejected by user"
+            color="red"
+          >
+            You rejected the transaction.
+          </Alert>
+        )}
+
+        {errorCode && errorCode !== "userRejected" && errorMessage && (
+          <Alert
+            mb={40}
+            icon={<AlertCircle size={16} />}
+            title="Something went wrong"
+            color="red"
+          >
+            Please try again.
+          </Alert>
+        )}
       </Stack>
     </ProjectTransactionContainer>
   );
