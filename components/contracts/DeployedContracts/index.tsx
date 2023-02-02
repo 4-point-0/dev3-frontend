@@ -87,6 +87,9 @@ export const DeployedContracts = () => {
   const columns: Array<DataTableColumn<DeployedContract>> = [
     {
       accessor: "alias",
+      render: ({ alias }) => {
+        return <Text fw="700">{alias}</Text>;
+      },
     },
     {
       accessor: "tags",

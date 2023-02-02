@@ -6,7 +6,7 @@ import {
   StrictRJSFSchema,
   SubmitButtonProps,
 } from "@rjsf/utils";
-import { Button } from "@mantine/core";
+import { Box, Button, Group } from "@mantine/core";
 
 export default function SubmitButton<
   T = any,
@@ -22,13 +22,10 @@ export default function SubmitButton<
     return null;
   }
   return (
-    <div>
-      <br />
-      <div className="ms-Grid-col ms-sm12">
-        <Button type="submit" {...submitButtonProps}>
-          {submitText}
-        </Button>
-      </div>
-    </div>
+    <Group pt="md" position="right">
+      <Button type="submit" {...submitButtonProps}>
+        {submitText}
+      </Button>
+    </Group>
   );
 }

@@ -11,6 +11,7 @@ import {
 import { Input } from "@mantine/core";
 
 import { AddressSpotlight } from "../payments/AddressSpotlight";
+import { camelCaseToTitleCase } from "../../utils/text";
 
 const ADDRESS_PATERN =
   "^(([a-z\\d]+[-_])*[a-z\\d]+\\.)*([a-z\\d]+[-_])*[a-z\\d]+$";
@@ -60,10 +61,15 @@ export default function BaseInputTemplate<
     onChange(value);
   };
 
+  const formattedLabel = React.useMemo(() => {
+    const text = label || schema.title;
+    return camelCaseToTitleCase(text);
+  }, [label, schema.title]);
+
   return (
     <Input.Wrapper
       mb={1}
-      label={displayLabel ? label || schema.title : undefined}
+      label={displayLabel ? formattedLabel : undefined}
       description={schema.description}
     >
       <Input

@@ -18,9 +18,9 @@ import { useWalletSelector } from "../../../context/WalletSelectorContext";
 import { fetchTransactionRequestControllerCreate } from "../../../services/api/dev3Components";
 import { useSelectedProject } from "../../../context/SelectedProjectContext";
 import { THIRTY_TGAS } from "../../../utils/near";
-import { FormThemeProvider } from "../../form";
 import { MethodDetails } from "./MethodDetails";
 import { useGetSchema } from "../../../hooks/useGetSchema";
+import { camelCaseToTitleCase } from "../../../utils/text";
 
 interface IContractMethodsProps {
   contractId: string;
@@ -74,7 +74,7 @@ export const ContractMethods: React.FC<IContractMethodsProps> = ({
         return (
           <CopyCell value={method}>
             <Group>
-              <Title order={5}>{key}</Title>
+              <Title order={5}>{camelCaseToTitleCase(key)}</Title>
               <Text c="dimmed">({method})</Text>
             </Group>
           </CopyCell>
@@ -151,45 +151,43 @@ export const ContractMethods: React.FC<IContractMethodsProps> = ({
   return (
     <Stack>
       <Title order={4}>Methods</Title>
-      <FormThemeProvider>
-        <DataTable
-          highlightOnHover
-          striped
-          withBorder
-          sx={{ thead: { display: "none" } }}
-          records={methods || []}
-          fetching={isLoading}
-          columns={columns}
-          idAccessor="key"
-          rowExpansion={{
-            allowMultiple: true,
-            content: ({ record }) => {
-              const { type, method, schema } = record;
-              const { data, error, isLoading } = results?.[record.method];
+      <DataTable
+        highlightOnHover
+        striped
+        withBorder
+        sx={{ thead: { display: "none" } }}
+        records={methods || []}
+        fetching={isLoading}
+        columns={columns}
+        idAccessor="key"
+        rowExpansion={{
+          allowMultiple: false,
+          content: ({ record }) => {
+            const { type, method, schema } = record;
+            const { data, error, isLoading } = results?.[record.method];
 
-              const handleReset = () => {
-                setResult(method, { isLoading: false });
-              };
+            const handleReset = () => {
+              setResult(method, { isLoading: false });
+            };
 
-              return (
-                <Paper p="md">
-                  <Stack>
-                    <MethodDetails
-                      type={type}
-                      schema={schema}
-                      data={data}
-                      error={error}
-                      isLoading={isLoading}
-                      onReset={handleReset}
-                      onSubmit={handleSubmit(method, type)}
-                    />
-                  </Stack>
-                </Paper>
-              );
-            },
-          }}
-        />
-      </FormThemeProvider>
+            return (
+              <Paper p="md">
+                <Stack>
+                  <MethodDetails
+                    type={type}
+                    schema={schema}
+                    data={data}
+                    error={error}
+                    isLoading={isLoading}
+                    onReset={handleReset}
+                    onSubmit={handleSubmit(method, type)}
+                  />
+                </Stack>
+              </Paper>
+            );
+          },
+        }}
+      />
     </Stack>
   );
 };

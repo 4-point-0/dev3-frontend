@@ -88,6 +88,9 @@ const AddressBook = () => {
   const columns: Array<DataTableColumn<Address>> = [
     {
       accessor: "alias",
+      render: ({ alias }) => {
+        return <Text fw={700}>{alias}</Text>;
+      },
     },
     {
       accessor: "wallet",

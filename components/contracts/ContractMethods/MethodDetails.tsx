@@ -82,7 +82,7 @@ export const MethodDetails: React.FC<IMethodDetailsProps> = ({
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Execute transaction now
+                    Open transaction request
                   </Button>
                   <CopyActionButton value={transactionUrl} />
                 </>
