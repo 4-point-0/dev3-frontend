@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useMemo } from "react";
 import { Plus, Selector } from "tabler-icons-react";
 
 import { useSelectedProject } from "../../context/SelectedProjectContext";
@@ -19,15 +20,28 @@ import { Project } from "../../services/api/dev3Schemas";
 import { getLogoPlaceholder, getLogoUrl } from "../../utils/logo";
 
 const ProjectSelector = () => {
-  const { isLoading, error, data } = useProjectControllerFindAll({
-    queryParams: { limit: 100 },
-  });
-  const router = useRouter();
-  const { setProject, project: selectedProject } = useSelectedProject();
+  const { setProjectId, projectId } = useSelectedProject();
+
+  const { isLoading, error, data } = useProjectControllerFindAll(
+    {
+      queryParams: { limit: 100 },
+    },
+    {
+      onSuccess: (data) => {
+        if (!projectId && data.results.length) {
+          handleSelect(data.results[0]);
+        }
+      },
+    }
+  );
+
+  const selectedProject = useMemo(() => {
+    return data?.results.find((project) => (project as any)._id === projectId);
+  }, [projectId, data?.results]);
 
   const handleSelect = (project: Project) => {
     return () => {
-      setProject(project);
+      setProjectId((project as any)._id);
     };
   };
 

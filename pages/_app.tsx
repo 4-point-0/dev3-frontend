@@ -47,8 +47,8 @@ export default function App(props: AppProps) {
 
       <QueryClientProvider client={queryClient}>
         <UserContextProvider>
-          <SelectedProjectProvider>
-            <WalletSelectorContextProvider>
+          <WalletSelectorContextProvider>
+            <SelectedProjectProvider>
               <AccountProvider>
                 <ColorSchemeProvider
                   colorScheme={colorScheme}
@@ -71,8 +71,8 @@ export default function App(props: AppProps) {
                   </MantineProvider>
                 </ColorSchemeProvider>
               </AccountProvider>
-            </WalletSelectorContextProvider>
-          </SelectedProjectProvider>
+            </SelectedProjectProvider>
+          </WalletSelectorContextProvider>
         </UserContextProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>

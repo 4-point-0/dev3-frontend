@@ -30,7 +30,7 @@ const Home: NextPage = () => {
       enabled: Boolean(user),
     }
   );
-  const { setProject } = useSelectedProject();
+  const { setProjectId } = useSelectedProject();
   const router = useRouter();
 
   const paginationProps = usePaginationProps({
@@ -67,7 +67,7 @@ const Home: NextPage = () => {
       accessor: "actions",
       render: (project) => {
         const handleClick = () => {
-          setProject(project);
+          setProjectId((project as any)._id);
           router.push("/contracts");
         };
 
