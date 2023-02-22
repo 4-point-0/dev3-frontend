@@ -1,12 +1,11 @@
 import { ActionIcon, Button, Group, Text, Tooltip } from "@mantine/core";
 import { openConfirmModal } from "@mantine/modals";
 import { NextLink } from "@mantine/next";
-import { showNotification } from "@mantine/notifications";
 import { DataTable, DataTableColumn } from "mantine-datatable";
 import { useState } from "react";
 import { Edit, Plus, Trash, X } from "tabler-icons-react";
-import { PageContainer } from "../../components/layout/PageContainer";
 
+import { PageContainer } from "../../components/layout/PageContainer";
 import { CopyCell } from "../../components/table/CopyCell";
 import { usePaginationProps } from "../../hooks/usePaginationProps";
 import {
@@ -14,6 +13,7 @@ import {
   useAddressControllerFindAll,
 } from "../../services/api/dev3Components";
 import { Address } from "../../services/api/dev3Schemas";
+import { notifications } from "../../utils/notifications";
 
 const PAGE_LIMIT = 20;
 
@@ -58,23 +58,28 @@ const AddressBook = () => {
       onCancel: () => {},
       onConfirm: async () => {
         try {
+          notifications.create({
+            title: "Removing address",
+          });
+
           await fetchAddressControllerRemove({
             pathParams: {
               id: (address as any)._id,
             },
           });
 
+          notifications.success({
+            title: "Address removed!",
+          });
+
           refetch();
         } catch (error) {
-          showNotification({
-            id: "loading-notification",
-            color: "red",
+          notifications.error({
             title: "Error while deleting the address",
             message:
-              "There was an error adding deleting the address. Please try again later.",
-            icon: <X size={16} />,
-            autoClose: 3000,
+              "There was an error deleting the address. Please try again later.",
           });
+
           console.error(error);
         }
       },
@@ -83,6 +88,9 @@ const AddressBook = () => {
   const columns: Array<DataTableColumn<Address>> = [
     {
       accessor: "alias",
+      render: ({ alias }) => {
+        return <Text fw={700}>{alias}</Text>;
+      },
     },
     {
       accessor: "wallet",
@@ -141,6 +149,7 @@ const AddressBook = () => {
         sx={{ alignSelf: "self-end" }}
         component={NextLink}
         href="/address-book/create"
+        as={`/address-book/create`}
         variant="light"
         leftIcon={<Plus />}
       >

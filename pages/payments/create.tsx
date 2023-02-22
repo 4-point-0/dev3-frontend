@@ -14,9 +14,9 @@ import { useForm } from "@mantine/form";
 import { parseNearAmount } from "near-api-js/lib/utils/format";
 import { useRouter } from "next/router";
 import { useCallback, useState } from "react";
-import { PageContainer } from "../../components/layout/PageContainer";
-import { IconAlertCircle } from "@tabler/icons";
+import { AlertCircle } from "tabler-icons-react";
 
+import { PageContainer } from "../../components/layout/PageContainer";
 import { AddressSpotlight } from "../../components/payments/AddressSpotlight";
 import { useSelectedProject } from "../../context/SelectedProjectContext";
 import { useWalletSelector } from "../../context/WalletSelectorContext";
@@ -24,7 +24,7 @@ import { fetchTransactionRequestControllerCreate } from "../../services/api/dev3
 import {
   FungibleTokenError,
   nearWalletRegex,
-  NEAR_CONTRACT_ID,
+  DEV3_CONTRACT_ID,
   parseFtAmount,
   ReceiverError,
   THIRTY_TGAS,
@@ -43,7 +43,7 @@ interface IPaymentFormValues {
 const CreatePayment = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { project } = useSelectedProject();
+  const { projectId } = useSelectedProject();
   const { viewMethod } = useWalletSelector();
 
   const form = useForm<IPaymentFormValues>({
@@ -133,12 +133,12 @@ const CreatePayment = () => {
 
       await fetchTransactionRequestControllerCreate({
         body: {
-          project_id: (project as any)._id,
+          project_id: projectId as string,
           method,
           is_near_token: !isFungibleToken,
           type: "Payment",
           args,
-          contractId: isFungibleToken ? contractId : NEAR_CONTRACT_ID,
+          contractId: isFungibleToken ? contractId : DEV3_CONTRACT_ID,
           meta: metadata,
           deposit,
           gas: THIRTY_TGAS,
@@ -228,7 +228,7 @@ const CreatePayment = () => {
               {form.values.contractId &&
                 form.isValid("contractId") &&
                 !metadataIsValid && (
-                  <Alert icon={<IconAlertCircle size={16} />} color="red">
+                  <Alert icon={<AlertCircle size={16} />} color="red">
                     {"Can't verify contract is a fungible token."}
                   </Alert>
                 )}

@@ -97,7 +97,11 @@ export default function AppLayout({ children }: React.PropsWithChildren<{}>) {
       }}
       navbarOffsetBreakpoint="sm"
       asideOffsetBreakpoint="sm"
-      navbar={<AppNavbar opened={opened} />}
+      navbar={
+        router.route === "/" || router.route === "/new-project" ? undefined : (
+          <AppNavbar opened={opened} />
+        )
+      }
       footer={<AppFooter />}
       header={<AppHeader theme={theme} opened={opened} setOpened={setOpened} />}
     >

@@ -9,16 +9,16 @@ import {
   ThreeDCubeSphere,
 } from "tabler-icons-react";
 
-const topSectionData = [
+const getTopSectionData = () => [
   {
     icon: <ThreeDCubeSphere size={24} />,
     label: "Contracts",
-    href: "/contracts",
+    href: `/contracts`,
   },
   {
     icon: <ArrowsLeftRight size={24} />,
     label: "Payment Requests",
-    href: "/payments",
+    href: `/payments`,
   },
   {
     icon: <Book size={24} />,
@@ -27,11 +27,11 @@ const topSectionData = [
   },
 ];
 
-const bottomSectionData = [
+const getBottomSectionData = () => [
   {
     icon: <Settings size={24} />,
     label: "Settings",
-    href: "/settings",
+    href: `/settings`,
   },
 ];
 
@@ -39,15 +39,16 @@ export interface MainLinkProps {
   icon: React.ReactNode;
   label: string;
   href: string;
+  as?: string;
   disabled: boolean;
 }
 
-export function AppLink({ icon, label, href, disabled }: MainLinkProps) {
+export function AppLink({ icon, label, href, disabled, as }: MainLinkProps) {
   const router = useRouter();
 
   return (
     <Box mb={8}>
-      <Link href={href} passHref>
+      <Link href={href} as={as} passHref>
         <NavLink
           disabled={disabled}
           label={label}
@@ -55,7 +56,7 @@ export function AppLink({ icon, label, href, disabled }: MainLinkProps) {
             // padding: theme.spacing.xs,
             borderRadius: theme.radius.sm,
           })}
-          active={router.pathname === href}
+          active={router.pathname.startsWith(href)}
           icon={icon}
         />
       </Link>
@@ -68,14 +69,14 @@ export interface LinksProps {
 }
 
 export function AppLinks({ disabled }: LinksProps) {
-  const links = topSectionData.map((link) => (
+  const links = getTopSectionData().map((link) => (
     <AppLink {...link} key={link.label} disabled={disabled} />
   ));
   return <div>{links}</div>;
 }
 
 export function AppLinksBottom({ disabled }: LinksProps) {
-  const links = bottomSectionData.map((link) => (
+  const links = getBottomSectionData().map((link) => (
     <AppLink {...link} disabled={disabled} key={link.label} />
   ));
   return <div>{links}</div>;

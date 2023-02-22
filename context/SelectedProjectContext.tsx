@@ -1,80 +1,58 @@
+import { useLocalStorage } from "@mantine/hooks";
 import { useRouter } from "next/router";
-import React, { useCallback, useContext, useMemo, useState } from "react";
+import React, { PropsWithChildren, useContext, useMemo } from "react";
 
-import { useProjectControllerFindAll } from "../services/api/dev3Components";
 import { Project } from "../services/api/dev3Schemas";
+import { useWalletSelector } from "./WalletSelectorContext";
 
 interface UseSelectedProject {
-  project: Project | null;
-  projectId: string | null;
-  selectProject: (project: Project) => void;
+  projectId?: string;
+  setProjectId: (projectId: string) => void;
 }
 
 const ProjectContext = React.createContext<UseSelectedProject | null>(null);
 
-export function isSameProject(a: Project | null) {
-  return (b: Project | null) => {
-    return (a as any)?._id === (b as any)?._id;
-  };
+function deserializeJSON(value: string) {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return value;
+  }
 }
 
-export const SelectedProjectProvider = ({ children }: any) => {
-  const router = useRouter();
-  const [project, setProject] = useState<Project | null>(null);
-
-  const projectId = useMemo(() => {
-    if (!project) {
-      return null;
-    }
-
-    return (project as any)._id as string;
-  }, [project]);
-
-  useProjectControllerFindAll(
-    {},
-    {
-      onSuccess: ({ results: projects }) => {
-        if (!projects) {
-          return;
-        }
-
-        if (projects.length === 0) {
-          router.push("/new-project");
-        }
-
-        if (!project) {
-          selectProject(projects[0]);
-        }
-      },
-    }
-  );
-
-  const selectProject = useCallback(
-    (selectedProject: Project) => {
-      setProject((previousProject) => {
-        if (
-          previousProject &&
-          !isSameProject(selectedProject)(previousProject)
-        ) {
-          router.push("/contracts");
-        }
-
-        return selectedProject;
-      });
+export const SelectedProjectProvider: React.FC<PropsWithChildren> = ({
+  children,
+}) => {
+  const { selector } = useWalletSelector();
+  const accountId = selector.store.getState().accounts?.[0]?.accountId;
+  const [projectId, setProjectId] = useLocalStorage({
+    key: `projectId:${accountId}`,
+    getInitialValueInEffect: true,
+    deserialize: (value: string) => {
+      return value ? deserializeJSON(value) : null;
     },
-    [setProject]
-  );
+  });
+  const router = useRouter();
+
+  const value = useMemo(() => {
+    return new Proxy(
+      {
+        projectId,
+        setProjectId,
+      },
+      {
+        get(target, prop, receiver) {
+          if (prop === "projectId" && projectId === null) {
+            router.push("/");
+          }
+          return Reflect.get(target, prop, receiver);
+        },
+      }
+    );
+  }, [projectId, setProjectId]);
 
   return (
-    <ProjectContext.Provider
-      value={{
-        project,
-        selectProject,
-        projectId,
-      }}
-    >
-      {children}
-    </ProjectContext.Provider>
+    <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>
   );
 };
 

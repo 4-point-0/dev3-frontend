@@ -3,7 +3,7 @@ import { formatNearAmount } from "near-api-js/lib/utils/format";
 export const THIRTY_TGAS = "30000000000000" as const;
 export const NO_DEPOSIT = "0";
 
-export const NEAR_CONTRACT_ID = process.env.NEXT_PUBLIC_CONTRACT_ID;
+export const DEV3_CONTRACT_ID = process.env.NEXT_PUBLIC_DEV3_CONTRACT_ID;
 
 export class FungibleTokenError extends Error {}
 
@@ -33,15 +33,30 @@ export function validateFungibleMetadata(metadata?: Record<string, any>) {
 }
 
 export function getInfoFromArgs(args: any, meta?: any) {
-  if (args.request) {
+  const parsedArgs = typeof args === "string" ? JSON.parse(args) : args;
+
+  if (parsedArgs.request) {
     return {
-      amount: formatNearAmount(args.request.amount),
-      receiver_id: args.request.receiver_account_id,
+      amount: formatNearAmount(parsedArgs.request.amount),
+      receiver_id: parsedArgs.request.receiver_account_id,
     };
   }
 
   return {
-    amount: formatFtAmount(args.amount, meta?.decimals),
-    receiver_id: args.receiver_id,
+    amount: formatFtAmount(parsedArgs.amount, meta?.decimals),
+    receiver_id: parsedArgs.receiver_id,
   };
+}
+
+export function getContractIdFromAlias(alias: string) {
+  return `${alias}.${DEV3_CONTRACT_ID}`;
+}
+
+export function getNearBlocksContractUrl(contractId: string, testnet = true) {
+  return `https://${
+    testnet ? "testnet." : ""
+  }nearblocks.io/address/${contractId}`;
+}
+export function getNearBlockTxnUrl(txHash: string, testnet = true) {
+  return `https://${testnet ? "testnet." : ""}nearblocks.io/txns/${txHash}`;
 }

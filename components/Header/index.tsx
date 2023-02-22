@@ -66,7 +66,7 @@ const AppHeader = ({ theme, opened, setOpened }: AdminHeaderProps) => {
               <AccountDetails />
             </Group>
           </MediaQuery>
-
+          {/* 
           {userContext.user && (
             <NovuProvider
               subscriberId={userContext.user.nearWalletAccountId}
@@ -81,7 +81,7 @@ const AppHeader = ({ theme, opened, setOpened }: AdminHeaderProps) => {
                 )}
               </PopoverNotificationCenter>
             </NovuProvider>
-          )}
+          )} */}
 
           <ThemeTogglerButton />
         </Group>

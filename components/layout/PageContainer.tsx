@@ -24,7 +24,7 @@ const ResponsivePaper: React.FC<PaperProps> = (props) => {
 };
 
 interface IPageContainerProps extends PropsWithChildren {
-  title: string;
+  title?: string;
   containerProps?: ContainerProps;
 }
 
@@ -37,7 +37,7 @@ export const PageContainer: React.FC<IPageContainerProps> = ({
     <Container p="0" {...containerProps}>
       <ResponsivePaper withBorder shadow="sm">
         <Stack>
-          <Title order={2}>{title}</Title>
+          {title && <Title order={2}>{title}</Title>}
 
           {children}
         </Stack>
