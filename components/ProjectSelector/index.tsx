@@ -1,67 +1,63 @@
 import {
   Avatar,
+  Box,
   Button,
   Divider,
   Group,
   Menu,
+  Skeleton,
   Text,
   UnstyledButton,
 } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { Plus, Selector } from "tabler-icons-react";
-import { useProjectContext } from "../../context/ProjectContext";
+
+import { useSelectedProject } from "../../context/SelectedProjectContext";
 import { useProjectControllerFindAll } from "../../services/api/dev3Components";
 import { Project } from "../../services/api/dev3Schemas";
+import { getLogoPlaceholder, getLogoUrl } from "../../utils/logo";
 
 const ProjectSelector = () => {
-  const { isLoading, refetch, error, data } = useProjectControllerFindAll({});
-  const { project, setProject, needRefresh, setNeedRefresh } =
-    useProjectContext();
-  const [selectedProject, setSelectedProject] = useState<Project | null>(
-    project
+  const { setProjectId, projectId } = useSelectedProject();
+
+  const { isLoading, error, data } = useProjectControllerFindAll(
+    {
+      queryParams: { limit: 100 },
+    },
+    {
+      onSuccess: (data) => {
+        if (!projectId && data.results.length) {
+          handleSelect(data.results[0]);
+        }
+      },
+    }
   );
-  const router = useRouter();
 
-  useEffect(() => {
-    if (needRefresh) {
-      refetch();
-    }
-  }, [needRefresh, refetch]);
+  const selectedProject = useMemo(() => {
+    return data?.results.find((project) => (project as any)._id === projectId);
+  }, [projectId, data?.results]);
 
-  useEffect(() => {
-    if (data && (data.results?.length ?? 0) > 0) {
-      setNeedRefresh(false);
-      const selectedProjectFromData =
-        data.results?.find(
-          (project) => (project as any)._id === (selectedProject as any)?._id
-        ) ?? project;
-
-      setSelectedProject(selectedProjectFromData ?? data.results![0]);
-      setProject(selectedProjectFromData ?? data.results![0]);
-      router.push("/contracts");
-    } else {
-      router.push("/new-project");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project, data, setProject]);
-
-  if (isLoading) {
-    return <Text>Loading...</Text>;
-  }
+  const handleSelect = (project: Project) => {
+    return () => {
+      setProjectId((project as any)._id);
+    };
+  };
 
   if (error) {
     return <Text>Error: {error.payload}</Text>;
   }
 
-  if (!data || data.results?.length === 0) {
+  if (data?.results?.length === 0) {
     return (
-      <Link href="/new-project" passHref>
-        <Button fullWidth leftIcon={<Plus size={14} />}>
-          Create new project
-        </Button>
-      </Link>
+      <Box p="xs">
+        <Link href="/new-project" passHref>
+          <Button fullWidth leftIcon={<Plus size={14} />}>
+            Create new project
+          </Button>
+        </Link>
+      </Box>
     );
   }
 
@@ -85,23 +81,28 @@ const ProjectSelector = () => {
             },
           })}
         >
-          <Group>
-            <Avatar
-              size="lg"
-              radius="sm"
-              alt="Project logo"
-              src={
-                selectedProject?.logoUrl ?? "https://via.placeholder.com/150"
-              }
-            />
+          <Skeleton visible={isLoading}>
+            <Group>
+              <Avatar
+                size="lg"
+                radius="sm"
+                alt="Project logo"
+                src={selectedProject ? getLogoUrl(selectedProject.logo) : null}
+                color="blue"
+              >
+                {selectedProject
+                  ? getLogoPlaceholder(selectedProject?.name)
+                  : ""}
+              </Avatar>
 
-            <Group position="apart" sx={{ flex: 1 }}>
-              <Text size="sm" color="dimmed">
-                {selectedProject?.name ?? ""}
-              </Text>
-              <Selector size={18} />
+              <Group position="apart" sx={{ flex: 1 }}>
+                <Text size="sm" color="dimmed">
+                  {selectedProject?.name ?? ""}
+                </Text>
+                <Selector size={18} />
+              </Group>
             </Group>
-          </Group>
+          </Skeleton>
         </UnstyledButton>
       </Menu.Target>
       <Menu.Dropdown>
@@ -120,16 +121,15 @@ const ProjectSelector = () => {
                   size="lg"
                   radius="sm"
                   alt={project.name}
-                  src={project.logoUrl}
-                />
+                  src={getLogoUrl(project?.logo)}
+                  color="blue"
+                >
+                  {getLogoPlaceholder(project.name)}
+                </Avatar>
               }
               rightSection={project.slug === selectedProject?.slug ? "✓" : ""}
               key={project.name}
-              onClick={() => {
-                setSelectedProject(project);
-                setProject(project);
-                router.push("/contracts");
-              }}
+              onClick={handleSelect(project)}
             >
               {project.name}
             </Menu.Item>

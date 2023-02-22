@@ -16,7 +16,7 @@ export interface ShareModalProps {
 
 const showShareModal = ({ title, url }: ShareModalProps) => {
   openModal({
-    title: `Share Event - ${title}`,
+    title,
     children: (
       <Group>
         <TelegramShareButton url={url} title={title}>

@@ -1,92 +1,99 @@
-import {
-  Button,
-  Group,
-  Paper,
-  TextInput,
-  useMantineTheme,
-} from "@mantine/core";
+import { Button, Group, Stack, Text, TextInput } from "@mantine/core";
+import { FileWithPath } from "@mantine/dropzone";
 import { useForm } from "@mantine/form";
-import { showNotification, updateNotification } from "@mantine/notifications";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { Check, X } from "tabler-icons-react";
-import { useProjectContext } from "../../context/ProjectContext";
-import { fetchProjectControllerCreate } from "../../services/api/dev3Components";
+
+import { PageContainer } from "../../components/layout/PageContainer";
+import { ProjectImage } from "../../components/settings/ProjectImage";
+import {
+  fetchApiKeyControllerCreate,
+  fetchFileControllerUploadFile,
+  fetchProjectControllerCreate,
+  useProjectControllerFindAll,
+} from "../../services/api/dev3Components";
+import { getDefaultExpires } from "../../utils/api-key";
+import { notifications } from "../../utils/notifications";
 
 const NewProject: NextPage = () => {
-  const theme = useMantineTheme();
-
   const [loading, setLoading] = useState(false);
-
-  const { setNeedRefresh } = useProjectContext();
-
+  const [logoFile, setLogoFile] = useState<FileWithPath | null>(null);
   const router = useRouter();
+
+  const { refetch: refetchProjects } = useProjectControllerFindAll({});
 
   const form = useForm({
     validateInputOnChange: true,
     initialValues: {
       name: "",
       slug: "",
-      logoUrl: "",
     },
     validate: {
       name: (value) => (value.length > 0 ? null : "Name is required"),
       slug: (value) => (value.length > 0 ? null : "Slug is required"),
-      logoUrl: (value) => (value.length > 0 ? null : "Logo URL is required"),
     },
   });
+
+  const handleImageUpload = (file: FileWithPath) => {
+    setLogoFile(file);
+  };
 
   const handleSubmit = async ({
     name,
     slug,
-    logoUrl,
   }: {
     name: string;
     slug: string;
-    logoUrl: string;
   }) => {
     try {
       setLoading(true);
 
-      showNotification({
-        id: "loading-notification",
-        loading: true,
+      notifications.create({
         title: "Creating a new project",
         message: "Please wait...",
-        autoClose: false,
-        disallowClose: true,
       });
+
+      let logoId;
+
+      if (logoFile) {
+        const uploadedFile = await fetchFileControllerUploadFile({
+          body: {
+            file: logoFile,
+          },
+        });
+
+        logoId = (uploadedFile as any)._id;
+      }
 
       const project = await fetchProjectControllerCreate({
         body: {
           name,
           slug,
-          logoUrl,
+          logo_id: logoId,
+        } as any,
+      });
+
+      await fetchApiKeyControllerCreate({
+        body: {
+          project_id: (project as any)._id,
+          expires: getDefaultExpires(),
         },
       });
 
-      updateNotification({
-        id: "loading-notification",
-        color: "teal",
+      notifications.success({
         title: "Project created!",
         message:
           "Your project has been created. You can now start adding contracts to it.",
-        icon: <Check size={16} />,
-        autoClose: 3000,
       });
 
-      setNeedRefresh(true);
-      router.push(`/contracts`);
+      await refetchProjects();
+      router.push("/");
     } catch (error) {
-      updateNotification({
-        id: "loading-notification",
-        color: "red",
+      notifications.error({
         title: "Error creating project",
         message:
           "There was an error creating your project. Please try again later.",
-        icon: <X size={16} />,
-        autoClose: 3000,
       });
 
       console.log(error);
@@ -96,7 +103,7 @@ const NewProject: NextPage = () => {
   };
 
   return (
-    <Paper p="lg" sx={{ maxWidth: 300 }} mx="auto">
+    <PageContainer title="Create new project">
       <form onSubmit={form.onSubmit((values) => handleSubmit(values))}>
         <TextInput
           disabled={loading}
@@ -115,14 +122,10 @@ const NewProject: NextPage = () => {
           {...form.getInputProps("slug")}
         />
 
-        <TextInput
-          disabled={loading}
-          mt="sm"
-          withAsterisk
-          label="Project Logo URL"
-          placeholder="Enter project logo URL"
-          {...form.getInputProps("logoUrl")}
-        />
+        <Stack mt="md" spacing={4}>
+          <Text fz="sm">Logo Image</Text>
+          <ProjectImage onUpload={handleImageUpload} />
+        </Stack>
 
         <Group position="right" mt="md">
           <Button disabled={loading} type="submit">
@@ -130,7 +133,7 @@ const NewProject: NextPage = () => {
           </Button>
         </Group>
       </form>
-    </Paper>
+    </PageContainer>
   );
 };
 

@@ -7,12 +7,14 @@ export type PaginatedDto = {
   total: number;
   limit: number;
   offset: number;
+  count: number;
+  results: any[];
 };
 
 export type CreateProjectDto = {
   name: string;
   slug: string;
-  logoUrl: string;
+  logo_id: string;
 };
 
 export type User = {
@@ -33,6 +35,22 @@ export type User = {
   nearWalletAccountId: string;
 };
 
+export type File = {
+  /**
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * @format date-time
+   */
+  createdAt: string;
+  name: string;
+  mime_type: string;
+  url: string;
+  key: string;
+  owner: User;
+};
+
 export type Project = {
   /**
    * @format date-time
@@ -44,14 +62,21 @@ export type Project = {
   createdAt: string;
   name: string;
   slug: string;
-  logoUrl: string;
+  logo: File;
   owner: User;
+};
+
+export type ProjectDto = {
+  id: string;
+  name: string;
+  slug: string;
+  logo_url: string;
 };
 
 export type UpdateProjectDto = {
   name?: string;
   slug?: string;
-  logoUrl?: string;
+  logo_id?: string;
 };
 
 export type NearLoginRequestDto = {
@@ -63,11 +88,49 @@ export type NearLoginResponseDto = {
   token: string;
 };
 
+export type CreateApiKeyDto = {
+  project_id: string;
+  /**
+   * @format date-time
+   */
+  expires: string;
+};
+
+export type ApiKeyDto = {};
+
+export type RegenerateApiKeyDto = {
+  /**
+   * @format date-time
+   */
+  expires: string;
+};
+
+export type RevokeApiKeyDto = {
+  is_revoked: boolean;
+};
+
+export type ApiKey = {
+  /**
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * @format date-time
+   */
+  createdAt: string;
+  api_key: string;
+  /**
+   * @format date-time
+   */
+  expires: string;
+  owner: User;
+};
+
 export type CreateAddressDto = {
   wallet: string;
   alias: string;
-  email?: string;
-  phone?: string;
+  email?: string | null;
+  phone?: string | null;
 };
 
 export type Address = {
@@ -91,15 +154,14 @@ export type UpdateAddressDto = {
   phone?: string;
 };
 
-export type CreatePaymentDto = {
-  uid: string;
-  memo: string;
-  amount: string;
-  receiver: string;
-  receiver_fungible: string;
+export type CreateDeployedContractDto = {
+  alias: string;
+  contract_template_id: string;
+  args: Record<string, any>;
+  project_id: string;
 };
 
-export type Payment = {
+export type Contract = {
   /**
    * @format date-time
    */
@@ -108,21 +170,162 @@ export type Payment = {
    * @format date-time
    */
   createdAt: string;
-  uid: string;
-  memo: string;
-  amount: string;
-  receiver: string;
-  receiver_fungible: string;
-  status: "pending" | "paid";
-  owner: User;
+  name: string;
+  description: string;
+  is_audited: boolean;
+  tags: string[];
+  creator_name: string;
+  github_url: string;
+  info_markdown_url: string;
 };
 
-export type PaymentDto = {
-  _id: string;
-  uid: string;
-  amount: string;
-  memo: string;
-  receiver: string;
-  receiver_fungible: string;
-  status: "pending" | "paid";
+export type DeployedContract = {
+  /**
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * @format date-time
+   */
+  createdAt: string;
+  uuid: string;
+  alias: string;
+  args: string;
+  tags: string[];
+  status: "Pending" | "Deployed";
+  address?: string;
+  txHash?: string;
+  txDetails?: string;
+  deployer_address?: string;
+  owner: User;
+  project: Project;
+  contract_template?: Contract;
+};
+
+export type DeployedContractDto = {
+  uuid: string;
+  contract_template_name: string;
+  contract_template_description: string;
+  alias: string;
+  tags: string[];
+  status: "Pending" | "Deployed";
+  args: Record<string, any>;
+  deployer_address?: string;
+  txHash: string;
+  txDetails: string;
+  project_name: string;
+  project_logo_url: string;
+  /**
+   * @format date-time
+   */
+  created_at: string;
+  /**
+   * @format date-time
+   */
+  updated_at: string;
+};
+
+export type UpdateDeployedContractDto = {
+  txHash: string;
+  deployer_address: string;
+  txDetails?: Record<string, any>;
+};
+
+export type CreateTransactionRequestDto = {
+  type: "Transaction" | "Payment";
+  contractId?: string;
+  method: string;
+  args?: Record<string, any>;
+  meta?: Record<string, any>;
+  gas?: string;
+  deposit?: string;
+  is_near_token: boolean;
+  project_id: string;
+};
+
+export type TransactionRequest = {
+  /**
+   * @format date-time
+   */
+  updatedAt: string;
+  /**
+   * @format date-time
+   */
+  createdAt: string;
+  uuid: string;
+  type: "Transaction" | "Payment";
+  status: "Pending" | "Success" | "Failure";
+  contractId?: string;
+  method: string;
+  meta: string;
+  args: string;
+  gas?: string;
+  deposit?: string;
+  txHash?: string;
+  txDetails?: string;
+  caller_address?: string;
+  is_near_token?: boolean;
+  owner: User;
+  project: Project;
+};
+
+export type ProjectTransactionRequestDto = {
+  name: string;
+  logo_url?: string;
+};
+
+export type PublicTransactionRequestDto = {
+  uuid: string;
+  type: "Transaction" | "Payment";
+  /**
+   * @format date-time
+   */
+  created_at: string;
+  status: "Pending" | "Success" | "Failure";
+  contractId?: string;
+  method: string;
+  meta?: Record<string, any>;
+  args?: Record<string, any>;
+  gas?: string;
+  deposit?: string;
+  caller_address?: string;
+  txHash: string;
+  txDetails: string;
+  is_near_token: boolean;
+  project: ProjectTransactionRequestDto;
+};
+
+export type UpdateTransactionRequestDto = {
+  txHash: string;
+  caller_address: string;
+  txDetails?: Record<string, any>;
+  type?: "Transaction" | "Payment";
+};
+
+export type TransactionRequestDto = {
+  uuid: string;
+  type: "Transaction" | "Payment";
+  /**
+   * @format date-time
+   */
+  created_at: string;
+  status: "Pending" | "Success" | "Failure";
+  contractId?: string;
+  method: string;
+  args?: Record<string, any>;
+  meta?: Record<string, any>;
+  gas?: string;
+  deposit?: string;
+  caller_address?: string;
+  txHash: string;
+  txDetails: string;
+  is_near_token: boolean;
+  project_id: string;
+};
+
+export type FileUploadDto = {
+  /**
+   * @format binary
+   */
+  file: Blob;
 };

@@ -1,6 +1,9 @@
 import { Dev3Context } from "./dev3Context";
+import fetch from "isomorphic-fetch";
 
-const baseUrl = "https://dev3-backend.herokuapp.com"; // "http://localhost:3001"; // TODO add your baseUrl
+const isServer = typeof window === "undefined";
+
+const baseUrl = isServer ? process.env.API_URL : ``;
 
 export type ErrorWrapper<TError> =
   | TError
@@ -15,6 +18,22 @@ export type Dev3FetcherOptions<TBody, THeaders, TQueryParams, TPathParams> = {
   pathParams?: TPathParams;
   signal?: AbortSignal;
 } & Dev3Context["fetcherOptions"];
+
+function serilazeBody(body: unknown) {
+  if (!body) {
+    return undefined;
+  }
+
+  if (body.hasOwnProperty("file")) {
+    const fd = new FormData();
+
+    fd.append("file", (body as any).file);
+
+    return fd;
+  }
+
+  return JSON.stringify(body);
+}
 
 export async function dev3Fetch<
   TData,
@@ -38,10 +57,12 @@ export async function dev3Fetch<
   TPathParams
 >): Promise<TData> {
   try {
-    const token = localStorage.getItem("token");
+    const token = !isServer ? localStorage?.getItem("token") : undefined;
+    const isFileUpload = body?.hasOwnProperty("file");
 
     let newHeaders = {
-      "Content-Type": "application/json",
+      ...(!isFileUpload && { "Content-Type": "application/json" }),
+
       ...headers,
     };
 
@@ -52,12 +73,12 @@ export async function dev3Fetch<
       (newHeaders as any)["authorization"] = token ? `Bearer ${token}` : "";
     }
 
-    const response = await window.fetch(
+    const response = await fetch(
       `${baseUrl}${resolveUrl(url, queryParams, pathParams)}`,
       {
         signal,
         method: method.toUpperCase(),
-        body: body ? JSON.stringify(body) : undefined,
+        body: serilazeBody(body),
         headers: newHeaders,
       }
     );
