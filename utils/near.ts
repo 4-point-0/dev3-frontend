@@ -33,16 +33,18 @@ export function validateFungibleMetadata(metadata?: Record<string, any>) {
 }
 
 export function getInfoFromArgs(args: any, meta?: any) {
-  if (args.request) {
+  const parsedArgs = typeof args === "string" ? JSON.parse(args) : args;
+
+  if (parsedArgs.request) {
     return {
-      amount: formatNearAmount(args.request.amount),
-      receiver_id: args.request.receiver_account_id,
+      amount: formatNearAmount(parsedArgs.request.amount),
+      receiver_id: parsedArgs.request.receiver_account_id,
     };
   }
 
   return {
-    amount: formatFtAmount(args.amount, meta?.decimals),
-    receiver_id: args.receiver_id,
+    amount: formatFtAmount(parsedArgs.amount, meta?.decimals),
+    receiver_id: parsedArgs.receiver_id,
   };
 }
 
