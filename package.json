@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "api:codegen": "npx openapi-codegen gen dev3",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "env:pull": "vercel env pull .env.local"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",

@@ -20,6 +20,26 @@ Run the development server:
 yarn dev
 ```
 
+## Pull environment variables
+
+Install [Vercal CLI](https://vercel.com/docs/cli) globally:
+
+```bash
+npm i -g vercel
+```
+
+[Link](https://vercel.com/docs/cli/link) the project to Vercel from the root directory:
+
+```bash
+vercel link
+```
+
+Pull environment variables to `.env.local` file.
+
+```bash
+yarn run env:pull
+```
+
 ## API code generator
 
 ```bash
