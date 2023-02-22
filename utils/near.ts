@@ -34,6 +34,7 @@ export function validateFungibleMetadata(metadata?: Record<string, any>) {
 
 export function getInfoFromArgs(args: any, meta?: any) {
   const parsedArgs = typeof args === "string" ? JSON.parse(args) : args;
+  const parsedMeta = typeof meta === "string" ? JSON.parse(meta) : meta;
 
   if (parsedArgs.request) {
     return {
@@ -43,7 +44,7 @@ export function getInfoFromArgs(args: any, meta?: any) {
   }
 
   return {
-    amount: formatFtAmount(parsedArgs.amount, meta?.decimals),
+    amount: formatFtAmount(parsedArgs.amount, parsedMeta?.decimals),
     receiver_id: parsedArgs.receiver_id,
   };
 }
