@@ -51,7 +51,11 @@ const Payments = () => {
     {
       accessor: "token",
       render: ({ is_near_token, meta }) => {
-        const parsedMeta = JSON.parse(meta || "null");
+        let parsedMeta = JSON.parse(meta || "null");
+
+        if (typeof parsedMeta === "string") {
+          parsedMeta = JSON.parse(parsedMeta);
+        }
 
         return (
           <Badge>
