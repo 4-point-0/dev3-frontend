@@ -6,13 +6,13 @@ import {
   Tooltip,
   Text,
 } from "@mantine/core";
-import React from "react";
 import { Check, Copy, ExternalLink } from "tabler-icons-react";
 import * as nearApi from "near-api-js";
 
 import { useUserContext } from "../../context/UserContext";
 import WalletConnectButton from "../WalletConnectButton";
 import { useAccount } from "../../context/AccountContext";
+import { getNearExplorerAccountUrl, IS_TESTNET } from "../../utils/near";
 
 export const AccountDetails = () => {
   const userContext = useUserContext();
@@ -51,7 +51,9 @@ export const AccountDetails = () => {
               variant="light"
               component="a"
               target="_blank"
-              href={`https://explorer.testnet.near.org/accounts/${userContext.user?.nearWalletAccountId}`}
+              href={getNearExplorerAccountUrl(
+                userContext.user?.nearWalletAccountId as string
+              )}
             >
               <ExternalLink size={16} />
             </ActionIcon>
@@ -65,21 +67,23 @@ export const AccountDetails = () => {
           <Text color="dimmed">
             {nearApi.utils.format.formatNearAmount(account?.amount ?? "0", 2)} Ⓝ
           </Text>
-          <Tooltip
-            label="Get more NEAR using faucet"
-            withArrow
-            position="bottom"
-          >
-            <ActionIcon
-              radius="xl"
-              variant="light"
-              component="a"
-              target="_blank"
-              href="https://near-faucet.io/"
+          {IS_TESTNET && (
+            <Tooltip
+              label="Get more NEAR using faucet"
+              withArrow
+              position="bottom"
             >
-              <ExternalLink size={16} />
-            </ActionIcon>
-          </Tooltip>
+              <ActionIcon
+                radius="xl"
+                variant="light"
+                component="a"
+                target="_blank"
+                href="https://near-faucet.io/"
+              >
+                <ExternalLink size={16} />
+              </ActionIcon>
+            </Tooltip>
+          )}
         </Group>
       </Paper>
 

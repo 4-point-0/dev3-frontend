@@ -13,7 +13,7 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
-import { Query, useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { BN } from "bn.js";
 import {
   formatNearAmount,
@@ -30,10 +30,8 @@ import {
   useDeployedContractControllerFindByUuidPublic,
   useDeployedContractControllerUpdate,
 } from "../../../services/api/dev3Components";
-import { THIRTY_TGAS } from "../../../utils/near";
+import { DEV3_CONTRACT_ID, THIRTY_TGAS } from "../../../utils/near";
 import { notifications } from "../../../utils/notifications";
-
-const DEV3_CONTRACT = "dev3_contracts.testnet";
 
 const Deployment = () => {
   const router = useRouter();
@@ -57,7 +55,7 @@ const Deployment = () => {
     useQuery({
       queryKey: ["get_contract_deployment_price", contractId],
       queryFn: () => {
-        return viewMethod(DEV3_CONTRACT, "get_contract_deployment_price", {
+        return viewMethod(DEV3_CONTRACT_ID, "get_contract_deployment_price", {
           contract_id: contractId,
         });
       },
@@ -101,7 +99,7 @@ const Deployment = () => {
 
     try {
       await callMethod(
-        DEV3_CONTRACT,
+        DEV3_CONTRACT_ID,
         "create_factory_subaccount_and_deploy",
         data?.args,
         deposit,

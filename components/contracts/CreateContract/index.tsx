@@ -23,6 +23,7 @@ import {
   fetchDeployedContractControllerCreate,
   useContractControllerFindAll,
 } from "../../../services/api/dev3Components";
+import { DEV3_CONTRACT_ID } from "../../../utils/near";
 import { notifications } from "../../../utils/notifications";
 import { ContractForm, IContractFormValues } from "../ContractForm";
 import { ContractInfo } from "../ContractInfo";
@@ -77,7 +78,7 @@ export const CreateContract: React.FC = () => {
 
     const result = await provider.query<CodeResult>({
       request_type: "call_function",
-      account_id: "dev3_contracts.testnet",
+      account_id: DEV3_CONTRACT_ID,
       method_name: "get_contracts",
       args_base64: "",
       finality: "optimistic",
