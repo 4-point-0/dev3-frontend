@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useUserContext } from "../../context/UserContext";
 import { useWalletSelector } from "../../context/WalletSelectorContext";
 import { fetchAuthControllerNearLogin } from "../../services/api/dev3Components";
+import { getConnectionConfig } from "../../utils/near";
 
 const ConnectAccount = () => {
   const { selector, modal, accounts, accountId } = useWalletSelector();
@@ -28,16 +29,7 @@ const ConnectAccount = () => {
 
     const keystore = new keyStores.BrowserLocalStorageKeyStore();
 
-    const connectionConfig: nearApi.ConnectConfig = {
-      networkId: "testnet",
-      keyStore: keystore,
-      nodeUrl: "https://rpc.testnet.near.org",
-      walletUrl: "https://wallet.testnet.near.org",
-      helperUrl: "https://helper.testnet.near.org",
-      headers: {},
-    };
-
-    const near = await connect(connectionConfig);
+    const near = await connect(getConnectionConfig(keystore));
     const enc = new TextEncoder();
 
     const signed = await near.connection.signer.signMessage(

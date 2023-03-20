@@ -21,7 +21,13 @@ import React, {
 } from "react";
 import { distinctUntilChanged, map } from "rxjs";
 
-import { DEV3_CONTRACT_ID, NO_DEPOSIT, THIRTY_TGAS } from "../utils/near";
+import {
+  DEV3_CONTRACT_ID,
+  getConnectionConfig,
+  IS_TESTNET,
+  NO_DEPOSIT,
+  THIRTY_TGAS,
+} from "../utils/near";
 
 declare global {
   interface Window {
@@ -129,24 +135,17 @@ export const WalletSelectorContextProvider = ({ children }: any) => {
   );
 
   const init = useCallback(async () => {
-    const { connect, keyStores, WalletConnection } = nearApi;
-
-    const connectionConfig = {
-      networkId: "testnet",
-      keyStore: new keyStores.BrowserLocalStorageKeyStore(),
-      nodeUrl: "https://rpc.testnet.near.org",
-      walletUrl: "https://wallet.testnet.near.org",
-      helperUrl: "https://helper.testnet.near.org",
-      explorerUrl: "https://explorer.testnet.near.org",
-    };
+    const { connect, keyStores } = nearApi;
 
     // connect to NEAR
-    const nearConnection = await connect(connectionConfig);
+    const nearConnection = await connect(
+      getConnectionConfig(new keyStores.BrowserLocalStorageKeyStore())
+    );
     setNearConnection(nearConnection);
 
     const _selector = await setupWalletSelector({
-      network: "testnet",
-      debug: true,
+      network: IS_TESTNET ? "testnet" : "mainnet",
+      debug: IS_TESTNET,
       modules: [
         ...(await setupDefaultWallets()),
         setupNearWallet(),
