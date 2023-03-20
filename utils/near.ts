@@ -1,9 +1,15 @@
+import { ConnectConfig } from "near-api-js";
+import { KeyStore } from "near-api-js/lib/key_stores";
 import { formatNearAmount } from "near-api-js/lib/utils/format";
 
 export const THIRTY_TGAS = "30000000000000" as const;
 export const NO_DEPOSIT = "0";
 
-export const DEV3_CONTRACT_ID = process.env.NEXT_PUBLIC_DEV3_CONTRACT_ID;
+export const DEV3_CONTRACT_ID = process.env
+  .NEXT_PUBLIC_DEV3_CONTRACT_ID as string;
+
+export const NETWORK_ID = process.env.NEXT_PUBLIC_NETWORK as string;
+export const IS_TESTNET = NETWORK_ID === "testnet";
 
 export class FungibleTokenError extends Error {}
 
@@ -53,11 +59,28 @@ export function getContractIdFromAlias(alias: string) {
   return `${alias}.${DEV3_CONTRACT_ID}`;
 }
 
-export function getNearBlocksContractUrl(contractId: string, testnet = true) {
+export function getNearBlocksContractUrl(contractId: string) {
   return `https://${
-    testnet ? "testnet." : ""
+    IS_TESTNET ? "testnet." : ""
   }nearblocks.io/address/${contractId}`;
 }
-export function getNearBlockTxnUrl(txHash: string, testnet = true) {
-  return `https://${testnet ? "testnet." : ""}nearblocks.io/txns/${txHash}`;
+export function getNearBlockTxnUrl(txHash: string) {
+  return `https://${IS_TESTNET ? "testnet." : ""}nearblocks.io/txns/${txHash}`;
+}
+
+export function getNearExplorerAccountUrl(accountId: string) {
+  return `https://explorer.${
+    IS_TESTNET ? "testnet." : ""
+  }near.org/accounts/${accountId}`;
+}
+
+export function getConnectionConfig(keyStore: KeyStore): ConnectConfig {
+  return {
+    networkId: NETWORK_ID,
+    keyStore,
+    nodeUrl: `https://rpc.${NETWORK_ID}.near.org`,
+    walletUrl: `https://wallet.${NETWORK_ID}.near.org`,
+    helperUrl: `https://helper.${NETWORK_ID}.near.org`,
+    headers: {},
+  };
 }

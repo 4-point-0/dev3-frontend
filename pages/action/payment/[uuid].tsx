@@ -20,7 +20,11 @@ import {
   useTransactionRequestControllerFindByUuid,
   useTransactionRequestControllerUpdate,
 } from "../../../services/api/dev3Components";
-import { getInfoFromArgs, DEV3_CONTRACT_ID } from "../../../utils/near";
+import {
+  getInfoFromArgs,
+  DEV3_CONTRACT_ID,
+  NETWORK_ID,
+} from "../../../utils/near";
 import { notifications } from "../../../utils/notifications";
 import { ProjectTransactionContainer } from "../../../components/action/ProjectTransactionContainer";
 
@@ -180,7 +184,9 @@ const PaymentRequestDetail = () => {
               : transactionRequestData?.meta?.symbol}
           </Badge>
 
-          <Text color="dimmed">on Testnet</Text>
+          <Text color="dimmed">
+            on <span style={{ textTransform: "capitalize" }}>{NETWORK_ID}</span>
+          </Text>
         </Stack>
       </Card>
 
